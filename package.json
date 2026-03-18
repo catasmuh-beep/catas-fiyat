@@ -1,15 +1,14 @@
 {
-  "name": "catas-fiyat-admin",
+  "name": "catas-fiyat-supabase",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.53.0",
+    "@supabase/supabase-js": "^2.56.1",
     "next": "14.2.32",
     "react": "18.3.1",
     "react-dom": "18.3.1"
