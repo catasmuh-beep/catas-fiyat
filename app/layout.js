@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Çataş Fiyat Programı",
-  description: "Vaillant, Demirdöküm, Protherm, ECA, Baykan, şofben, elektrikli kombi ve klima fiyat programı"
+  title: "Çataş Fiyat Listesi",
+  description: "Personel için okunabilir, yönetici için düzenlenebilir fiyat sistemi"
 };
 
 export default function RootLayout({ children }) {
