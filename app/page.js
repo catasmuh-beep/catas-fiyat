@@ -101,49 +101,51 @@ const sorted = (data || []).sort((a, b) => {
     }
     return map;
   }, [filtered]);
-
-  return (
-    <main className="container">
+      return (
+  <div className="price-page">
+    <div className="price-shell">
       <div className="topbar">
         <span className="badge">Personel görünümü</span>
         <a href="/admin" className="button primary">Yönetici Girişi</a>
       </div>
 
-      <div className="card hero">
-        <Image src="/logo.png" alt="Çataş Mühendislik" width={1600} height={700} priority />
-      </div>
+      <div className="top-panel">
+        <div className="top-row">
+          <Image src="/logo.png" alt="Çataş Mühendislik" width={1600} height={700} priority />
+        </div>
 
-      <section className="card panel" style={{ marginTop: 16 }}>
         <div className="stats">
           <div className="stat">Toplam ürün: <strong>{filtered.length}</strong></div>
           <div className="stat">Kategori: <strong>{options.kategori.length}</strong></div>
           <div className="stat">Marka: <strong>{options.marka.length}</strong></div>
         </div>
 
-        <div className="filters">
-          <select value={filters.kategori} onChange={(e) => setFilters((s) => ({ ...s, kategori: e.target.value }))}>
+        <div className="filter-row">
+          <select className="soft-select" value={filters.kategori} onChange={(e) => setFilters((s) => ({ ...s, kategori: e.target.value }))}>
             <option value="">Tüm kategoriler</option>
             {options.kategori.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
 
-          <select value={filters.marka} onChange={(e) => setFilters((s) => ({ ...s, marka: e.target.value }))}>
+          <select className="soft-select" value={filters.marka} onChange={(e) => setFilters((s) => ({ ...s, marka: e.target.value }))}>
             <option value="">Tüm markalar</option>
             {options.marka.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
 
-          <select value={filters.model} onChange={(e) => setFilters((s) => ({ ...s, model: e.target.value }))}>
+          <select className="soft-select" value={filters.model} onChange={(e) => setFilters((s) => ({ ...s, model: e.target.value }))}>
             <option value="">Tüm modeller</option>
             {options.model.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
 
           <input
+            className="soft-input"
             placeholder="Ara: model / güç / marka"
             value={filters.arama}
             onChange={(e) => setFilters((s) => ({ ...s, arama: e.target.value }))}
           />
         </div>
-
-        {loading ? (
+      </div>
+           </div>
+                   {loading ? (
           <div className="empty">Yükleniyor…</div>
         ) : filtered.length === 0 ? (
           <div className="empty">Sonuç bulunamadı.</div>
