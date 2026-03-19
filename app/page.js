@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -25,6 +24,10 @@ export default function HomePage() {
         .from("products")
         .select("*")
         .eq("aktif", true)
+        .order("kategori", { ascending: true })
+        .order("marka", { ascending: true })
+        .order("model", { ascending: true })
+        .order("alt_model", { ascending: true });
         
 
       if (!active) return;
@@ -32,6 +35,7 @@ export default function HomePage() {
         console.error(error);
         setRows([]);
       } else {
+        setRows(data || []);
       const categoryOrder = {
   kombi: 1,
   klima: 2,
@@ -100,205 +104,50 @@ const sorted = (data || []).sort((a, b) => {
       map.get(k).get(b).push(row);
     }
     return map;
-    }, [filtered]);
-    return (
-  <div className="price-page">
-    <div className="price-shell">
-
-      <div className="topbar">
-        <span className="badge">Personel görünümü</span>
-        <a href="/admin" className="button primary">Yönetici Girişi</a>
-      </div>
-
-      <div className="top-panel">
-        <div className="top-row">
-          <Image src="/logo.png" alt="Çataş Mühendislik" width={1600} height={700} priority />
-        </div>
-
-        <div className="stats">
-          <div className="stat">Toplam ürün: <strong>{filtered.length}</strong></div>
-          <div className="stat">Kategori: <strong>{options.kategori.length}</strong></div>
-          <div className="stat">Marka: <strong>{options.marka.length}</strong></div>
-        </div>
-
-        <div className="filter-row">
-          <select className="soft-select" value={filters.kategori} onChange={(e) => setFilters((s) => ({ ...s, kategori: e.target.value }))}>
-            <option value="">Tüm kategoriler</option>
-            {options.kategori.map((v) => <option key={v} value={v}>{v}</option>)}
-          </select>
-
-          <select className="soft-select" value={filters.marka} onChange={(e) => setFilters((s) => ({ ...s, marka: e.target.value }))}>
-            <option value="">Tüm markalar</option>
-            {options.marka.map((v) => <option key={v} value={v}>{v}</option>)}
-          </select>
-
-          <select className="soft-select" value={filters.model} onChange={(e) => setFilters((s) => ({ ...s, model: e.target.value }))}>
-            <option value="">Tüm modeller</option>
-            {options.model.map((v) => <option key={v} value={v}>{v}</option>)}
-          </select>
-
-          <input
-            className="soft-input"
-            placeholder="Ara: model / güç / marka"
-            value={filters.arama}
-            onChange={(e) => setFilters((s) => ({ ...s, arama: e.target.value }))}
-          />
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="empty">Yükleniyor…</div>
-      ) : filtered.length === 0 ? (
-        <div className="empty">Sonuç bulunamadı.</div>
-      ) : (
-        [...grouped.entries()].map(([kategori, brands]) => (
-          <section key={kategori}>
-            <h2 className="section-title">{kategori}</h2>
-
-            {[...brands.entries()].map(([marka, items]) => (
-              <div key={`${kategori}-${marka}`}>
-                <h3 className="brand-title">{marka}</h3>
-
-                <div className="table-wrap">
-                  <div className="cards-wrap">
-
-                    {items.map((item) => (
-                      <div className="product-card" key={item.id}>
-
-                        <div className="product-top-line" />
-
-                        <div className="product-inner">
-
-                          <div className="card-head">
-                            <div>
-                              <div className="brand-pill">{item.marka}</div>
-                              <h3 className="model-title">
-                                {item.model} {item.alt_model || ""}
-                              </h3>
-                            </div>
-                            <button className="settings-btn">Ayar</button>
-                          </div>
-
-                          <div className="price-grid">
-
-                            <div className="price-box">
-                              <div className="price-label orange">Nakit</div>
-                              <div className="price-value">{formatMoney(item.nakit_satis)}</div>
-                            </div>
-
-                            <div className="price-box">
-                              <div className="price-label blue">Kart</div>
-                              <div className="price-value">{formatMoney(item.kart_satis)}</div>
-                            </div>
-
-                            <div className="price-box">
-                              <div className="price-label gray">Net</div>
-                              <div className="price-value">{formatMoney(item.net_bedel)}</div>
-                            </div>
-
-                            <div className="price-box">
-                              <div className="price-label green">Kar</div>
-                              <div className="price-value">
-                                <span
-                                  className={
-                                    (item.net_bedel || 0) - (item.alis_fiyati || 0) >= 0
-                                      ? "kar-pozitif"
-                                      : "kar-negatif"
-                                  }
-                                >
-                                  {formatMoney((item.net_bedel || 0) - (item.alis_fiyati || 0))}
-                                </span>
-                              </div>
-                            </div>
-
-                          </div>
-
-                          <div className="edit-grid">
-
-                            <div className="field-box">
-                              <label>Alış</label>
-                              <input defaultValue={item.alis_fiyati} />
-                            </div>
-
-                            <div className="field-box">
-                              <label>Montaj</label>
-                              <input defaultValue={item.montaj_maliyeti} />
-                            </div>
-
-                            <div className="field-box">
-                              <label>Puan</label>
-                              <input defaultValue={item.puan} />
-                            </div>
-
-                            <div className="field-box">
-                              <label>Fayda</label>
-                              <input defaultValue={item.fayda} />
-                            </div>
-
-                          </div>
-
-                        </div>
-                      </div>
-                    ))}
-
-                  </div>
-                </div>
-              </div>
-            ))}
-
-          </section>
-        ))
-      }
-
-    </div>
-  </div>
-);
   }, [filtered]);
-      return (
-  <div className="price-page">
-    <div className="price-shell">
+
+  return (
+    <main className="container">
       <div className="topbar">
         <span className="badge">Personel görünümü</span>
         <a href="/admin" className="button primary">Yönetici Girişi</a>
       </div>
 
-      <div className="top-panel">
-        <div className="top-row">
-          <Image src="/logo.png" alt="Çataş Mühendislik" width={1600} height={700} priority />
-        </div>
+      <div className="card hero">
+        <Image src="/logo.png" alt="Çataş Mühendislik" width={1600} height={700} priority />
+      </div>
 
+      <section className="card panel" style={{ marginTop: 16 }}>
         <div className="stats">
           <div className="stat">Toplam ürün: <strong>{filtered.length}</strong></div>
           <div className="stat">Kategori: <strong>{options.kategori.length}</strong></div>
           <div className="stat">Marka: <strong>{options.marka.length}</strong></div>
         </div>
 
-        <div className="filter-row">
-          <select className="soft-select" value={filters.kategori} onChange={(e) => setFilters((s) => ({ ...s, kategori: e.target.value }))}>
+        <div className="filters">
+          <select value={filters.kategori} onChange={(e) => setFilters((s) => ({ ...s, kategori: e.target.value }))}>
             <option value="">Tüm kategoriler</option>
             {options.kategori.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
 
-          <select className="soft-select" value={filters.marka} onChange={(e) => setFilters((s) => ({ ...s, marka: e.target.value }))}>
+          <select value={filters.marka} onChange={(e) => setFilters((s) => ({ ...s, marka: e.target.value }))}>
             <option value="">Tüm markalar</option>
             {options.marka.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
 
-          <select className="soft-select" value={filters.model} onChange={(e) => setFilters((s) => ({ ...s, model: e.target.value }))}>
+          <select value={filters.model} onChange={(e) => setFilters((s) => ({ ...s, model: e.target.value }))}>
             <option value="">Tüm modeller</option>
             {options.model.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
 
           <input
-            className="soft-input"
             placeholder="Ara: model / güç / marka"
             value={filters.arama}
             onChange={(e) => setFilters((s) => ({ ...s, arama: e.target.value }))}
           />
         </div>
-      </div>
-           </div>
-                   {loading ? (
+
+        {loading ? (
           <div className="empty">Yükleniyor…</div>
         ) : filtered.length === 0 ? (
           <div className="empty">Sonuç bulunamadı.</div>
@@ -310,84 +159,47 @@ const sorted = (data || []).sort((a, b) => {
                 <div key={`${kategori}-${marka}`}>
                   <h3 className="brand-title">{marka}</h3>
                   <div className="table-wrap">
-                    <div className="cards-wrap">
-  {items.map((item) => (
-    <div className="product-card" key={item.id}>
-      <div className="product-top-line" />
-
-      <div className="product-inner">
-        <div className="card-head">
-          <div>
-            <div className="brand-pill">{item.marka}</div>
-            <h3 className="model-title">
-              {item.model} {item.alt_model || ""}
-            </h3>
-          </div>
-
-          <button className="settings-btn">Ayar</button>
-        </div>
-
-        <div className="price-grid">
-              <div className="price-box">
-  <div className="price-label orange">Nakit</div>
-  <div className="price-value">{formatMoney(item.nakit_satis)}</div>
-</div>
-                   <div className="price-box">
-            <div className="price-label blue">Kart</div>
-            <div className="price-value">{formatMoney(item.kart_satis)}</div>
-          </div>
-
-          <div className="price-box">
-            <div className="price-label gray">Net</div>
-            <div className="price-value">{formatMoney(item.net_bedel)}</div>
-          </div>
- <div className="price-box">
-   <div className="price-label green">Kar</div>
-  <div className="price-value">
-  <span
-    className={
-      (item.net_bedel || 0) - (item.alis_fiyati || 0) >= 0
-        ? "kar-pozitif"
-        : "kar-negatif"
-    }
-  >
-    {formatMoney((item.net_bedel || 0) - (item.alis_fiyati || 0))}
-  </span>
-</div>
-              </div>
- </div>
-          </div>
-          <div className="edit-grid">
-          <div className="field-box">
-            <label>Alış</label>
-            <input defaultValue={item.alis_fiyati} />
-          </div>
-
-          <div className="field-box">
-            <label>Montaj</label>
-            <input defaultValue={item.montaj_maliyeti} />
-          </div>
-
-          <div className="field-box">
-            <label>Puan</label>
-            <input defaultValue={item.puan} />
-          </div>
-
-          <div className="field-box">
-            <label>Fayda</label>
-            <input defaultValue={item.fayda} />
-          </div>
-        </div>
-      </div>
-    </div>
-  ))}
-</div>
-      </div>
-    </div> //
-  ))}
-</section>
-))}
-    </div>
-  </div>
-);
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>Model</th>
+                          <th>Güç / Alt Model</th>
+                          <th>Alış</th>
+                          <th>Puan</th>
+                          <th>Fayda</th>
+                          <th>Kampanya M.</th>
+                          <th>Montaj M.</th>
+                          <th>Net Bedel</th>
+                          <th>Kar</th>
+                          <th>Nakit Satış</th>
+                          <th>Kart Satış %18</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {items.map((r) => (
+                          <tr key={r.id}>
+                            <td>{norm(r.model)}</td>
+                            <td>{norm(r.alt_model)}</td>
+                            <td className="money">{formatMoney(r.alis_fiyati)}</td>
+                            <td>{formatMoney(r.puan)}</td>
+                            <td>{formatMoney(r.fayda)}</td>
+                            <td>{formatMoney(r.kampanya_maliyeti)}</td>
+                            <td>{formatMoney(r.montaj_maliyeti)}</td>
+                            <td className="money">{formatMoney(r.net_bedel)}</td>
+                            <td>{formatMoney(r.kar)}</td>
+                            <td className="money">{formatMoney(r.nakit_satis)}</td>
+                            <td className="money">{formatMoney(r.kart_satis)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
+            </section>
+          ))
+        )}
+      </section>
+    </main>
+  );
 }
