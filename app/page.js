@@ -157,40 +157,81 @@ const sorted = (data || []).sort((a, b) => {
                 <div key={`${kategori}-${marka}`}>
                   <h3 className="brand-title">{marka}</h3>
                   <div className="table-wrap">
-                    <table className="table">
-                      <thead>
-                        <tr>
-                          <th>Model</th>
-                          <th>Güç / Alt Model</th>
-                          <th>Alış</th>
-                          <th>Puan</th>
-                          <th>Fayda</th>
-                          <th>Kampanya M.</th>
-                          <th>Montaj M.</th>
-                          <th>Net Bedel</th>
-                          <th>Kar</th>
-                          <th>Nakit Satış</th>
-                          <th>Kart Satış %18</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {items.map((r) => (
-                          <tr key={r.id}>
-                            <td>{norm(r.model)}</td>
-                            <td>{norm(r.alt_model)}</td>
-                            <td className="money">{formatMoney(r.alis_fiyati)}</td>
-                            <td>{formatMoney(r.puan)}</td>
-                            <td>{formatMoney(r.fayda)}</td>
-                            <td>{formatMoney(r.kampanya_maliyeti)}</td>
-                            <td>{formatMoney(r.montaj_maliyeti)}</td>
-                            <td className="money">{formatMoney(r.net_bedel)}</td>
-                            <td>{formatMoney(r.kar)}</td>
-                            <td className="money">{formatMoney(r.nakit_satis)}</td>
-                            <td className="money">{formatMoney(r.kart_satis)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <div className="cards-wrap">
+  {items.map((item) => (
+    <div className="product-card" key={item.id}>
+      <div className="product-top-line" />
+
+      <div className="product-inner">
+        <div className="card-head">
+          <div>
+            <div className="brand-pill">{item.marka}</div>
+            <h3 className="model-title">
+              {item.model} {item.alt_model || ""}
+            </h3>
+          </div>
+
+          <button className="settings-btn">Ayar</button>
+        </div>
+
+        <div className="price-grid">
+              <div className="price-box">
+  <div className="price-label orange">Nakit</div>
+  <div className="price-value">{formatMoney(item.nakit_satis)}</div>
+</div>
+                   <div className="price-box">
+            <div className="price-label blue">Kart</div>
+            <div className="price-value">{formatMoney(item.kart_satis)}</div>
+          </div>
+
+          <div className="price-box">
+            <div className="price-label gray">Net</div>
+            <div className="price-value">{formatMoney(item.net_bedel)}</div>
+          </div>
+ <div className="price-box">
+   <div className="price-label green">Kar</div>
+  <div className="price-value">
+  <span
+    className={
+      (item.net_bedel || 0) - (item.alis_fiyati || 0) >= 0
+        ? "kar-pozitif"
+        : "kar-negatif"
+    }
+  >
+    {formatMoney((item.net_bedel || 0) - (item.alis_fiyati || 0))}
+  </span>
+</div>
+              </div>
+   </div>
+ </div>
+          </div>
+        </div>
+
+        <div className="edit-grid">
+          <div className="field-box">
+            <label>Alış</label>
+            <input defaultValue={item.alis_fiyati} />
+          </div>
+
+          <div className="field-box">
+            <label>Montaj</label>
+            <input defaultValue={item.montaj_maliyeti} />
+          </div>
+
+          <div className="field-box">
+            <label>Puan</label>
+            <input defaultValue={item.puan} />
+          </div>
+
+          <div className="field-box">
+            <label>Fayda</label>
+            <input defaultValue={item.fayda} />
+          </div>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
                   </div>
                 </div>
               ))}
