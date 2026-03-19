@@ -159,14 +159,20 @@ return aText.localeCompare(bText, "tr");
 
         <div className="top-panel">
           <div className="top-row">
-           <Image
+         <Image
   src="/logo.png"
   alt="Çataş Mühendislik"
   width={900}
   height={394}
   priority
-  style={{ width: "100%", maxWidth: "420px", height: "auto", display: "block" }}
-            />
+  style={{
+    width: "100%",
+    maxWidth: "380px",
+    height: "auto",
+    display: "block",
+    margin: "0 auto",
+  }}
+/>
           </div>
 
           <div className="stats">
