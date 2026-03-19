@@ -36,36 +36,58 @@ export default function HomePage() {
         return;
       }
 
-      const categoryOrder = {
-        kombi: 1,
-        klima: 2,
-        sofben: 3,
-        elektrikli_kombi: 4,
-        "elektrikli kombi": 4,
-      };
+     const categoryOrder = {
+  kombi: 1,
+  klima: 2,
+  sofben: 3,
+  "şofben": 3,
+  elektriklikombi: 4,
+  elektrikli_kombi: 4,
+  "elektrikli kombi": 4,
+};
 
-      const brandOrder = {
-        vaillant: 1,
-        "demirdöküm": 2,
-        demirdokum: 2,
-        protherm: 3,
-      };
+const brandOrder = {
+  vaillant: 1,
+  demirdokum: 2,
+  protherm: 3,
+};
 
-      const sorted = [...(data || [])].sort((a, b) => {
-        const aCat = categoryOrder[(a.kategori || "").toLowerCase()] ?? 999;
-        const bCat = categoryOrder[(b.kategori || "").toLowerCase()] ?? 999;
+const sorted = [...(data || [])].sort((a, b) => {
+  const aCatKey = norm(a.kategori).toLowerCase().replace(/\s+/g, "");
+  const bCatKey = norm(b.kategori).toLowerCase().replace(/\s+/g, "");
 
-        if (aCat !== bCat) return aCat - bCat;
+  const aCat = categoryOrder[aCatKey] ?? 999;
+  const bCat = categoryOrder[bCatKey] ?? 999;
 
-        if ((a.kategori || "").toLowerCase() === "kombi") {
-          const aBrand = brandOrder[(a.marka || "").toLowerCase()] ?? 999;
-          const bBrand = brandOrder[(b.marka || "").toLowerCase()] ?? 999;
+  if (aCat !== bCat) return aCat - bCat;
 
-          if (aBrand !== bBrand) return aBrand - bBrand;
-        }
+  if (aCat === 1) {
+    const aBrandKey = norm(a.marka)
+      .toLowerCase()
+      .replace(/ö/g, "o")
+      .replace(/ü/g, "u")
+      .replace(/ı/g, "i")
+      .replace(/ş/g, "s")
+      .replace(/ç/g, "c")
+      .replace(/\s+/g, "");
 
-        return (a.model || "").localeCompare(b.model || "", "tr");
-      });
+    const bBrandKey = norm(b.marka)
+      .toLowerCase()
+      .replace(/ö/g, "o")
+      .replace(/ü/g, "u")
+      .replace(/ı/g, "i")
+      .replace(/ş/g, "s")
+      .replace(/ç/g, "c")
+      .replace(/\s+/g, "");
+
+    const aBrand = brandOrder[aBrandKey] ?? 999;
+    const bBrand = brandOrder[bBrandKey] ?? 999;
+
+    if (aBrand !== bBrand) return aBrand - bBrand;
+  }
+
+  return norm(a.model).localeCompare(norm(b.model), "tr");
+});
 
       setRows(sorted);
       setLoading(false);
