@@ -202,12 +202,9 @@ const sorted = (data || []).sort((a, b) => {
   </span>
 </div>
               </div>
-   </div>
  </div>
           </div>
-        </div>
-
-        <div className="edit-grid">
+          <div className="edit-grid">
           <div className="field-box">
             <label>Alış</label>
             <input defaultValue={item.alis_fiyati} />
@@ -230,15 +227,15 @@ const sorted = (data || []).sort((a, b) => {
         </div>
       </div>
     </div>
-  ))}
+        ))}
+    </div>
+  </div>
 </div>
-                  </div>
-                </div>
-              ))}
-            </section>
-          ))
-        )}
-      </section>
-    </main>
-  );
+    ))}
+  </section>
+))}
+  </div>
+</div>
+);
+);
 }
