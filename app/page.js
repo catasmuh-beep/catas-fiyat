@@ -232,7 +232,7 @@ const sorted = [...(data || [])].sort((a, b) => {
                   <div className="table-wrap">
                     <div className="cards-wrap">
                       {items.map((item) => {
-                        const kar = (item.net_bedel || 0) - (item.alis_fiyati || 0);
+                        const kar = (item.nakit_satis || 0) - (item.net_bedel || 0);
 
                         return (
                           <div className="product-card" key={item.id}>
