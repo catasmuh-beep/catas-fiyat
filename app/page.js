@@ -123,12 +123,13 @@ export default function HomePage() {
 
         <div className="top-panel">
           <div className="top-row">
-            <Image
-              src="/logo.png"
-              alt="Çataş Mühendislik"
-              width={1600}
-              height={700}
-              priority
+           <Image
+  src="/logo.png"
+  alt="Çataş Mühendislik"
+  width={900}
+  height={394}
+  priority
+  style={{ width: "100%", maxWidth: "420px", height: "auto", display: "block" }}
             />
           </div>
 
