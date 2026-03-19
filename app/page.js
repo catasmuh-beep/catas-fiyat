@@ -25,17 +25,43 @@ export default function HomePage() {
         .from("products")
         .select("*")
         .eq("aktif", true)
-        .order("kategori", { ascending: true })
-        .order("marka", { ascending: true })
-        .order("model", { ascending: true })
-        .order("alt_model", { ascending: true });
+        
 
       if (!active) return;
       if (error) {
         console.error(error);
         setRows([]);
       } else {
-        setRows(data || []);
+      const categoryOrder = {
+  kombi: 1,
+  klima: 2,
+  sofben: 3,
+  elektrikli_kombi: 4,
+  "elektrikli kombi": 4,
+};
+const brandOrder = {
+  vaillant: 1,
+  "demirdöküm": 2,
+  demirdokum: 2,
+  protherm: 3,
+};
+
+const sorted = (data || []).sort((a, b) => {
+  const aCat = categoryOrder[(a.kategori || "").toLowerCase()] ?? 999;
+  const bCat = categoryOrder[(b.kategori || "").toLowerCase()] ?? 999;
+
+  if (aCat !== bCat) return aCat - bCat;
+
+  if ((a.kategori || "").toLowerCase() === "kombi") {
+    const aBrand = brandOrder[(a.marka || "").toLowerCase()] ?? 999;
+    const bBrand = brandOrder[(b.marka || "").toLowerCase()] ?? 999;
+
+    if (aBrand !== bBrand) return aBrand - bBrand;
+  }
+
+  return (a.model || "").localeCompare(b.model || "", "tr");
+});
+        setRows(sorted);
       }
       setLoading(false);
     }
