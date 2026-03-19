@@ -267,7 +267,7 @@ return aText.localeCompare(bText, "tr");
                                   </h3>
                                 </div>
 
-                                <button className="settings-btn">Ayar</button>
+                                <div className="settings-placeholder" />
                               </div>
 
                               <div className="price-grid">
@@ -303,23 +303,48 @@ return aText.localeCompare(bText, "tr");
                               </div>
 
                               <div className="edit-grid">
+                                    <div className="summary-grid">
+  <div className="summary-box">
+    <div className="summary-label">Kampanya</div>
+    <div className="summary-value">{formatMoney(item.kampanya_maliyeti)}</div>
+  </div>
+
+  <div className="summary-box">
+    <div className="summary-label">Net Bedel</div>
+    <div className="summary-value">{formatMoney(item.net_bedel)}</div>
+  </div>
+
+  <div className="summary-box">
+    <div className="summary-label">Nakit Çarpanı</div>
+    <div className="summary-value">
+      {item.nakit_carpani ? item.nakit_carpani : "-"}
+    </div>
+  </div>
+
+  <div className="summary-box">
+    <div className="summary-label">Kart Komisyon</div>
+    <div className="summary-value">
+      {item.kart_komisyonu ? `%${item.kart_komisyonu}` : "-"}
+    </div>
+  </div>
+</div>
                                 <div className="field-box">
                                   <label>Alış</label>
-                                  <input defaultValue={item.alis_fiyati} />
+                                  <input defaultValue={item.alis_fiyati} readOnly className="readonly-input" />
                                 </div>
 
                                 <div className="field-box">
                                   <label>Montaj</label>
-                                  <input defaultValue={item.montaj_maliyeti} />
+                                  <input defaultValue={item.montaj_maliyeti} readOnly className="readonly-input" />
                                 </div>
 
                                 <div className="field-box">
                                   <label>Puan</label>
-                                  <input defaultValue={item.puan} />
+                                  <input defaultValue={item.puan} readOnly className="readonly-input" />
                                 </div>
 
                                 <div className="field-box">
-                                  <label>Fayda</label>
+                                 <input defaultValue={item.fayda} readOnly className="readonly-input" />
                                   <input defaultValue={item.fayda} />
                                 </div>
                               </div>
