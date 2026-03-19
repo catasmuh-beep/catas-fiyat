@@ -86,19 +86,13 @@ const sorted = [...(data || [])].sort((a, b) => {
     if (aBrand !== bBrand) return aBrand - bBrand;
   }
 
- const aText = `${norm(a.model)} ${norm(a.alt_model)}`;
+const aPrice = Number(a.nakit_satis || 0);
+const bPrice = Number(b.nakit_satis || 0);
+
+if (aPrice !== bPrice) return aPrice - bPrice;
+
+const aText = `${norm(a.model)} ${norm(a.alt_model)}`;
 const bText = `${norm(b.model)} ${norm(b.alt_model)}`;
-
-const aNums = aText.match(/\d+/g)?.map(Number) || [];
-const bNums = bText.match(/\d+/g)?.map(Number) || [];
-
-if (aNums.length && bNums.length) {
-  for (let i = 0; i < Math.max(aNums.length, bNums.length); i++) {
-    const av = aNums[i] ?? 0;
-    const bv = bNums[i] ?? 0;
-    if (av !== bv) return av - bv;
-  }
-}
 
 return aText.localeCompare(bText, "tr");
 });
