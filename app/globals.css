@@ -318,3 +318,12 @@ body {
     align-items: flex-start;
   }
 }
+.kar-pozitif {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.kar-negatif {
+  color: #dc2626;
+  font-weight: 600;
+}
