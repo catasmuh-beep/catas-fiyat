@@ -339,8 +339,7 @@ return aText.localeCompare(bText, "tr");
 
                                 <div className="field-box">
                                  <input defaultValue={item.fayda} readOnly className="readonly-input" />
-                                  <input defaultValue={item.fayda} />
-                                </div>
+                                 </div>
                               </div>
                             </div>
                           </div>
