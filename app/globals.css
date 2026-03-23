@@ -1899,3 +1899,149 @@ h2.category-title,
 .admin-table td strong {
   display: block;
 }
+/* ===================================== */
+/* KATEGORI BASLIK RENKLERI */
+/* ===================================== */
+
+.category-title {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 14px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  margin-bottom: 14px;
+  color: white !important;
+}
+
+/* Kombi */
+.category-title.kombi {
+  background: linear-gradient(135deg,#ff9900,#ff7a00);
+}
+
+/* Klima */
+.category-title.klima {
+  background: linear-gradient(135deg,#00917e,#0ea5a4);
+}
+
+/* Şofben */
+.category-title.sofben {
+  background: linear-gradient(135deg,#2563eb,#1d4ed8);
+}
+
+/* Elektrikli kombi */
+.category-title.elk-kombi {
+  background: linear-gradient(135deg,#7c3aed,#5b21b6);
+}
+
+
+/* ===================================== */
+/* MARKA ROZETLERI */
+/* ===================================== */
+
+.brand-badge{
+  display:inline-block;
+  padding:5px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:6px;
+  border:2px solid transparent;
+}
+
+/* Vaillant */
+.brand-badge.vaillant{
+  background:rgba(0,145,126,0.12);
+  color:#00917e;
+  border-color:#00917e;
+}
+
+/* Baymak */
+.brand-badge.baymak{
+  background:rgba(0,146,69,0.12);
+  color:#009245;
+  border-color:#009245;
+}
+
+/* Demirdöküm */
+.brand-badge.demirdokum{
+  background:rgba(0,102,204,0.12);
+  color:#0066cc;
+  border-color:#0066cc;
+}
+
+/* ECA */
+.brand-badge.eca{
+  background:rgba(0,84,166,0.12);
+  color:#0054a6;
+  border-color:#0054a6;
+}
+
+/* Baykan */
+.brand-badge.baykan{
+  background:rgba(255,120,0,0.12);
+  color:#ff7800;
+  border-color:#ff7800;
+}
+
+
+/* ===================================== */
+/* ALIŞ FIYATI VURGUSU */
+/* ===================================== */
+
+.purchase-input{
+  border:2px solid #ff9900 !important;
+  background:linear-gradient(180deg,#fff7ed,#ffffff);
+  font-weight:900;
+  font-style:italic;
+  color:#9a3412;
+  box-shadow:0 3px 10px rgba(255,153,0,0.35);
+  transition:all .2s ease;
+}
+
+.purchase-input:hover{
+  border-color:#f97316;
+  box-shadow:0 4px 14px rgba(249,115,22,0.45);
+}
+
+.purchase-input:focus{
+  outline:none;
+  border:2px solid #ea580c;
+  background:#fff1e6;
+}
+
+
+/* ===================================== */
+/* MOBIL UYUMLULUK DÜZENLEMESI */
+/* ===================================== */
+
+.admin-mobile-brand.brand-badge{
+  margin-bottom:6px;
+}
+
+.admin-table td .brand-badge{
+  margin-bottom:6px;
+}
+
+.admin-table td strong{
+  display:block;
+}
+
+
+/* ===================================== */
+/* MASAÜSTÜ INPUT GÖRÜNÜMÜ */
+/* ===================================== */
+
+.admin-table input[type="number"]{
+  width:100%;
+  padding:6px 8px;
+  border-radius:6px;
+}
+
+
+/* ===================================== */
+/* DIRTY ROW (DEĞİŞEN SATIR) */
+/* ===================================== */
+
+.admin-row-dirty{
+  background:rgba(255,153,0,0.08);
+}
