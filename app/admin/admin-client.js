@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { getServerSupabase } from "../../../lib/supabase";
-
 function norm(value) {
   return String(value ?? "").trim();
 }
