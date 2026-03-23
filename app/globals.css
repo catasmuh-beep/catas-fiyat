@@ -2,11 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* GENEL */
 :root {
   --bg: #f3f0e6;
   --card: #fcfcfc;
-  --soft: #f1f1f1;
+  --soft: #f4f4f4;
   --line: #d8d8d8;
   --text: #171717;
   --muted: #6b7280;
@@ -40,29 +39,32 @@ img {
 }
 
 a {
-  text-decoration: none;
   color: inherit;
+  text-decoration: none;
 }
 
 input,
 select,
-button {
+button,
+textarea {
   font: inherit;
 }
 
-/* SAYFA */
+/* =========================
+   PERSONEL SAYFASI SADECE
+   ========================= */
+
 .price-page {
   width: 100%;
 }
 
-.price-shell {
+.price-page .price-shell {
   width: min(1120px, calc(100% - 28px));
   margin: 0 auto;
   padding: 20px 0 40px;
 }
 
-/* ÜST ALAN */
-.topbar {
+.price-page .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -70,7 +72,7 @@ button {
   margin-bottom: 18px;
 }
 
-.badge {
+.price-page .badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -83,7 +85,7 @@ button {
   font-weight: 800;
 }
 
-.button {
+.price-page .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -95,22 +97,22 @@ button {
   transition: 0.2s ease;
 }
 
-.button.primary {
+.price-page .button.primary {
   background: var(--teal);
   color: #fff;
 }
 
-.top-panel {
+.price-page .top-panel {
   margin-bottom: 26px;
 }
 
-.top-row {
+.price-page .top-row {
   display: flex;
   justify-content: center;
   margin-bottom: 10px;
 }
 
-.stats {
+.price-page .stats {
   display: flex;
   justify-content: center;
   gap: 36px;
@@ -118,23 +120,23 @@ button {
   margin: 6px 0 18px;
 }
 
-.stat {
+.price-page .stat {
   font-size: 16px;
 }
 
-.stat strong {
+.price-page .stat strong {
   font-size: 18px;
 }
 
-.filter-row {
+.price-page .filter-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   align-items: stretch;
 }
 
-.soft-select,
-.soft-input {
+.price-page .soft-select,
+.price-page .soft-input {
   width: 100%;
   min-height: 50px;
   padding: 0 14px;
@@ -146,12 +148,11 @@ button {
   outline: none;
 }
 
-.soft-input::placeholder {
+.price-page .soft-input::placeholder {
   color: #9ca3af;
 }
 
-/* BAŞLIKLAR */
-.section-title {
+.price-page .section-title {
   margin: 30px 0 10px;
   font-size: 42px;
   font-weight: 800;
@@ -159,21 +160,23 @@ button {
   text-transform: capitalize;
 }
 
-.brand-title {
+.price-page .brand-title {
   margin: 10px 0 16px;
   font-size: 28px;
   font-weight: 800;
 }
 
-/* KARTLAR */
-/* İSTEK: mobilde de windowsta da alt alta */
-.cards-wrap {
+.price-page .table-wrap {
+  width: 100%;
+}
+
+.price-page .cards-wrap {
   display: grid;
   grid-template-columns: 1fr;
   gap: 18px;
 }
 
-.product-card {
+.price-page .product-card {
   width: 100%;
   background: var(--card);
   border: 1px solid #e6e6e6;
@@ -182,16 +185,16 @@ button {
   overflow: hidden;
 }
 
-.product-top-line {
+.price-page .product-top-line {
   height: 8px;
   background: var(--teal);
 }
 
-.product-inner {
+.price-page .product-inner {
   padding: 22px;
 }
 
-.card-head {
+.price-page .card-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -199,7 +202,7 @@ button {
   margin-bottom: 18px;
 }
 
-.brand-pill {
+.price-page .brand-pill {
   display: inline-flex;
   align-items: center;
   min-height: 34px;
@@ -212,116 +215,114 @@ button {
   margin-bottom: 10px;
 }
 
-.model-title {
+.price-page .model-title {
   margin: 0;
   font-size: 38px;
   line-height: 1.15;
   font-weight: 800;
 }
 
-.settings-placeholder {
+.price-page .settings-placeholder {
   width: 28px;
   height: 28px;
   flex: 0 0 28px;
 }
 
-/* FİYAT ALANI */
-.price-grid {
+.price-page .price-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 16px;
 }
 
-.price-box {
-  background: #f4f4f4;
+.price-page .price-box {
+  background: var(--soft);
   border-radius: 16px;
   padding: 16px 14px;
   text-align: center;
 }
 
-.price-label {
+.price-page .price-label {
   margin-bottom: 10px;
   font-size: 15px;
   font-weight: 500;
 }
 
-.price-label.orange {
+.price-page .price-label.orange {
   color: var(--orange);
 }
 
-.price-label.blue {
+.price-page .price-label.blue {
   color: var(--blue);
 }
 
-.price-label.gray {
+.price-page .price-label.gray {
   color: #777;
 }
 
-.price-label.green {
+.price-page .price-label.green {
   color: var(--green);
 }
 
-.price-value {
+.price-page .price-value {
   font-size: 26px;
   font-weight: 800;
   line-height: 1.15;
 }
 
-.kar-pozitif {
+.price-page .kar-pozitif {
   color: var(--green);
 }
 
-.kar-negatif {
+.price-page .kar-negatif {
   color: var(--red);
 }
 
-/* ÖZET + ALANLAR */
-.edit-grid {
+.price-page .edit-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
   align-items: start;
 }
 
-.summary-grid {
+.price-page .summary-grid {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
 
-.summary-box {
-  background: #f4f4f4;
+.price-page .summary-box {
+  background: var(--soft);
   border-radius: 16px;
   padding: 16px 14px;
 }
 
-.summary-label {
+.price-page .summary-label {
   margin-bottom: 10px;
   font-size: 15px;
   color: #333;
 }
 
-.summary-value {
+.price-page .summary-value {
   font-size: 22px;
   font-weight: 800;
   line-height: 1.15;
 }
 
-.field-box {
+.price-page .field-box {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.field-box label {
+.price-page .field-box label {
   font-size: 14px;
   font-weight: 700;
   color: #222;
 }
 
-.readonly-input {
+.price-page .readonly-input {
   width: 100%;
   min-height: 60px;
   padding: 0 16px;
@@ -333,25 +334,25 @@ button {
   outline: none;
 }
 
-.field-box-red .readonly-input,
-.input-red {
+.price-page .field-box-red .readonly-input,
+.price-page .input-red {
   border-color: #ff5a47;
 }
 
-.field-box-green .readonly-input,
-.input-green {
+.price-page .field-box-green .readonly-input,
+.price-page .input-green {
   border-color: var(--teal);
 }
 
-.label-red {
+.price-page .label-red {
   color: #ff5a47 !important;
 }
 
-.label-green {
+.price-page .label-green {
   color: var(--teal) !important;
 }
 
-.empty {
+.price-page .empty {
   text-align: center;
   padding: 40px 10px;
   font-size: 18px;
@@ -359,172 +360,158 @@ button {
   color: var(--muted);
 }
 
-/* TABLE WRAP */
-.table-wrap {
-  width: 100%;
-}
-
-/* TABLET */
+/* PERSONEL - TABLET */
 @media (max-width: 1024px) {
-  .price-shell {
+  .price-page .price-shell {
     width: min(100%, calc(100% - 24px));
   }
 
-  .filter-row {
+  .price-page .filter-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .price-grid {
+  .price-page .price-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .summary-grid {
+  .price-page .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .model-title {
+  .price-page .model-title {
     font-size: 30px;
   }
 }
 
-/* MOBİL */
+/* PERSONEL - MOBİL */
 @media (max-width: 640px) {
-  .price-shell {
-    width: calc(100% - 16px);
+  .price-page .price-shell {
+    width: min(100%, 420px);
     padding-top: 14px;
   }
 
-  .topbar {
+  .price-page .topbar {
     gap: 10px;
   }
 
-  .badge,
-  .button {
+  .price-page .badge,
+  .price-page .button {
     min-height: 42px;
     padding: 0 14px;
     font-size: 14px;
     text-align: center;
   }
 
-  .top-panel {
-    margin-bottom: 20px;
-  }
-
-  .stats {
+  .price-page .stats {
     gap: 14px;
     margin: 6px 0 14px;
   }
 
-  .stat {
+  .price-page .stat {
     font-size: 13px;
   }
 
-  .stat strong {
+  .price-page .stat strong {
     font-size: 15px;
   }
 
-  .filter-row {
+  .price-page .filter-row {
     grid-template-columns: 1fr 1fr;
     gap: 10px;
   }
 
-  .soft-select,
-  .soft-input {
+  .price-page .soft-select,
+  .price-page .soft-input {
     min-height: 46px;
     font-size: 15px;
     padding: 0 12px;
   }
 
-  .section-title {
+  .price-page .section-title {
     margin-top: 24px;
     font-size: 30px;
   }
 
-  .brand-title {
+  .price-page .brand-title {
     font-size: 24px;
     margin-bottom: 12px;
   }
 
-  .product-card {
+  .price-page .product-card {
     border-radius: 18px;
   }
 
-  .product-top-line {
+  .price-page .product-top-line {
     height: 7px;
   }
 
-  .product-inner {
+  .price-page .product-inner {
     padding: 16px;
   }
 
-  .card-head {
-    margin-bottom: 14px;
-  }
-
-  .brand-pill {
+  .price-page .brand-pill {
     min-height: 30px;
     padding: 0 12px;
     font-size: 13px;
     margin-bottom: 8px;
   }
 
-  .model-title {
+  .price-page .model-title {
     font-size: 22px;
   }
 
-  .price-grid {
+  .price-page .price-grid {
     grid-template-columns: 1fr 1fr;
     gap: 10px;
     margin-bottom: 12px;
   }
 
-  .price-box {
+  .price-page .price-box {
     border-radius: 12px;
     padding: 12px 10px;
   }
 
-  .price-label {
+  .price-page .price-label {
     font-size: 12px;
     margin-bottom: 6px;
   }
 
-  .price-value {
+  .price-page .price-value {
     font-size: 18px;
   }
 
-  .edit-grid {
+  .price-page .edit-grid {
     grid-template-columns: 1fr 1fr;
     gap: 10px;
   }
 
-  .summary-grid {
-    grid-column: 1 / -1;
+  .price-page .summary-grid {
     grid-template-columns: 1fr 1fr;
     gap: 10px;
   }
 
-  .summary-box {
+  .price-page .summary-box {
     border-radius: 12px;
     padding: 12px 10px;
   }
 
-  .summary-label {
+  .price-page .summary-label {
     font-size: 12px;
     margin-bottom: 6px;
   }
 
-  .summary-value {
+  .price-page .summary-value {
     font-size: 16px;
   }
 
-  .readonly-input {
+  .price-page .readonly-input {
     min-height: 50px;
     padding: 0 12px;
     font-size: 16px;
     border-radius: 12px;
   }
 
-  .field-box label {
+  .price-page .field-box label {
     font-size: 12px;
   }
 }
