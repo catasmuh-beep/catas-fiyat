@@ -16,6 +16,7 @@ function trKey(value) {
     .replace(/ş/g, "s")
     .replace(/ç/g, "c")
     .replace(/ğ/g, "g")
+    .replace(/\.(?=\d)/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -44,13 +45,98 @@ const klimaBrandOrder = {
   eca: 3,
 };
 
+const ecaKombiModelOrder = {
+  "citius premix 20": 1,
+  "citius premix 24": 2,
+  "citius premix 28": 3,
+  "proteus premix 24": 4,
+  "proteus premix 28": 5,
+  "proteus premix 30": 6,
+  "proteus premix 35": 7,
+  "proteus premix 42": 8,
+  "proteus premix 45": 9,
+  "proteus premix hst 35": 10,
+  "proteus premix hst 45": 11,
+  "confeo premix 24": 12,
+  "confeo premix 30": 13,
+  "confeo premix 35": 14,
+  "cofeo premix 24": 12,
+  "cofeo premix 30": 13,
+  "cofeo premix 35": 14,
+};
+
+const ecaKlimaModelOrder = {
+  "spaylos pro 9000": 1,
+  "spaylos pro 12000": 2,
+  "spaylos pro 18000": 3,
+  "spaylos pro 24000": 4,
+  "spylos pro 9000": 1,
+  "spylos pro 12000": 2,
+  "spylos pro 18000": 3,
+  "spylos pro 24000": 4,
+  "ecotech 9000": 5,
+  "ecotech 12000": 6,
+  "ecotech 18000": 7,
+  "ecotech 24000": 8,
+  "ecotec 9000": 5,
+  "ecotec 12000": 6,
+  "ecotec 18000": 7,
+  "ecotec 24000": 8,
+};
+
+function sortRowsForCategory(items, kategori) {
+  return [...items].sort((a, b) => {
+    const kategoriKey = trKey(kategori).replace(/\s+/g, "");
+
+    const aBrand = trKey(a.marka).replace(/\s+/g, "");
+    const bBrand = trKey(b.marka).replace(/\s+/g, "");
+
+    if (kategoriKey === "kombi") {
+      const aBrandOrder = combiBrandOrder[aBrand] ?? 999;
+      const bBrandOrder = combiBrandOrder[bBrand] ?? 999;
+      if (aBrandOrder !== bBrandOrder) return aBrandOrder - bBrandOrder;
+
+      const aModelFull = trKey(`${a.model} ${a.alt_model || ""}`);
+      const bModelFull = trKey(`${b.model} ${b.alt_model || ""}`);
+
+      if (aBrand === "eca" && bBrand === "eca") {
+        const aOrder = ecaKombiModelOrder[aModelFull] ?? 999;
+        const bOrder = ecaKombiModelOrder[bModelFull] ?? 999;
+        if (aOrder !== bOrder) return aOrder - bOrder;
+      }
+    }
+
+    if (kategoriKey === "klima") {
+      const aBrandOrder = klimaBrandOrder[aBrand] ?? 999;
+      const bBrandOrder = klimaBrandOrder[bBrand] ?? 999;
+      if (aBrandOrder !== bBrandOrder) return aBrandOrder - bBrandOrder;
+
+      const aModelFull = trKey(`${a.model} ${a.alt_model || ""}`);
+      const bModelFull = trKey(`${b.model} ${b.alt_model || ""}`);
+
+      if (aBrand === "eca" && bBrand === "eca") {
+        const aOrder = ecaKlimaModelOrder[aModelFull] ?? 999;
+        const bOrder = ecaKlimaModelOrder[bModelFull] ?? 999;
+        if (aOrder !== bOrder) return aOrder - bOrder;
+      }
+    }
+
+    const aText = `${norm(a.marka)} ${norm(a.model)} ${norm(a.alt_model)}`;
+    const bText = `${norm(b.marka)} ${norm(b.model)} ${norm(b.alt_model)}`;
+
+    return aText.localeCompare(bText, "tr");
+  });
+}
+
 export default function AdminClient({ initialRows }) {
-  const [rows, setRows] = useState(initialRows);
+  const [rows, setRows] = useState(
+    (initialRows || []).map((row) => ({ ...row, ...computeDerived(row) }))
+  );
   const [savingId, setSavingId] = useState("");
   const [notice, setNotice] = useState("");
 
   const categories = useMemo(() => {
-    return [...new Set(rows.map((r) => norm(r.kategori)))].sort((a, b) => {
+    return [...new Set(rows.map((r) => norm(r.kategori)).filter(Boolean))].sort((a, b) => {
       const aKey = trKey(a).replace(/\s+/g, "");
       const bKey = trKey(b).replace(/\s+/g, "");
       return (categoryOrder[aKey] ?? 999) - (categoryOrder[bKey] ?? 999);
@@ -68,15 +154,18 @@ export default function AdminClient({ initialRows }) {
       marka: norm(row.marka),
       model: norm(row.model),
       alt_model: norm(row.alt_model),
+
       alis_fiyati: Number(row.alis_fiyati || 0),
       puan: Number(row.puan || 0),
       fayda: Number(row.fayda || 0),
       montaj_maliyeti: Number(row.montaj_maliyeti || 0),
+
       kampanya_maliyeti: derived.kampanya_maliyeti,
       net_bedel: derived.net_bedel,
       kar: derived.kar,
       nakit_satis: derived.nakit_satis,
       kart_satis: derived.kart_satis,
+
       aktif: !!row.aktif,
     };
 
@@ -87,13 +176,18 @@ export default function AdminClient({ initialRows }) {
     });
 
     const json = await res.json().catch(() => ({}));
+
     if (!res.ok) {
       setNotice(json.error || "Kayıt kaydedilemedi.");
       setSavingId("");
       return;
     }
 
-    setRows((prev) => prev.map((r) => (r.id === row.id ? json.row || r : r)));
+    setRows((prev) =>
+      prev.map((r) =>
+        r.id === row.id ? { ...(json.row || r), ...computeDerived(json.row || r) } : r
+      )
+    );
     setSavingId("");
     setNotice("Kayıt güncellendi.");
   }
@@ -104,7 +198,9 @@ export default function AdminClient({ initialRows }) {
         if (r.id !== id) return r;
         const next = {
           ...r,
-          [field]: numericFields().includes(field) ? Number(value || 0) : value,
+          [field]: numericFields().includes(field)
+            ? Number(value === "" ? 0 : value)
+            : value,
         };
         return { ...next, ...computeDerived(next) };
       })
@@ -125,67 +221,58 @@ export default function AdminClient({ initialRows }) {
             Fiyatları burada değiştirince personel ekranı otomatik yeni veriyi gösterir.
           </div>
         </div>
+
         <div style={{ display: "flex", gap: 10 }}>
-          <a href="/" className="button secondary">Personel görünümüne dön</a>
-          <button className="button danger" onClick={logout}>Çıkış</button>
+          <a href="/" className="button secondary">
+            Personel görünümüne dön
+          </a>
+          <button className="button danger" onClick={logout}>
+            Çıkış
+          </button>
         </div>
       </div>
 
       {notice ? <div className="notice ok">{notice}</div> : null}
 
-      {categories.map((kategori) => (
-        <section key={kategori} className="card panel" style={{ marginBottom: 16 }}>
-          <h2 className="section-title" style={{ marginTop: 0 }}>{kategori}</h2>
-          <div className="table-wrap">
-            <table className="table admin-table">
-              <thead>
-                <tr>
-                  <th>Marka</th>
-                  <th>Model</th>
-                  <th>Güç / Alt Model</th>
-                  <th>Alış</th>
-                  <th>Puan</th>
-                  <th>Fayda</th>
-                  <th>Montaj</th>
-                  <th>Net</th>
-                  <th>Kar</th>
-                  <th>Nakit</th>
-                  <th>Kart %18</th>
-                  <th>Aktif</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows
-                  .filter((r) => norm(r.kategori) === kategori)
-                  .sort((a, b) => {
-                    const kategoriKey = trKey(kategori).replace(/\s+/g, "");
+      {categories.map((kategori) => {
+        const categoryRows = sortRowsForCategory(
+          rows.filter((r) => norm(r.kategori) === kategori),
+          kategori
+        );
 
-                    const aBrand = trKey(a.marka).replace(/\s+/g, "");
-                    const bBrand = trKey(b.marka).replace(/\s+/g, "");
+        return (
+          <section key={kategori} className="card panel" style={{ marginBottom: 16 }}>
+            <h2 className="section-title" style={{ marginTop: 0 }}>
+              {kategori}
+            </h2>
 
-                    if (kategoriKey === "kombi") {
-                      const aOrder = combiBrandOrder[aBrand] ?? 999;
-                      const bOrder = combiBrandOrder[bBrand] ?? 999;
-                      if (aOrder !== bOrder) return aOrder - bOrder;
-                    }
+            <div className="table-wrap">
+              <table className="table admin-table">
+                <thead>
+                  <tr>
+                    <th>Marka</th>
+                    <th>Model</th>
+                    <th>Güç / Alt Model</th>
+                    <th>Alış</th>
+                    <th>Puan</th>
+                    <th>Fayda</th>
+                    <th>Montaj</th>
+                    <th>Net</th>
+                    <th>Kar</th>
+                    <th>Nakit</th>
+                    <th>Kart</th>
+                    <th>Aktif</th>
+                    <th className="save-cell">Kaydet</th>
+                  </tr>
+                </thead>
 
-                    if (kategoriKey === "klima") {
-                      const aOrder = klimaBrandOrder[aBrand] ?? 999;
-                      const bOrder = klimaBrandOrder[bBrand] ?? 999;
-                      if (aOrder !== bOrder) return aOrder - bOrder;
-                    }
-
-                    const aText = `${norm(a.marka)} ${norm(a.model)} ${norm(a.alt_model)}`;
-                    const bText = `${norm(b.marka)} ${norm(b.model)} ${norm(b.alt_model)}`;
-
-                    return aText.localeCompare(bText, "tr");
-                  })
-                  .map((row) => (
+                <tbody>
+                  {categoryRows.map((row) => (
                     <tr key={row.id}>
                       <td>{norm(row.marka)}</td>
                       <td>{norm(row.model)}</td>
                       <td>{norm(row.alt_model)}</td>
+
                       <td>
                         <input
                           type="number"
@@ -193,6 +280,7 @@ export default function AdminClient({ initialRows }) {
                           onChange={(e) => updateField(row.id, "alis_fiyati", e.target.value)}
                         />
                       </td>
+
                       <td>
                         <input
                           type="number"
@@ -200,6 +288,7 @@ export default function AdminClient({ initialRows }) {
                           onChange={(e) => updateField(row.id, "puan", e.target.value)}
                         />
                       </td>
+
                       <td>
                         <input
                           type="number"
@@ -207,6 +296,7 @@ export default function AdminClient({ initialRows }) {
                           onChange={(e) => updateField(row.id, "fayda", e.target.value)}
                         />
                       </td>
+
                       <td>
                         <input
                           type="number"
@@ -214,10 +304,12 @@ export default function AdminClient({ initialRows }) {
                           onChange={(e) => updateField(row.id, "montaj_maliyeti", e.target.value)}
                         />
                       </td>
+
                       <td>{formatMoney(row.net_bedel)}</td>
                       <td>{formatMoney(row.kar)}</td>
                       <td className="money">{formatMoney(row.nakit_satis)}</td>
                       <td className="money">{formatMoney(row.kart_satis)}</td>
+
                       <td>
                         <input
                           type="checkbox"
@@ -225,9 +317,10 @@ export default function AdminClient({ initialRows }) {
                           onChange={(e) => updateField(row.id, "aktif", e.target.checked)}
                         />
                       </td>
-                      <td>
+
+                      <td className="save-cell">
                         <button
-                          className="button primary"
+                          className="button primary save-btn"
                           disabled={savingId === row.id}
                           onClick={() => saveRow(row)}
                         >
@@ -236,11 +329,12 @@ export default function AdminClient({ initialRows }) {
                       </td>
                     </tr>
                   ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        );
+      })}
     </main>
   );
 }
