@@ -2258,3 +2258,55 @@ h2.category-title,
 .product-top-line-protherm {
   background: linear-gradient(90deg,#e11d48,#fb7185);
 }
+.admin-product-meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.admin-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.admin-meta-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  min-width: 72px;
+}
+
+.admin-meta-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  text-align: right;
+  word-break: break-word;
+}
+
+.admin-meta-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+}
+
+@media (max-width: 640px) {
+  .admin-meta-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-meta-value {
+    text-align: left;
+  }
+}
