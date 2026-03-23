@@ -669,3 +669,58 @@ body {
     font-size: 12px;
   }
 }
+.admin-table {
+  width: 100%;
+  table-layout: fixed;
+  font-size: 14px;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 8px 6px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.admin-table th {
+  font-size: 13px;
+}
+
+.admin-table input[type="number"] {
+  width: 100%;
+  min-width: 88px;
+  max-width: 110px;
+  padding: 6px 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.admin-table input[type="checkbox"] {
+  transform: scale(1.05);
+}
+
+.admin-table .money {
+  font-size: 13px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+@media (min-width: 1200px) {
+  .admin-table {
+    font-size: 13px;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 6px 5px;
+  }
+
+  .admin-table input[type="number"] {
+    min-width: 78px;
+    max-width: 95px;
+    padding: 5px 7px;
+    font-size: 13px;
+  }
+}
