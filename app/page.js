@@ -327,8 +327,7 @@ return aText.localeCompare(bText, "tr");
                                   <input defaultValue={item.alis_fiyati} readOnly className="readonly-input" />
                                 </div>
 
-                                <div className="field-box">
-     <div className="field-box field-box-red">
+<div className="field-box field-box-red">
   <label className="label-red">Montaj</label>
   <input
     defaultValue={item.montaj_maliyeti}
@@ -353,7 +352,6 @@ return aText.localeCompare(bText, "tr");
     readOnly
     className="readonly-input input-green"
   />
-</div>
 </div>
                                  </div>
                               </div>
