@@ -2045,3 +2045,205 @@ h2.category-title,
 .admin-row-dirty{
   background:rgba(255,153,0,0.08);
 }
+/* ===================================== */
+/* PERSONEL GORUNUMU - MARKA VE KATEGORI */
+/* ===================================== */
+
+/* Ana kategori başlığı siyah kalsın */
+.section-title {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+/* Marka başlığı */
+.brand-title {
+  display: inline-block;
+  margin: 4px 0 14px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+/* Vaillant */
+.brand-title-vaillant {
+  color: #00917e;
+}
+
+/* Demirdöküm */
+.brand-title-demirdokum {
+  color: #0066cc;
+}
+
+/* ECA */
+.brand-title-eca {
+  color: #0054a6;
+}
+
+/* Baymak */
+.brand-title-baymak {
+  color: #009245;
+}
+
+/* Baykan */
+.brand-title-baykan {
+  color: #d4a000;
+}
+
+/* Bilinmeyen/diğer */
+.brand-title-default {
+  color: #334155;
+}
+
+
+/* ===================================== */
+/* KART ICINDEKI MARKA PILL */
+/* ===================================== */
+
+.brand-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  border: 1px solid transparent;
+  margin-bottom: 10px;
+}
+
+/* Vaillant */
+.brand-pill-vaillant {
+  color: #00917e;
+  background: rgba(0, 145, 126, 0.10);
+  border-color: rgba(0, 145, 126, 0.25);
+}
+
+/* Demirdöküm */
+.brand-pill-demirdokum {
+  color: #0066cc;
+  background: rgba(0, 102, 204, 0.10);
+  border-color: rgba(0, 102, 204, 0.24);
+}
+
+/* ECA */
+.brand-pill-eca {
+  color: #0054a6;
+  background: rgba(0, 84, 166, 0.10);
+  border-color: rgba(0, 84, 166, 0.24);
+}
+
+/* Baymak */
+.brand-pill-baymak {
+  color: #009245;
+  background: rgba(0, 146, 69, 0.10);
+  border-color: rgba(0, 146, 69, 0.24);
+}
+
+/* Baykan */
+.brand-pill-baykan {
+  color: #b8860b;
+  background: rgba(212, 160, 0, 0.14);
+  border-color: rgba(212, 160, 0, 0.30);
+}
+
+/* Default */
+.brand-pill-default {
+  color: #475569;
+  background: rgba(148, 163, 184, 0.14);
+  border-color: rgba(148, 163, 184, 0.26);
+}
+
+
+/* ===================================== */
+/* KART UST RENK CIZGISI */
+/* ===================================== */
+
+.product-top-line {
+  height: 8px;
+  width: 100%;
+  border-radius: 18px 18px 0 0;
+}
+
+.product-top-line-vaillant {
+  background: linear-gradient(90deg, #00917e, #0ea5a4);
+}
+
+.product-top-line-demirdokum {
+  background: linear-gradient(90deg, #0066cc, #3b82f6);
+}
+
+.product-top-line-eca {
+  background: linear-gradient(90deg, #0054a6, #2563eb);
+}
+
+.product-top-line-baymak {
+  background: linear-gradient(90deg, #009245, #16a34a);
+}
+
+.product-top-line-baykan {
+  background: linear-gradient(90deg, #d4a000, #f2c94c);
+}
+
+.product-top-line-default {
+  background: linear-gradient(90deg, #94a3b8, #cbd5e1);
+}
+
+
+/* ===================================== */
+/* MODEL BASLIGI DAHA TEMIZ GORUNSUN */
+/* ===================================== */
+
+.model-title {
+  color: #0f172a;
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0;
+  word-break: break-word;
+}
+
+
+/* ===================================== */
+/* PERSONEL FILTRE VE BASLIK KOSMETIK */
+/* ===================================== */
+
+.price-page .filter-row {
+  gap: 12px;
+}
+
+.price-page .soft-select,
+.price-page .soft-input {
+  border-radius: 12px;
+}
+
+.price-page .stats {
+  margin-top: 6px;
+}
+
+
+/* ===================================== */
+/* MOBILDE PILL VE MARKA BASLIGI */
+/* ===================================== */
+
+@media (max-width: 640px) {
+  .brand-title {
+    margin: 2px 0 12px;
+    font-size: 22px;
+    line-height: 1.2;
+  }
+
+  .brand-pill {
+    font-size: 11px;
+    min-height: 26px;
+    padding: 4px 10px;
+    margin-bottom: 8px;
+  }
+
+  .product-top-line {
+    height: 6px;
+  }
+
+  .model-title {
+    font-size: 17px;
+  }
+}
