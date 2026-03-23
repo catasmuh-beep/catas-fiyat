@@ -37,12 +37,16 @@ const combiBrandOrder = {
   baymak: 3,
   eca: 4,
   baykan: 5,
+  protherm: 6,
+  daxom: 7,
 };
 
 const klimaBrandOrder = {
   vaillant: 1,
   baymak: 2,
   eca: 3,
+  protherm: 4,
+  daxom: 5,
 };
 
 const ecaKombiModelOrder = {
@@ -160,8 +164,87 @@ function brandClass(marka) {
   if (key.includes("demirdokum")) return "demirdokum";
   if (key.includes("eca")) return "eca";
   if (key.includes("baykan")) return "baykan";
+  if (key.includes("protherm")) return "protherm";
+  if (key.includes("daxom")) return "daxom";
+  if (key.includes("warmhaus")) return "warmhaus";
 
   return "";
+}
+
+function buildProductName(row) {
+  return `${norm(row.model)} ${norm(row.alt_model)}`
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getPowerText(row) {
+  const candidates = [
+    row.guc,
+    row.guc_kw,
+    row.kapasite,
+    row.kapasite_kw,
+    row.kw,
+    row.btu,
+    row.power,
+    row.power_kw,
+    row.isitma_gucu,
+    row.isitma_kapasitesi,
+    row.alt_model,
+  ];
+
+  for (const item of candidates) {
+    const value = norm(item);
+    if (value) return value;
+  }
+
+  return "-";
+}
+
+function getVaillantKombiOrder(row) {
+  const markaKey = trKey(row.marka).replace(/\s+/g, "");
+  if (markaKey !== "vaillant") return 999;
+
+  const full = trKey(`${row.model} ${row.alt_model || ""}`);
+
+  if (full.includes("intro 24/24")) return 1;
+  if (full.includes("intro 28/28")) return 2;
+
+  if (full.includes("pure 236/7-2")) return 3;
+  if (full.includes("pure 286/7-2")) return 4;
+
+  if (
+    full.includes("ecotec plus 26") ||
+    full.includes("ecotec plus vuw 26") ||
+    full.includes("ecotec plus vuw tr 26")
+  ) {
+    return 5;
+  }
+
+  if (
+    full.includes("ecotec plus 32") ||
+    full.includes("ecotec plus vuw 32") ||
+    full.includes("ecotec plus vuw tr 32")
+  ) {
+    return 6;
+  }
+
+  if (
+    full.includes("ecotec plus 36") ||
+    full.includes("ecotec plus vuw 36") ||
+    full.includes("ecotec plus vuw tr 36")
+  ) {
+    return 7;
+  }
+
+  if (
+    full.includes("ecotec plus 40") ||
+    full.includes("ecotec plus vuw 40") ||
+    full.includes("ecotec plus vuw tr 40")
+  ) {
+    return 8;
+  }
+
+  return 999;
 }
 
 function sortRowsForCategory(items, kategori) {
@@ -177,6 +260,12 @@ function sortRowsForCategory(items, kategori) {
 
       const aModelFull = trKey(`${a.model} ${a.alt_model || ""}`);
       const bModelFull = trKey(`${b.model} ${b.alt_model || ""}`);
+
+      if (aBrand === "vaillant" && bBrand === "vaillant") {
+        const aOrder = getVaillantKombiOrder(a);
+        const bOrder = getVaillantKombiOrder(b);
+        if (aOrder !== bOrder) return aOrder - bOrder;
+      }
 
       if (aBrand === "eca" && bBrand === "eca") {
         const aOrder = ecaKombiModelOrder[aModelFull] ?? 999;
@@ -212,21 +301,38 @@ function sortRowsForCategory(items, kategori) {
   });
 }
 
-function buildProductName(row) {
-  return `${norm(row.model)} ${norm(row.alt_model)}`
-    .replace(/\s+/g, " ")
-    .trim();
+function ProductInfoBlock({ row }) {
+  return (
+    <div className="admin-product-info">
+      <div className="admin-product-line">
+        <span className="admin-product-label">Kategori</span>
+        <strong className="admin-product-value">{norm(row.kategori) || "-"}</strong>
+      </div>
+
+      <div className="admin-product-line">
+        <span className="admin-product-label">Marka</span>
+        <span className={`brand-badge ${brandClass(row.marka)}`}>{norm(row.marka) || "-"}</span>
+      </div>
+
+      <div className="admin-product-line">
+        <span className="admin-product-label">Model</span>
+        <strong className="admin-product-value">{buildProductName(row) || "-"}</strong>
+      </div>
+
+      <div className="admin-product-line">
+        <span className="admin-product-label">Güç</span>
+        <strong className="admin-product-value">{getPowerText(row)}</strong>
+      </div>
+    </div>
+  );
 }
 
 function MobileRowCard({ row, isDirty, updateField }) {
   return (
     <div className={`admin-mobile-card${isDirty ? " dirty" : ""}`}>
       <div className="admin-mobile-head">
-        <div>
-          <div className={`admin-mobile-brand brand-badge ${brandClass(row.marka)}`}>
-            {norm(row.marka)}
-          </div>
-          <div className="admin-mobile-model">{buildProductName(row)}</div>
+        <div className="admin-mobile-head-main">
+          <ProductInfoBlock row={row} />
         </div>
 
         <label className="admin-active-toggle">
@@ -516,7 +622,7 @@ export default function AdminClient({ initialRows }) {
                 <table className="table admin-table">
                   <thead>
                     <tr>
-                      <th>Ürün</th>
+                      <th>Ürün Bilgisi</th>
                       <th>Alış</th>
                       <th>Montaj Maliyeti</th>
                       <th>Puan</th>
@@ -535,10 +641,7 @@ export default function AdminClient({ initialRows }) {
                       return (
                         <tr key={row.id} className={isDirty ? "admin-row-dirty" : ""}>
                           <td>
-                            <div className={`brand-badge ${brandClass(row.marka)}`}>
-                              {norm(row.marka)}
-                            </div>
-                            <strong>{buildProductName(row)}</strong>
+                            <ProductInfoBlock row={row} />
                           </td>
 
                           <td>
