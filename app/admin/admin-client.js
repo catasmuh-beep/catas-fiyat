@@ -1,30 +1,8 @@
-
 "use client";
 
 import { useMemo, useState } from "react";
 import { computeDerived, formatMoney, norm } from "../lib/pricing";
-function toNumber(value) {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : 0;
-}
 
-function calcNakitCarpani(netBedel, nakitSatis) {
-  const net = toNumber(netBedel);
-  const nakit = toNumber(nakitSatis);
-
-  if (!net || !nakit || nakit <= net) return 0;
-
-  return Math.floor(((nakit - net) / net) * 100);
-}
-
-function calcKartKomisyonu(nakitSatis, kartSatis) {
-  const nakit = toNumber(nakitSatis);
-  const kart = toNumber(kartSatis);
-
-  if (!nakit || !kart || kart <= nakit) return 0;
-
-  return Math.floor(((kart - nakit) / nakit) * 100);
-}
 function numericFields() {
   return ["alis_fiyati", "puan", "fayda", "montaj_maliyeti"];
 }
@@ -32,58 +10,42 @@ function numericFields() {
 export default function AdminClient({ initialRows }) {
   const [rows, setRows] = useState(initialRows);
   const [savingId, setSavingId] = useState("");
-   const [notice, setNotice] = useState("");
+  const [notice, setNotice] = useState("");
 
- const categories = useMemo(() => [...new Set(rows.map((r) => norm(r.kategori)))], [rows]);
+  const categories = useMemo(
+    () => [...new Set(rows.map((r) => norm(r.kategori)))],
+    [rows]
+  );
 
-async function saveRow(row) {
-  setSavingId(row.id);
-  setNotice("");
+  async function saveRow(row) {
+    setSavingId(row.id);
+    setNotice("");
 
-  const derived = computeDerived(row);
+    const derived = computeDerived(row);
 
-  const payload = {
-    kategori: norm(row.kategori),
-    marka: norm(row.marka),
-    model: norm(row.model),
-    alt_model: norm(row.alt_model),
-    alis_fiyati: Number(row.alis_fiyati || 0),
-    puan: Number(row.puan || 0),
-    fayda: Number(row.fayda || 0),
-    montaj_maliyeti: Number(row.montaj_maliyeti || 0),
-    kampanya_maliyeti: derived.kampanya_maliyeti,
-    net_bedel: derived.net_bedel,
-    kar: derived.kar,
-    nakit_satis: derived.nakit_satis,
-    kart_satis: derived.kart_satis,
-    aktif: !!row.aktif,
-  };
+    const payload = {
+      kategori: norm(row.kategori),
+      marka: norm(row.marka),
+      model: norm(row.model),
+      alt_model: norm(row.alt_model),
+      alis_fiyati: Number(row.alis_fiyati || 0),
+      puan: Number(row.puan || 0),
+      fayda: Number(row.fayda || 0),
+      montaj_maliyeti: Number(row.montaj_maliyeti || 0),
+      kampanya_maliyeti: derived.kampanya_maliyeti,
+      net_bedel: derived.net_bedel,
+      kar: derived.kar,
+      nakit_satis: derived.nakit_satis,
+      kart_satis: derived.kart_satis,
+      aktif: !!row.aktif,
+    };
 
-  const res = await fetch(`/api/products/${row.id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    setNotice(json.error || "Kayıt kaydedilemedi.");
-    setSavingId("");
-    return;
-  }
-
-  setRows((prev) => prev.map((r) => (r.id === row.id ? json.row || r : r)));
-  setSavingId("");
-  setNotice("Kayıt güncellendi.");
-}
-
-  aktif: !!row.aktif,
-};
     const res = await fetch(`/api/products/${row.id}`, {
-  method: "PATCH",
-  headers: { "Content-Type": "application/json" },
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+
     const json = await res.json().catch(() => ({}));
     if (!res.ok) {
       setNotice(json.error || "Kayıt kaydedilemedi.");
@@ -91,7 +53,7 @@ async function saveRow(row) {
       return;
     }
 
-    setRows((prev) => prev.map((r) => (r.id === row.id ? json.row : r)));
+    setRows((prev) => prev.map((r) => (r.id === row.id ? json.row || r : r)));
     setSavingId("");
     setNotice("Kayıt güncellendi.");
   }
@@ -100,7 +62,10 @@ async function saveRow(row) {
     setRows((prev) =>
       prev.map((r) => {
         if (r.id !== id) return r;
-        const next = { ...r, [field]: numericFields().includes(field) ? Number(value || 0) : value };
+        const next = {
+          ...r,
+          [field]: numericFields().includes(field) ? Number(value || 0) : value,
+        };
         return { ...next, ...computeDerived(next) };
       })
     );
@@ -151,29 +116,63 @@ async function saveRow(row) {
                 </tr>
               </thead>
               <tbody>
-                {rows.filter((r) => norm(r.kategori) === kategori).map((row) => (
-                  <tr key={row.id}>
-                    <td>{norm(row.marka)}</td>
-                    <td>{norm(row.model)}</td>
-                    <td>{norm(row.alt_model)}</td>
-                    <td><input type="number" value={row.alis_fiyati ?? 0} onChange={(e) => updateField(row.id, "alis_fiyati", e.target.value)} /></td>
-                    <td><input type="number" value={row.puan ?? 0} onChange={(e) => updateField(row.id, "puan", e.target.value)} /></td>
-                    <td><input type="number" value={row.fayda ?? 0} onChange={(e) => updateField(row.id, "fayda", e.target.value)} /></td>
-                    <td><input type="number" value={row.montaj_maliyeti ?? 0} onChange={(e) => updateField(row.id, "montaj_maliyeti", e.target.value)} /></td>
-                    <td>{formatMoney(row.net_bedel)}</td>
-                    <td>{formatMoney(row.kar)}</td>
-                    <td className="money">{formatMoney(row.nakit_satis)}</td>
-                    <td className="money">{formatMoney(row.kart_satis)}</td>
-                    <td>
-                      <input type="checkbox" checked={!!row.aktif} onChange={(e) => updateField(row.id, "aktif", e.target.checked)} />
-                    </td>
-                    <td>
-                      <button className="button primary" disabled={savingId === row.id} onClick={() => saveRow(row)}>
-                        {savingId === row.id ? "Kaydediliyor..." : "Kaydet"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {rows
+                  .filter((r) => norm(r.kategori) === kategori)
+                  .map((row) => (
+                    <tr key={row.id}>
+                      <td>{norm(row.marka)}</td>
+                      <td>{norm(row.model)}</td>
+                      <td>{norm(row.alt_model)}</td>
+                      <td>
+                        <input
+                          type="number"
+                          value={row.alis_fiyati ?? 0}
+                          onChange={(e) => updateField(row.id, "alis_fiyati", e.target.value)}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          value={row.puan ?? 0}
+                          onChange={(e) => updateField(row.id, "puan", e.target.value)}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          value={row.fayda ?? 0}
+                          onChange={(e) => updateField(row.id, "fayda", e.target.value)}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          value={row.montaj_maliyeti ?? 0}
+                          onChange={(e) => updateField(row.id, "montaj_maliyeti", e.target.value)}
+                        />
+                      </td>
+                      <td>{formatMoney(row.net_bedel)}</td>
+                      <td>{formatMoney(row.kar)}</td>
+                      <td className="money">{formatMoney(row.nakit_satis)}</td>
+                      <td className="money">{formatMoney(row.kart_satis)}</td>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={!!row.aktif}
+                          onChange={(e) => updateField(row.id, "aktif", e.target.checked)}
+                        />
+                      </td>
+                      <td>
+                        <button
+                          className="button primary"
+                          disabled={savingId === row.id}
+                          onClick={() => saveRow(row)}
+                        >
+                          {savingId === row.id ? "Kaydediliyor..." : "Kaydet"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
