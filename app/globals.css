@@ -1667,3 +1667,23 @@ textarea {
     line-height: 1.4 !important;
   }
 }
+@media (max-width: 640px) {
+  .admin-topbar-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .topbar-btn {
+    width: 100% !important;
+    min-height: 48px !important;
+    height: 48px !important;
+    padding: 0 14px !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: normal !important;
+  }
+}
