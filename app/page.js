@@ -36,66 +36,66 @@ export default function HomePage() {
         return;
       }
 
-     const categoryOrder = {
-  kombi: 1,
-  klima: 2,
-  sofben: 3,
-  "şofben": 3,
-  elektriklikombi: 4,
-  elektrikli_kombi: 4,
-  "elektrikli kombi": 4,
-};
+      const categoryOrder = {
+        kombi: 1,
+        klima: 2,
+        sofben: 3,
+        "şofben": 3,
+        elektriklikombi: 4,
+        elektrikli_kombi: 4,
+        "elektrikli kombi": 4,
+      };
 
-const brandOrder = {
-  vaillant: 1,
-  demirdokum: 2,
-  protherm: 3,
-};
+      const brandOrder = {
+        vaillant: 1,
+        demirdokum: 2,
+        protherm: 3,
+      };
 
-const sorted = [...(data || [])].sort((a, b) => {
-  const aCatKey = norm(a.kategori).toLowerCase().replace(/\s+/g, "");
-  const bCatKey = norm(b.kategori).toLowerCase().replace(/\s+/g, "");
+      const sorted = [...(data || [])].sort((a, b) => {
+        const aCatKey = norm(a.kategori).toLowerCase().replace(/\s+/g, "");
+        const bCatKey = norm(b.kategori).toLowerCase().replace(/\s+/g, "");
 
-  const aCat = categoryOrder[aCatKey] ?? 999;
-  const bCat = categoryOrder[bCatKey] ?? 999;
+        const aCat = categoryOrder[aCatKey] ?? 999;
+        const bCat = categoryOrder[bCatKey] ?? 999;
 
-  if (aCat !== bCat) return aCat - bCat;
+        if (aCat !== bCat) return aCat - bCat;
 
-  if (aCat === 1) {
-    const aBrandKey = norm(a.marka)
-      .toLowerCase()
-      .replace(/ö/g, "o")
-      .replace(/ü/g, "u")
-      .replace(/ı/g, "i")
-      .replace(/ş/g, "s")
-      .replace(/ç/g, "c")
-      .replace(/\s+/g, "");
+        if (aCat === 1) {
+          const aBrandKey = norm(a.marka)
+            .toLowerCase()
+            .replace(/ö/g, "o")
+            .replace(/ü/g, "u")
+            .replace(/ı/g, "i")
+            .replace(/ş/g, "s")
+            .replace(/ç/g, "c")
+            .replace(/\s+/g, "");
 
-    const bBrandKey = norm(b.marka)
-      .toLowerCase()
-      .replace(/ö/g, "o")
-      .replace(/ü/g, "u")
-      .replace(/ı/g, "i")
-      .replace(/ş/g, "s")
-      .replace(/ç/g, "c")
-      .replace(/\s+/g, "");
+          const bBrandKey = norm(b.marka)
+            .toLowerCase()
+            .replace(/ö/g, "o")
+            .replace(/ü/g, "u")
+            .replace(/ı/g, "i")
+            .replace(/ş/g, "s")
+            .replace(/ç/g, "c")
+            .replace(/\s+/g, "");
 
-    const aBrand = brandOrder[aBrandKey] ?? 999;
-    const bBrand = brandOrder[bBrandKey] ?? 999;
+          const aBrand = brandOrder[aBrandKey] ?? 999;
+          const bBrand = brandOrder[bBrandKey] ?? 999;
 
-    if (aBrand !== bBrand) return aBrand - bBrand;
-  }
+          if (aBrand !== bBrand) return aBrand - bBrand;
+        }
 
-const aPrice = Number(a.nakit_satis || 0);
-const bPrice = Number(b.nakit_satis || 0);
+        const aPrice = Number(a.nakit_satis || 0);
+        const bPrice = Number(b.nakit_satis || 0);
 
-if (aPrice !== bPrice) return aPrice - bPrice;
+        if (aPrice !== bPrice) return aPrice - bPrice;
 
-const aText = `${norm(a.model)} ${norm(a.alt_model)}`;
-const bText = `${norm(b.model)} ${norm(b.alt_model)}`;
+        const aText = `${norm(a.model)} ${norm(a.alt_model)}`;
+        const bText = `${norm(b.model)} ${norm(b.alt_model)}`;
 
-return aText.localeCompare(bText, "tr");
-});
+        return aText.localeCompare(bText, "tr");
+      });
 
       setRows(sorted);
       setLoading(false);
@@ -117,7 +117,8 @@ return aText.localeCompare(bText, "tr");
 
   const filtered = useMemo(() => {
     return rows.filter((r) => {
-      const text = `${norm(r.kategori)} ${norm(r.marka)} ${norm(r.model)} ${norm(r.alt_model)}`.toLowerCase();
+      const text =
+        `${norm(r.kategori)} ${norm(r.marka)} ${norm(r.model)} ${norm(r.alt_model)}`.toLowerCase();
 
       return (
         (!filters.kategori || norm(r.kategori) === filters.kategori) &&
@@ -153,20 +154,20 @@ return aText.localeCompare(bText, "tr");
 
         <div className="top-panel">
           <div className="top-row">
-         <Image
-  src="/logo.png"
-  alt="Çataş Mühendislik"
-  width={900}
-  height={394}
-  priority
-  style={{
-    width: "100%",
-    maxWidth: "380px",
-    height: "auto",
-    display: "block",
-    margin: "0 auto",
-  }}
-/>
+            <Image
+              src="/logo.png"
+              alt="Çataş Mühendislik"
+              width={900}
+              height={394}
+              priority
+              style={{
+                width: "100%",
+                maxWidth: "380px",
+                height: "auto",
+                display: "block",
+                margin: "0 auto",
+              }}
+            />
           </div>
 
           <div className="stats">
@@ -297,63 +298,71 @@ return aText.localeCompare(bText, "tr");
                               </div>
 
                               <div className="edit-grid">
-                                    <div className="summary-grid">
-  <div className="summary-box">
-    <div className="summary-label">Kampanya</div>
-    <div className="summary-value">{formatMoney(item.kampanya_maliyeti)}</div>
-  </div>
+                                <div className="summary-grid">
+                                  <div className="summary-box">
+                                    <div className="summary-label">Kampanya</div>
+                                    <div className="summary-value">
+                                      {formatMoney(item.kampanya_maliyeti)}
+                                    </div>
+                                  </div>
 
-  <div className="summary-box">
-    <div className="summary-label">Net Bedel</div>
-    <div className="summary-value">{formatMoney(item.net_bedel)}</div>
-  </div>
+                                  <div className="summary-box">
+                                    <div className="summary-label">Net Bedel</div>
+                                    <div className="summary-value">
+                                      {formatMoney(item.net_bedel)}
+                                    </div>
+                                  </div>
 
-  <div className="summary-box">
-    <div className="summary-label">Nakit Çarpanı</div>
-    <div className="summary-value">
-      {item.nakit_carpani ? item.nakit_carpani : "-"}
-    </div>
-  </div>
+                                  <div className="summary-box">
+                                    <div className="summary-label">Nakit Çarpanı</div>
+                                    <div className="summary-value">
+                                      {item.nakit_carpani ? item.nakit_carpani : "-"}
+                                    </div>
+                                  </div>
 
-  <div className="summary-box">
-    <div className="summary-label">Kart Komisyon</div>
-    <div className="summary-value">
-      {item.kart_komisyonu ? `%${item.kart_komisyonu}` : "-"}
-    </div>
-  </div>
-</div>
-                                <div className="field-box">
-                                  <label>Alış</label>
-                                  <input defaultValue={item.alis_fiyati} readOnly className="readonly-input" />
+                                  <div className="summary-box">
+                                    <div className="summary-label">Kart Komisyon</div>
+                                    <div className="summary-value">
+                                      {item.kart_komisyonu ? `%${item.kart_komisyonu}` : "-"}
+                                    </div>
+                                  </div>
                                 </div>
 
-<div className="field-box field-box-red">
-  <label className="label-red">Montaj</label>
-  <input
-    defaultValue={item.montaj_maliyeti}
-    readOnly
-    className="readonly-input input-red"
-  />
-</div>
+                                <div className="field-box">
+                                  <label>Alış</label>
+                                  <input
+                                    defaultValue={item.alis_fiyati}
+                                    readOnly
+                                    className="readonly-input"
+                                  />
+                                </div>
 
-<div className="field-box field-box-green">
-  <label className="label-green">Puan</label>
-  <input
-    defaultValue={item.puan}
-    readOnly
-    className="readonly-input input-green"
-  />
-</div>
+                                <div className="field-box field-box-red">
+                                  <label className="label-red">Montaj</label>
+                                  <input
+                                    defaultValue={item.montaj_maliyeti}
+                                    readOnly
+                                    className="readonly-input input-red"
+                                  />
+                                </div>
 
-<div className="field-box field-box-green">
-  <label className="label-green">Fayda</label>
-  <input
-    defaultValue={item.fayda}
-    readOnly
-    className="readonly-input input-green"
-  />
-</div>
-                                 </div>
+                                <div className="field-box field-box-green">
+                                  <label className="label-green">Puan</label>
+                                  <input
+                                    defaultValue={item.puan}
+                                    readOnly
+                                    className="readonly-input input-green"
+                                  />
+                                </div>
+
+                                <div className="field-box field-box-green">
+                                  <label className="label-green">Fayda</label>
+                                  <input
+                                    defaultValue={item.fayda}
+                                    readOnly
+                                    className="readonly-input input-green"
+                                  />
+                                </div>
                               </div>
                             </div>
                           </div>
