@@ -155,7 +155,9 @@ function sortRowsForCategory(items, kategori) {
 }
 
 function buildProductName(row) {
-  return `${norm(row.marka)} ${norm(row.model)} ${norm(row.alt_model)}`.replace(/\s+/g, " ").trim();
+  return `${norm(row.marka)} ${norm(row.model)} ${norm(row.alt_model)}`
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function MobileRowCard({ row, isDirty, updateField }) {
@@ -403,18 +405,6 @@ export default function AdminClient({ initialRows }) {
   return (
     <main className="container admin-page-shell">
       <div className="admin-topbar-card">
-        <div>
-          <span className="badge">Yönetici paneli</span>
-          <div className="small admin-top-note">
-            Fiyatları burada değiştirince personel ekranı otomatik yeni veriyi gösterir.
-          </div>
-          <div className="small admin-dirty-text">
-            {dirtyCount > 0
-              ? `${dirtyCount} satırda kaydedilmemiş değişiklik var`
-              : "Kaydedilmemiş değişiklik yok"}
-          </div>
-        </div>
-
         <div className="admin-top-actions">
           <button
             className="button primary"
