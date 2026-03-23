@@ -3,229 +3,528 @@
 @tailwind utilities;
 
 /* GENEL */
-
-body{
-  margin:0;
-  background:#f3f0e6;
-  font-family:Arial, Helvetica, sans-serif;
+:root {
+  --bg: #f3f0e6;
+  --card: #fcfcfc;
+  --soft: #f1f1f1;
+  --line: #d8d8d8;
+  --text: #171717;
+  --muted: #6b7280;
+  --teal: #11a79a;
+  --gold: #e5c36a;
+  --orange: #ff8a00;
+  --blue: #1570ef;
+  --green: #11a79a;
+  --red: #ef4444;
 }
 
-.price-shell{
-  max-width:1200px;
-  margin:auto;
-  padding:20px;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:20px;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
-.badge{
-  background:#e8c777;
-  padding:8px 16px;
-  border-radius:20px;
-  font-weight:600;
+img {
+  max-width: 100%;
+  display: block;
 }
 
-.button{
-  padding:10px 16px;
-  border-radius:20px;
-  text-decoration:none;
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
-.button.primary{
-  background:#0f9d8a;
-  color:white;
+input,
+select,
+button {
+  font: inherit;
 }
 
-.top-panel{
-  text-align:center;
-  margin-bottom:20px;
+/* SAYFA */
+.price-page {
+  width: 100%;
 }
 
-.stats{
-  display:flex;
-  gap:20px;
-  justify-content:center;
-  margin-top:10px;
+.price-shell {
+  width: min(1120px, calc(100% - 28px));
+  margin: 0 auto;
+  padding: 20px 0 40px;
 }
 
-.stat{
-  font-size:14px;
+/* ÜST ALAN */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
-/* FILTER */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #111;
+  font-size: 17px;
+  font-weight: 800;
+}
 
-.filter-row{
-  margin-top:15px;
-  display:flex;
-  gap:10px;
-  justify-content:center;
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-size: 17px;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.button.primary {
+  background: var(--teal);
+  color: #fff;
+}
+
+.top-panel {
+  margin-bottom: 26px;
+}
+
+.top-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  flex-wrap: wrap;
+  margin: 6px 0 18px;
+}
+
+.stat {
+  font-size: 16px;
+}
+
+.stat strong {
+  font-size: 18px;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
 }
 
 .soft-select,
-.soft-input{
-  padding:8px;
-  border-radius:6px;
-  border:1px solid #ccc;
+.soft-input {
+  width: 100%;
+  min-height: 50px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid #cfcfcf;
+  background: #f5f5f7;
+  color: #222;
+  font-size: 16px;
+  outline: none;
 }
 
-/* KATEGORİ */
-
-.section-title{
-  margin-top:40px;
-  font-size:22px;
-  font-weight:bold;
+.soft-input::placeholder {
+  color: #9ca3af;
 }
 
-.brand-title{
-  margin-top:10px;
-  font-size:18px;
-  font-weight:600;
+/* BAŞLIKLAR */
+.section-title {
+  margin: 30px 0 10px;
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-transform: capitalize;
+}
+
+.brand-title {
+  margin: 10px 0 16px;
+  font-size: 28px;
+  font-weight: 800;
 }
 
 /* KARTLAR */
-
-.cards-wrap{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-  gap:20px;
-  margin-top:10px;
+/* İSTEK: mobilde de windowsta da alt alta */
+.cards-wrap {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
 }
 
-.product-card{
-  background:white;
-  border-radius:16px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
-  overflow:hidden;
+.product-card {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid #e6e6e6;
+  border-radius: 22px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
 }
 
-.product-top-line{
-  height:6px;
-  background:#0f9d8a;
+.product-top-line {
+  height: 8px;
+  background: var(--teal);
 }
 
-.product-inner{
-  padding:16px;
+.product-inner {
+  padding: 22px;
 }
 
-.card-head{
-  display:flex;
-  justify-content:space-between;
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
-.brand-pill{
-  font-size:12px;
-  background:#eee;
-  padding:3px 8px;
-  border-radius:10px;
-  margin-bottom:5px;
+.brand-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #ededed;
+  color: #333;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
-.model-title{
-  font-size:16px;
-  font-weight:bold;
+.model-title {
+  margin: 0;
+  font-size: 38px;
+  line-height: 1.15;
+  font-weight: 800;
 }
 
-/* FİYAT GRID */
-
-.price-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-  margin-top:15px;
+.settings-placeholder {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
 }
 
-.price-box{
-  background:#fafafa;
-  border-radius:8px;
-  padding:10px;
-  text-align:center;
+/* FİYAT ALANI */
+.price-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
-.price-label{
-  font-size:12px;
+.price-box {
+  background: #f4f4f4;
+  border-radius: 16px;
+  padding: 16px 14px;
+  text-align: center;
 }
 
-.price-label.orange{color:#ff7a00}
-.price-label.blue{color:#0080ff}
-.price-label.gray{color:#666}
-.price-label.green{color:#0f9d8a}
-
-.price-value{
-  font-size:18px;
-  font-weight:bold;
+.price-label {
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 500;
 }
 
-.kar-pozitif{
-  color:#0f9d8a;
+.price-label.orange {
+  color: var(--orange);
 }
 
-.kar-negatif{
-  color:#c0392b;
+.price-label.blue {
+  color: var(--blue);
 }
 
-/* SUMMARY */
-
-.summary-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-  margin-top:15px;
+.price-label.gray {
+  color: #777;
 }
 
-.summary-box{
-  background:#f5f5f5;
-  padding:8px;
-  border-radius:6px;
+.price-label.green {
+  color: var(--green);
 }
 
-.summary-label{
-  font-size:12px;
+.price-value {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.15;
 }
 
-.summary-value{
-  font-weight:bold;
+.kar-pozitif {
+  color: var(--green);
 }
 
-/* INPUTLAR */
-
-.edit-grid{
-  margin-top:10px;
+.kar-negatif {
+  color: var(--red);
 }
 
-.field-box{
-  margin-top:10px;
+/* ÖZET + ALANLAR */
+.edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
 }
 
-.field-box label{
-  font-size:12px;
+.summary-grid {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
 }
 
-.readonly-input{
-  width:100%;
-  padding:6px;
-  border-radius:6px;
-  border:1px solid #ddd;
+.summary-box {
+  background: #f4f4f4;
+  border-radius: 16px;
+  padding: 16px 14px;
 }
 
-.input-red{
-  border-color:#e74c3c;
+.summary-label {
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #333;
 }
 
-.input-green{
-  border-color:#0f9d8a;
+.summary-value {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.15;
 }
 
-.label-red{color:#e74c3c}
-.label-green{color:#0f9d8a}
+.field-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-/* BOŞ DURUM */
+.field-box label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #222;
+}
 
-.empty{
-  text-align:center;
-  padding:40px;
+.readonly-input {
+  width: 100%;
+  min-height: 60px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 2px solid #d8d8d8;
+  background: #fafafa;
+  color: #111;
+  font-size: 18px;
+  outline: none;
+}
+
+.field-box-red .readonly-input,
+.input-red {
+  border-color: #ff5a47;
+}
+
+.field-box-green .readonly-input,
+.input-green {
+  border-color: var(--teal);
+}
+
+.label-red {
+  color: #ff5a47 !important;
+}
+
+.label-green {
+  color: var(--teal) !important;
+}
+
+.empty {
+  text-align: center;
+  padding: 40px 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+/* TABLE WRAP */
+.table-wrap {
+  width: 100%;
+}
+
+/* TABLET */
+@media (max-width: 1024px) {
+  .price-shell {
+    width: min(100%, calc(100% - 24px));
+  }
+
+  .filter-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .price-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .model-title {
+    font-size: 30px;
+  }
+}
+
+/* MOBİL */
+@media (max-width: 640px) {
+  .price-shell {
+    width: calc(100% - 16px);
+    padding-top: 14px;
+  }
+
+  .topbar {
+    gap: 10px;
+  }
+
+  .badge,
+  .button {
+    min-height: 42px;
+    padding: 0 14px;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .top-panel {
+    margin-bottom: 20px;
+  }
+
+  .stats {
+    gap: 14px;
+    margin: 6px 0 14px;
+  }
+
+  .stat {
+    font-size: 13px;
+  }
+
+  .stat strong {
+    font-size: 15px;
+  }
+
+  .filter-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .soft-select,
+  .soft-input {
+    min-height: 46px;
+    font-size: 15px;
+    padding: 0 12px;
+  }
+
+  .section-title {
+    margin-top: 24px;
+    font-size: 30px;
+  }
+
+  .brand-title {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  .product-card {
+    border-radius: 18px;
+  }
+
+  .product-top-line {
+    height: 7px;
+  }
+
+  .product-inner {
+    padding: 16px;
+  }
+
+  .card-head {
+    margin-bottom: 14px;
+  }
+
+  .brand-pill {
+    min-height: 30px;
+    padding: 0 12px;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .model-title {
+    font-size: 22px;
+  }
+
+  .price-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .price-box {
+    border-radius: 12px;
+    padding: 12px 10px;
+  }
+
+  .price-label {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .price-value {
+    font-size: 18px;
+  }
+
+  .edit-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .summary-grid {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .summary-box {
+    border-radius: 12px;
+    padding: 12px 10px;
+  }
+
+  .summary-label {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .summary-value {
+    font-size: 16px;
+  }
+
+  .readonly-input {
+    min-height: 50px;
+    padding: 0 12px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+
+  .field-box label {
+    font-size: 12px;
+  }
 }
