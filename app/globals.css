@@ -426,3 +426,36 @@ body {
     grid-template-columns: 1fr 1fr;
   }
 }
+.field-box-red {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.field-box-green {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.label-red {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.label-green {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.input-red {
+  color: #b91c1c !important;
+  font-weight: 700;
+}
+
+.input-green {
+  color: #15803d !important;
+  font-weight: 700;
+}
