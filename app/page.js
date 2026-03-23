@@ -28,6 +28,19 @@ function calcKartKomisyonu(item) {
   return Math.floor(((kart - nakit) / nakit) * 100);
 }
 
+function trKey(value) {
+  return norm(value)
+    .toLowerCase()
+    .replace(/ö/g, "o")
+    .replace(/ü/g, "u")
+    .replace(/ı/g, "i")
+    .replace(/ş/g, "s")
+    .replace(/ç/g, "c")
+    .replace(/ğ/g, "g")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export default function HomePage() {
   const [rows, setRows] = useState([]);
   const [filters, setFilters] = useState({
@@ -69,44 +82,85 @@ export default function HomePage() {
         "elektrikli kombi": 4,
       };
 
-      const brandOrder = {
+      const combiBrandOrder = {
         vaillant: 1,
         demirdokum: 2,
-        protherm: 3,
+        baymak: 3,
+        eca: 4,
+        baykan: 5,
+      };
+
+      const klimaBrandOrder = {
+        vaillant: 1,
+        baymak: 2,
+        eca: 3,
+      };
+
+      const ecaModelOrder = {
+        "citius premix 20": 1,
+        "citius premix 24": 2,
+        "citius premix 28": 3,
+        "proteus premix 24": 4,
+        "proteus premix 28": 5,
+        "proteus premix 30": 6,
+        "proteus premix 35": 7,
+        "proteus premix 42": 8,
+        "proteus premix 45": 9,
+        "proteus premix hst 35": 10,
+        "proteus premix hst 45": 11,
+        "confeo premix 24": 12,
+        "confeo premix 30": 13,
+        "confeo premix 35": 14,
+      };
+
+      const klimaModelOrder = {
+        "spylos pro 9000": 1,
+        "spylos pro 12000": 2,
+        "spylos pro 18000": 3,
+        "spylos pro 24000": 4,
+        "ecotec 9000": 5,
+        "ecotec 12000": 6,
+        "ecotec 18000": 7,
+        "ecotec 24000": 8,
       };
 
       const sorted = [...(data || [])].sort((a, b) => {
-        const aCatKey = norm(a.kategori).toLowerCase().replace(/\s+/g, "");
-        const bCatKey = norm(b.kategori).toLowerCase().replace(/\s+/g, "");
+        const aCatKey = trKey(a.kategori).replace(/\s+/g, "");
+        const bCatKey = trKey(b.kategori).replace(/\s+/g, "");
 
         const aCat = categoryOrder[aCatKey] ?? 999;
         const bCat = categoryOrder[bCatKey] ?? 999;
 
         if (aCat !== bCat) return aCat - bCat;
 
-        if (aCat === 1) {
-          const aBrandKey = norm(a.marka)
-            .toLowerCase()
-            .replace(/ö/g, "o")
-            .replace(/ü/g, "u")
-            .replace(/ı/g, "i")
-            .replace(/ş/g, "s")
-            .replace(/ç/g, "c")
-            .replace(/\s+/g, "");
+        const aBrandKey = trKey(a.marka).replace(/\s+/g, "");
+        const bBrandKey = trKey(b.marka).replace(/\s+/g, "");
 
-          const bBrandKey = norm(b.marka)
-            .toLowerCase()
-            .replace(/ö/g, "o")
-            .replace(/ü/g, "u")
-            .replace(/ı/g, "i")
-            .replace(/ş/g, "s")
-            .replace(/ç/g, "c")
-            .replace(/\s+/g, "");
-
-          const aBrand = brandOrder[aBrandKey] ?? 999;
-          const bBrand = brandOrder[bBrandKey] ?? 999;
-
+        if (aCatKey === "kombi") {
+          const aBrand = combiBrandOrder[aBrandKey] ?? 999;
+          const bBrand = combiBrandOrder[bBrandKey] ?? 999;
           if (aBrand !== bBrand) return aBrand - bBrand;
+        }
+
+        if (aCatKey === "klima") {
+          const aBrand = klimaBrandOrder[aBrandKey] ?? 999;
+          const bBrand = klimaBrandOrder[bBrandKey] ?? 999;
+          if (aBrand !== bBrand) return aBrand - bBrand;
+        }
+
+        const aModelFull = trKey(`${a.model} ${a.alt_model || ""}`);
+        const bModelFull = trKey(`${b.model} ${b.alt_model || ""}`);
+
+        if (aBrandKey === "eca" && bBrandKey === "eca") {
+          const aOrder = ecaModelOrder[aModelFull] ?? 999;
+          const bOrder = ecaModelOrder[bModelFull] ?? 999;
+          if (aOrder !== bOrder) return aOrder - bOrder;
+        }
+
+        if (aCatKey === "klima") {
+          const aOrder = klimaModelOrder[aModelFull] ?? 999;
+          const bOrder = klimaModelOrder[bModelFull] ?? 999;
+          if (aOrder !== bOrder) return aOrder - bOrder;
         }
 
         const aPrice = Number(a.nakit_satis || 0);
@@ -140,7 +194,8 @@ export default function HomePage() {
 
   const filtered = useMemo(() => {
     return rows.filter((r) => {
-      const text = `${norm(r.kategori)} ${norm(r.marka)} ${norm(r.model)} ${norm(r.alt_model)}`.toLowerCase();
+      const text =
+        `${norm(r.kategori)} ${norm(r.marka)} ${norm(r.model)} ${norm(r.alt_model)}`.toLowerCase();
 
       return (
         (!filters.kategori || norm(r.kategori) === filters.kategori) &&
