@@ -910,3 +910,108 @@ select,
 textarea {
   font-family: Calibri, Arial, Helvetica, sans-serif;
 }
+/* =========================
+   ADMIN ÜST BUTONLAR DÜZEN
+   ========================= */
+
+.admin-topbar-card {
+  padding: 0;
+  margin-bottom: 18px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.admin-top-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin: 0 0 18px;
+}
+
+.admin-top-actions .button,
+.admin-top-actions button,
+.admin-top-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 14px;
+  text-decoration: none;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-top-actions .button.primary {
+  background: #00917e;
+  color: #fff;
+  border: 1px solid #00917e;
+}
+
+.admin-top-actions .button.secondary {
+  background: #fff;
+  color: #00917e;
+  border: 1px solid #00917e;
+}
+
+.admin-top-actions .button.danger {
+  background: #fff;
+  color: #111;
+  border: 1px solid #d7d7d7;
+}
+
+.admin-top-actions .button:disabled,
+.admin-top-actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .admin-top-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .admin-top-actions .button,
+  .admin-top-actions button,
+  .admin-top-actions a {
+    width: 100%;
+    min-width: 0;
+    padding: 0 10px;
+    font-size: 14px;
+    text-align: center;
+  }
+}
+
+/* =========================
+   ADMIN TABLO SATIRLARI FLU
+   ========================= */
+
+.admin-table tbody tr:nth-child(odd) {
+  background: rgba(0, 145, 126, 0.04);
+}
+
+.admin-table tbody tr:nth-child(even) {
+  background: rgba(0, 145, 126, 0.08);
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(0, 145, 126, 0.12);
+}
+
+.admin-table input[type="number"],
+.admin-table input[type="text"] {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+  font-family: Calibri, Arial, Helvetica, sans-serif;
+}
