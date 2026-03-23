@@ -1776,3 +1776,50 @@ h2.category-title,
 .section-category-title.elk-kombi {
   background: linear-gradient(135deg, #7c3aed, #5b21b6);
 }
+/* MARKA ETIKETLERI */
+.brand-badge,
+.brand-title,
+.brand-name-chip {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 14px;
+  border: 2px solid transparent;
+}
+
+/* Vaillant */
+.brand-badge.vaillant,
+.brand-title.vaillant,
+.brand-name-chip.vaillant {
+  background: rgba(0, 145, 126, 0.10);
+  color: #00917e;
+  border-color: #00917e;
+}
+
+/* Baymak */
+.brand-badge.baymak,
+.brand-title.baymak,
+.brand-name-chip.baymak {
+  background: rgba(0, 146, 69, 0.10);
+  color: #009245;
+  border-color: #009245;
+}
+
+/* Demirdöküm */
+.brand-badge.demirdokum,
+.brand-title.demirdokum,
+.brand-name-chip.demirdokum {
+  background: rgba(0, 102, 204, 0.10);
+  color: #0066cc;
+  border-color: #0066cc;
+}
+
+/* ECA */
+.brand-badge.eca,
+.brand-title.eca,
+.brand-name-chip.eca {
+  background: rgba(0, 84, 166, 0.10);
+  color: #0054a6;
+  border-color: #0054a6;
+}
