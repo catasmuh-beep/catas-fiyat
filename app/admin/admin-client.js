@@ -156,7 +156,7 @@ function sortRowsForCategory(items, kategori) {
 
 function MobileRowCard({ row, isDirty, updateField }) {
   return (
-    <div className={`admin-mobile-card ${isDirty ? "dirty" : ""}`}>
+    <div className={`admin-mobile-card${isDirty ? " dirty" : ""}`}>
       <div className="admin-mobile-head">
         <div>
           <div className="admin-mobile-brand">{norm(row.marka)}</div>
@@ -176,10 +176,22 @@ function MobileRowCard({ row, isDirty, updateField }) {
       </div>
 
       <div className="admin-mobile-stats">
-        <div><span>Net</span><strong>{formatMoney(row.net_bedel)}</strong></div>
-        <div><span>Kar</span><strong>{formatMoney(row.kar)}</strong></div>
-        <div><span>Nakit</span><strong>{formatMoney(row.nakit_satis)}</strong></div>
-        <div><span>Kart</span><strong>{formatMoney(row.kart_satis)}</strong></div>
+        <div>
+          <span>Net</span>
+          <strong>{formatMoney(row.net_bedel)}</strong>
+        </div>
+        <div>
+          <span>Kar</span>
+          <strong>{formatMoney(row.kar)}</strong>
+        </div>
+        <div>
+          <span>Nakit</span>
+          <strong>{formatMoney(row.nakit_satis)}</strong>
+        </div>
+        <div>
+          <span>Kart</span>
+          <strong>{formatMoney(row.kart_satis)}</strong>
+        </div>
       </div>
 
       <div className="admin-mobile-fields">
@@ -391,7 +403,7 @@ export default function AdminClient({ initialRows }) {
       <div className="admin-topbar-card">
         <div>
           <span className="badge">Yönetici paneli</span>
-          <div className="small" style={{ marginTop: 8 }}>
+          <div className="small admin-top-note">
             Fiyatları burada değiştirince personel ekranı otomatik yeni veriyi gösterir.
           </div>
           <div className="small admin-dirty-text">
@@ -466,7 +478,7 @@ export default function AdminClient({ initialRows }) {
                       return (
                         <tr
                           key={row.id}
-                          style={{ background: isDirty ? "#fff9e8" : "transparent" }}
+                          className={isDirty ? "admin-row-dirty" : ""}
                         >
                           <td>{norm(row.marka)}</td>
                           <td>{norm(row.model)}</td>
@@ -500,9 +512,7 @@ export default function AdminClient({ initialRows }) {
                             <input
                               type="number"
                               value={row.montaj_maliyeti ?? 0}
-                              onChange={(e) =>
-                                updateField(row.id, "montaj_maliyeti", e.target.value)
-                              }
+                              onChange={(e) => updateField(row.id, "montaj_maliyeti", e.target.value)}
                             />
                           </td>
 
@@ -511,7 +521,7 @@ export default function AdminClient({ initialRows }) {
                           <td className="money">{formatMoney(row.nakit_satis)}</td>
                           <td className="money">{formatMoney(row.kart_satis)}</td>
 
-                          <td style={{ textAlign: "center" }}>
+                          <td className="admin-check-cell">
                             <input
                               type="checkbox"
                               checked={!!row.aktif}
