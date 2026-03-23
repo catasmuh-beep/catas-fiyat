@@ -2250,3 +2250,8 @@ h2.category-title,
 .brand-title-protherm {
   color: #e11d48;
 }
+.brand-pill-protherm {
+  color: #e11d48;
+  background: rgba(225,29,72,0.10);
+  border-color: rgba(225,29,72,0.25);
+}
