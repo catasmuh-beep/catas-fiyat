@@ -556,3 +556,151 @@
     font-size: 12px;
   }
 }
+/* =========================
+   PERSONEL SAYFASI İYİLEŞTİRME
+   ========================= */
+
+/* Logoya yakın, daha zarif başlık fontu */
+.price-page .section-title,
+.price-page .brand-title,
+.price-page .model-title {
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: -0.02em;
+}
+
+/* Ürün kartı iç alanlar */
+.price-page .edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.price-page .field-box {
+  min-width: 0;
+}
+
+.price-page .readonly-input {
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+}
+
+/* Kutular birbirine girmesin */
+.price-page .field-box:nth-child(2),
+.price-page .field-box:nth-child(3),
+.price-page .field-box:nth-child(4),
+.price-page .field-box:nth-child(5) {
+  margin-top: 0;
+}
+
+/* Özet kutuları ile alt input alanları arasında boşluk */
+.price-page .summary-grid {
+  margin-bottom: 4px;
+}
+
+/* Mobilde daha kontrollü */
+@media (max-width: 640px) {
+  .price-page .product-inner {
+    padding: 14px;
+  }
+
+  .price-page .edit-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .price-page .field-box {
+    width: 100%;
+  }
+
+  .price-page .readonly-input {
+    min-height: 48px;
+    padding: 0 12px;
+    font-size: 16px;
+  }
+
+  .price-page .model-title {
+    font-size: 20px;
+    line-height: 1.2;
+  }
+}
+
+/* =========================
+   ADMIN ÜST BUTONLAR DÜZENİ
+   ========================= */
+
+.admin-page-shell .admin-top-actions,
+.admin-page-shell .top-actions,
+.admin-page-shell .header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin: 14px 0 18px;
+}
+
+.admin-page-shell .button,
+.admin-page-shell button,
+.admin-page-shell a.button,
+.admin-page-shell .top-actions a,
+.admin-page-shell .top-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 14px;
+  border: 1px solid #00917e;
+  background: #00917e;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-page-shell .button:hover,
+.admin-page-shell button:hover,
+.admin-page-shell a.button:hover,
+.admin-page-shell .top-actions a:hover,
+.admin-page-shell .top-actions button:hover {
+  opacity: 0.92;
+}
+
+.admin-page-shell .button.secondary,
+.admin-page-shell .secondary,
+.admin-page-shell .ghost {
+  background: #fff;
+  color: #00917e;
+  border: 1px solid #00917e;
+}
+
+.admin-page-shell .button.danger,
+.admin-page-shell .danger {
+  background: #fff;
+  color: #111;
+  border: 1px solid #d7d7d7;
+}
+
+@media (max-width: 640px) {
+  .admin-page-shell .admin-top-actions,
+  .admin-page-shell .top-actions,
+  .admin-page-shell .header-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .admin-page-shell .button,
+  .admin-page-shell button,
+  .admin-page-shell a.button,
+  .admin-page-shell .top-actions a,
+  .admin-page-shell .top-actions button {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: 14px;
+    text-align: center;
+  }
+}
