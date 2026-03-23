@@ -99,18 +99,15 @@ function buildPayload(row) {
     marka: norm(row.marka),
     model: norm(row.model),
     alt_model: norm(row.alt_model),
-
     alis_fiyati: Number(row.alis_fiyati || 0),
     puan: Number(row.puan || 0),
     fayda: Number(row.fayda || 0),
     montaj_maliyeti: Number(row.montaj_maliyeti || 0),
-
     kampanya_maliyeti: derived.kampanya_maliyeti,
     net_bedel: derived.net_bedel,
     kar: derived.kar,
     nakit_satis: derived.nakit_satis,
     kart_satis: derived.kart_satis,
-
     aktif: !!row.aktif,
   };
 }
@@ -118,7 +115,6 @@ function buildPayload(row) {
 function sortRowsForCategory(items, kategori) {
   return [...items].sort((a, b) => {
     const kategoriKey = trKey(kategori).replace(/\s+/g, "");
-
     const aBrand = trKey(a.marka).replace(/\s+/g, "");
     const bBrand = trKey(b.marka).replace(/\s+/g, "");
 
@@ -154,9 +150,77 @@ function sortRowsForCategory(items, kategori) {
 
     const aText = `${norm(a.marka)} ${norm(a.model)} ${norm(a.alt_model)}`;
     const bText = `${norm(b.marka)} ${norm(b.model)} ${norm(b.alt_model)}`;
-
     return aText.localeCompare(bText, "tr");
   });
+}
+
+function MobileRowCard({ row, isDirty, updateField }) {
+  return (
+    <div className={`admin-mobile-card ${isDirty ? "dirty" : ""}`}>
+      <div className="admin-mobile-head">
+        <div>
+          <div className="admin-mobile-brand">{norm(row.marka)}</div>
+          <div className="admin-mobile-model">
+            {norm(row.model)} {norm(row.alt_model)}
+          </div>
+        </div>
+
+        <label className="admin-active-toggle">
+          <span>Aktif</span>
+          <input
+            type="checkbox"
+            checked={!!row.aktif}
+            onChange={(e) => updateField(row.id, "aktif", e.target.checked)}
+          />
+        </label>
+      </div>
+
+      <div className="admin-mobile-stats">
+        <div><span>Net</span><strong>{formatMoney(row.net_bedel)}</strong></div>
+        <div><span>Kar</span><strong>{formatMoney(row.kar)}</strong></div>
+        <div><span>Nakit</span><strong>{formatMoney(row.nakit_satis)}</strong></div>
+        <div><span>Kart</span><strong>{formatMoney(row.kart_satis)}</strong></div>
+      </div>
+
+      <div className="admin-mobile-fields">
+        <label>
+          <span>Alış</span>
+          <input
+            type="number"
+            value={row.alis_fiyati ?? 0}
+            onChange={(e) => updateField(row.id, "alis_fiyati", e.target.value)}
+          />
+        </label>
+
+        <label>
+          <span>Puan</span>
+          <input
+            type="number"
+            value={row.puan ?? 0}
+            onChange={(e) => updateField(row.id, "puan", e.target.value)}
+          />
+        </label>
+
+        <label>
+          <span>Fayda</span>
+          <input
+            type="number"
+            value={row.fayda ?? 0}
+            onChange={(e) => updateField(row.id, "fayda", e.target.value)}
+          />
+        </label>
+
+        <label>
+          <span>Montaj</span>
+          <input
+            type="number"
+            value={row.montaj_maliyeti ?? 0}
+            onChange={(e) => updateField(row.id, "montaj_maliyeti", e.target.value)}
+          />
+        </label>
+      </div>
+    </div>
+  );
 }
 
 export default function AdminClient({ initialRows }) {
@@ -238,7 +302,6 @@ export default function AdminClient({ initialRows }) {
     setSaving(true);
     setNotice("");
 
-    const idsToSave = Array.from(dirtyIds);
     const rowsToSave = rows.filter((row) => dirtyIds.has(row.id));
 
     const results = await Promise.all(
@@ -267,7 +330,7 @@ export default function AdminClient({ initialRows }) {
             id: row.id,
             row: { ...(json.row || row), ...computeDerived(json.row || row) },
           };
-        } catch (error) {
+        } catch {
           return {
             ok: false,
             id: row.id,
@@ -281,21 +344,25 @@ export default function AdminClient({ initialRows }) {
     const succeeded = results.filter((r) => r.ok);
 
     if (succeeded.length > 0) {
-      const nextRowsMap = new Map(rows.map((row) => [row.id, row]));
-      succeeded.forEach((item) => {
-        nextRowsMap.set(item.id, item.row);
-      });
+      setRows((prev) =>
+        prev.map((row) => {
+          const found = succeeded.find((s) => s.id === row.id);
+          return found ? found.row : row;
+        })
+      );
 
-      const nextRows = Array.from(nextRowsMap.values());
-      setRows(nextRows);
-      setSavedRows(nextRows);
-      clearDirty(succeeded.map((item) => item.id));
+      setSavedRows((prev) =>
+        prev.map((row) => {
+          const found = succeeded.find((s) => s.id === row.id);
+          return found ? found.row : row;
+        })
+      );
+
+      clearDirty(succeeded.map((s) => s.id));
     }
 
     if (failed.length > 0) {
-      setNotice(
-        `${succeeded.length} kayıt kaydedildi, ${failed.length} kayıt kaydedilemedi.`
-      );
+      setNotice(`${succeeded.length} kayıt kaydedildi, ${failed.length} kayıt kaydedilemedi.`);
     } else {
       setNotice(`${succeeded.length} kayıt başarıyla güncellendi.`);
     }
@@ -311,9 +378,7 @@ export default function AdminClient({ initialRows }) {
 
   async function logout() {
     if (dirtyIds.size > 0) {
-      const ok = window.confirm(
-        "Kaydedilmemiş değişiklikler var. Çıkmak istediğine emin misin?"
-      );
+      const ok = window.confirm("Kaydedilmemiş değişiklikler var. Çıkmak istediğine emin misin?");
       if (!ok) return;
     }
 
@@ -322,33 +387,21 @@ export default function AdminClient({ initialRows }) {
   }
 
   return (
-    <main className="container" style={{ paddingBottom: 90 }}>
-      <div
-        className="admin-actions"
-        style={{
-          position: "sticky",
-          top: 8,
-          zIndex: 20,
-          background: "#f7f4ee",
-          border: "1px solid #e7dfd2",
-          borderRadius: 16,
-          padding: 14,
-          marginBottom: 16,
-        }}
-      >
+    <main className="container admin-page-shell">
+      <div className="admin-topbar-card">
         <div>
           <span className="badge">Yönetici paneli</span>
           <div className="small" style={{ marginTop: 8 }}>
             Fiyatları burada değiştirince personel ekranı otomatik yeni veriyi gösterir.
           </div>
-          <div className="small" style={{ marginTop: 6, fontWeight: 700 }}>
+          <div className="small admin-dirty-text">
             {dirtyCount > 0
               ? `${dirtyCount} satırda kaydedilmemiş değişiklik var`
               : "Kaydedilmemiş değişiklik yok"}
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div className="admin-top-actions">
           <button
             className="button primary"
             onClick={saveAllChanges}
@@ -384,98 +437,104 @@ export default function AdminClient({ initialRows }) {
         );
 
         return (
-          <section key={kategori} className="card panel" style={{ marginBottom: 16 }}>
-            <h2 className="section-title" style={{ marginTop: 0 }}>
-              {kategori}
-            </h2>
+          <section key={kategori} className="card panel admin-section">
+            <h2 className="section-title admin-section-title">{kategori}</h2>
 
-            <div className="table-wrap">
-              <table className="table admin-table">
-                <thead>
-                  <tr>
-                    <th>Marka</th>
-                    <th>Model</th>
-                    <th>Güç / Alt Model</th>
-                    <th>Alış</th>
-                    <th>Puan</th>
-                    <th>Fayda</th>
-                    <th>Montaj</th>
-                    <th>Net</th>
-                    <th>Kar</th>
-                    <th>Nakit</th>
-                    <th>Kart</th>
-                    <th>Aktif</th>
-                  </tr>
-                </thead>
+            <div className="admin-desktop-table">
+              <div className="table-wrap">
+                <table className="table admin-table">
+                  <thead>
+                    <tr>
+                      <th>Marka</th>
+                      <th>Model</th>
+                      <th>Güç / Alt Model</th>
+                      <th>Alış</th>
+                      <th>Puan</th>
+                      <th>Fayda</th>
+                      <th>Montaj</th>
+                      <th>Net</th>
+                      <th>Kar</th>
+                      <th>Nakit</th>
+                      <th>Kart</th>
+                      <th>Aktif</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {categoryRows.map((row) => {
+                      const isDirty = dirtyIds.has(row.id);
 
-                <tbody>
-                  {categoryRows.map((row) => {
-                    const isDirty = dirtyIds.has(row.id);
+                      return (
+                        <tr
+                          key={row.id}
+                          style={{ background: isDirty ? "#fff9e8" : "transparent" }}
+                        >
+                          <td>{norm(row.marka)}</td>
+                          <td>{norm(row.model)}</td>
+                          <td>{norm(row.alt_model)}</td>
 
-                    return (
-                      <tr
-                        key={row.id}
-                        style={{
-                          background: isDirty ? "#fff9e8" : "transparent",
-                        }}
-                      >
-                        <td>{norm(row.marka)}</td>
-                        <td>{norm(row.model)}</td>
-                        <td>{norm(row.alt_model)}</td>
+                          <td>
+                            <input
+                              type="number"
+                              value={row.alis_fiyati ?? 0}
+                              onChange={(e) => updateField(row.id, "alis_fiyati", e.target.value)}
+                            />
+                          </td>
 
-                        <td>
-                          <input
-                            type="number"
-                            value={row.alis_fiyati ?? 0}
-                            onChange={(e) =>
-                              updateField(row.id, "alis_fiyati", e.target.value)
-                            }
-                          />
-                        </td>
+                          <td>
+                            <input
+                              type="number"
+                              value={row.puan ?? 0}
+                              onChange={(e) => updateField(row.id, "puan", e.target.value)}
+                            />
+                          </td>
 
-                        <td>
-                          <input
-                            type="number"
-                            value={row.puan ?? 0}
-                            onChange={(e) => updateField(row.id, "puan", e.target.value)}
-                          />
-                        </td>
+                          <td>
+                            <input
+                              type="number"
+                              value={row.fayda ?? 0}
+                              onChange={(e) => updateField(row.id, "fayda", e.target.value)}
+                            />
+                          </td>
 
-                        <td>
-                          <input
-                            type="number"
-                            value={row.fayda ?? 0}
-                            onChange={(e) => updateField(row.id, "fayda", e.target.value)}
-                          />
-                        </td>
+                          <td>
+                            <input
+                              type="number"
+                              value={row.montaj_maliyeti ?? 0}
+                              onChange={(e) =>
+                                updateField(row.id, "montaj_maliyeti", e.target.value)
+                              }
+                            />
+                          </td>
 
-                        <td>
-                          <input
-                            type="number"
-                            value={row.montaj_maliyeti ?? 0}
-                            onChange={(e) =>
-                              updateField(row.id, "montaj_maliyeti", e.target.value)
-                            }
-                          />
-                        </td>
+                          <td>{formatMoney(row.net_bedel)}</td>
+                          <td>{formatMoney(row.kar)}</td>
+                          <td className="money">{formatMoney(row.nakit_satis)}</td>
+                          <td className="money">{formatMoney(row.kart_satis)}</td>
 
-                        <td>{formatMoney(row.net_bedel)}</td>
-                        <td>{formatMoney(row.kar)}</td>
-                        <td className="money">{formatMoney(row.nakit_satis)}</td>
-                        <td className="money">{formatMoney(row.kart_satis)}</td>
+                          <td style={{ textAlign: "center" }}>
+                            <input
+                              type="checkbox"
+                              checked={!!row.aktif}
+                              onChange={(e) => updateField(row.id, "aktif", e.target.checked)}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-                        <td style={{ textAlign: "center" }}>
-                          <input
-                            type="checkbox"
-                            checked={!!row.aktif}
-                            onChange={(e) => updateField(row.id, "aktif", e.target.checked)}
-                          />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            <div className="admin-mobile-list">
+              {categoryRows.map((row) => (
+                <MobileRowCard
+                  key={row.id}
+                  row={row}
+                  isDirty={dirtyIds.has(row.id)}
+                  updateField={updateField}
+                />
+              ))}
             </div>
           </section>
         );
