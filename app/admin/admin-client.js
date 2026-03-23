@@ -4,6 +4,42 @@ import { useMemo, useState } from "react";
 import { computeDerived, formatMoney, norm } from "../lib/pricing";
 
 function numericFields() {
+  function trKey(value) {
+  return norm(value)
+    .toLowerCase()
+    .replace(/ö/g, "o")
+    .replace(/ü/g, "u")
+    .replace(/ı/g, "i")
+    .replace(/ş/g, "s")
+    .replace(/ç/g, "c")
+    .replace(/ğ/g, "g")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const categoryOrder = {
+  kombi: 1,
+  klima: 2,
+  sofben: 3,
+  "şofben": 3,
+  elektriklikombi: 4,
+  elektrikli_kombi: 4,
+  "elektrikli kombi": 4,
+};
+
+const combiBrandOrder = {
+  vaillant: 1,
+  demirdokum: 2,
+  baymak: 3,
+  eca: 4,
+  baykan: 5,
+};
+
+const klimaBrandOrder = {
+  vaillant: 1,
+  baymak: 2,
+  eca: 3,
+};
   return ["alis_fiyati", "puan", "fayda", "montaj_maliyeti"];
 }
 
