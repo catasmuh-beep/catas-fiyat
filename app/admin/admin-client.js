@@ -1,8 +1,4 @@
 "use client";
-
-import { useEffect, useMemo, useState } from "react";
-"use client";
-
 import { useEffect, useState } from "react";
 
 /* VAİLLANT KLİMA SIRALAMASI */
