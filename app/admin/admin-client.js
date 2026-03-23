@@ -154,15 +154,17 @@ function sortRowsForCategory(items, kategori) {
   });
 }
 
+function buildProductName(row) {
+  return `${norm(row.marka)} ${norm(row.model)} ${norm(row.alt_model)}`.replace(/\s+/g, " ").trim();
+}
+
 function MobileRowCard({ row, isDirty, updateField }) {
   return (
     <div className={`admin-mobile-card${isDirty ? " dirty" : ""}`}>
       <div className="admin-mobile-head">
         <div>
-          <div className="admin-mobile-brand">{norm(row.marka)}</div>
-          <div className="admin-mobile-model">
-            {norm(row.model)} {norm(row.alt_model)}
-          </div>
+          <div className="admin-mobile-brand">{norm(row.kategori)}</div>
+          <div className="admin-mobile-model">{buildProductName(row)}</div>
         </div>
 
         <label className="admin-active-toggle">
@@ -205,6 +207,15 @@ function MobileRowCard({ row, isDirty, updateField }) {
         </label>
 
         <label>
+          <span>Montaj</span>
+          <input
+            type="number"
+            value={row.montaj_maliyeti ?? 0}
+            onChange={(e) => updateField(row.id, "montaj_maliyeti", e.target.value)}
+          />
+        </label>
+
+        <label>
           <span>Puan</span>
           <input
             type="number"
@@ -219,15 +230,6 @@ function MobileRowCard({ row, isDirty, updateField }) {
             type="number"
             value={row.fayda ?? 0}
             onChange={(e) => updateField(row.id, "fayda", e.target.value)}
-          />
-        </label>
-
-        <label>
-          <span>Montaj</span>
-          <input
-            type="number"
-            value={row.montaj_maliyeti ?? 0}
-            onChange={(e) => updateField(row.id, "montaj_maliyeti", e.target.value)}
           />
         </label>
       </div>
@@ -457,14 +459,12 @@ export default function AdminClient({ initialRows }) {
                 <table className="table admin-table">
                   <thead>
                     <tr>
-                      <th>Marka</th>
-                      <th>Model</th>
-                      <th>Güç / Alt Model</th>
+                      <th>Ürün</th>
                       <th>Alış</th>
+                      <th>Montaj Maliyeti</th>
                       <th>Puan</th>
                       <th>Fayda</th>
-                      <th>Montaj</th>
-                      <th>Net</th>
+                      <th>Net Maliyet</th>
                       <th>Kar</th>
                       <th>Nakit</th>
                       <th>Kart</th>
@@ -476,19 +476,26 @@ export default function AdminClient({ initialRows }) {
                       const isDirty = dirtyIds.has(row.id);
 
                       return (
-                        <tr
-                          key={row.id}
-                          className={isDirty ? "admin-row-dirty" : ""}
-                        >
-                          <td>{norm(row.marka)}</td>
-                          <td>{norm(row.model)}</td>
-                          <td>{norm(row.alt_model)}</td>
+                        <tr key={row.id} className={isDirty ? "admin-row-dirty" : ""}>
+                          <td>
+                            <strong>{buildProductName(row)}</strong>
+                          </td>
 
                           <td>
                             <input
                               type="number"
                               value={row.alis_fiyati ?? 0}
                               onChange={(e) => updateField(row.id, "alis_fiyati", e.target.value)}
+                            />
+                          </td>
+
+                          <td>
+                            <input
+                              type="number"
+                              value={row.montaj_maliyeti ?? 0}
+                              onChange={(e) =>
+                                updateField(row.id, "montaj_maliyeti", e.target.value)
+                              }
                             />
                           </td>
 
@@ -505,14 +512,6 @@ export default function AdminClient({ initialRows }) {
                               type="number"
                               value={row.fayda ?? 0}
                               onChange={(e) => updateField(row.id, "fayda", e.target.value)}
-                            />
-                          </td>
-
-                          <td>
-                            <input
-                              type="number"
-                              value={row.montaj_maliyeti ?? 0}
-                              onChange={(e) => updateField(row.id, "montaj_maliyeti", e.target.value)}
                             />
                           </td>
 
