@@ -779,3 +779,26 @@ ADMIN PANEL DÜZEN
 .admin-top-actions a:hover{
   opacity:0.9;
 }
+.admin-top-actions{
+  display:flex;
+  gap:12px;
+  margin:14px 0;
+  flex-wrap:wrap;
+}
+
+.admin-top-actions button,
+.admin-top-actions a{
+  background:#00917e;
+  color:white;
+  border:none;
+  padding:10px 16px;
+  border-radius:8px;
+  font-weight:700;
+  cursor:pointer;
+  text-decoration:none;
+}
+
+.admin-top-actions button:hover,
+.admin-top-actions a:hover{
+  opacity:0.9;
+}
