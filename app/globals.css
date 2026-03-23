@@ -1711,3 +1711,34 @@ textarea {
   font-size: 13px;
   letter-spacing: 0.3px;
 }
+/* ===== ALIŞ FİYATI VURGUSU ===== */
+
+/* ALIŞ kolonundaki input */
+table td:nth-child(2) input {
+  border: 2px solid #ff9900 !important;
+  background: linear-gradient(180deg,#fff7ed,#ffffff);
+  font-weight: 900 !important;
+  font-style: italic;
+  color: #9a3412;
+  box-shadow: 0 4px 14px rgba(255,153,0,0.35);
+  transition: all 0.2s ease;
+}
+
+/* hover efekti */
+table td:nth-child(2) input:hover {
+  border-color: #f97316;
+  box-shadow: 0 6px 18px rgba(249,115,22,0.45);
+}
+
+/* focus efekti */
+table td:nth-child(2) input:focus {
+  outline: none;
+  border: 2px solid #ea580c;
+  background: #fff1e6;
+}
+
+/* başlık yazısını da vurgula */
+table th:nth-child(2) {
+  color: #ea580c;
+  font-weight: 800;
+}
