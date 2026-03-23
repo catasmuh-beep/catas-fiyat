@@ -52,6 +52,7 @@ function brandClassName(marka) {
   if (key.includes("eca")) return "eca";
   if (key.includes("baymak")) return "baymak";
   if (key.includes("baykan")) return "baykan";
+  if (key.includes("protherm")) return "protherm";
 
   return "default";
 }
