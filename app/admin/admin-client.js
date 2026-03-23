@@ -172,32 +172,9 @@ function brandClass(marka) {
 }
 
 function buildProductName(row) {
-  return `${norm(row.model)} ${norm(row.alt_model)}`
+  return `${norm(row.marka)} ${norm(row.model)} ${norm(row.alt_model)}`
     .replace(/\s+/g, " ")
     .trim();
-}
-
-function getPowerText(row) {
-  const candidates = [
-    row.guc,
-    row.guc_kw,
-    row.kapasite,
-    row.kapasite_kw,
-    row.kw,
-    row.btu,
-    row.power,
-    row.power_kw,
-    row.isitma_gucu,
-    row.isitma_kapasitesi,
-    row.alt_model,
-  ];
-
-  for (const item of candidates) {
-    const value = norm(item);
-    if (value) return value;
-  }
-
-  return "-";
 }
 
 function getVaillantKombiOrder(row) {
@@ -304,25 +281,7 @@ function sortRowsForCategory(items, kategori) {
 function ProductInfoBlock({ row }) {
   return (
     <div className="admin-product-info">
-      <div className="admin-product-line">
-        <span className="admin-product-label">Kategori</span>
-        <strong className="admin-product-value">{norm(row.kategori) || "-"}</strong>
-      </div>
-
-      <div className="admin-product-line">
-        <span className="admin-product-label">Marka</span>
-        <span className={`brand-badge ${brandClass(row.marka)}`}>{norm(row.marka) || "-"}</span>
-      </div>
-
-      <div className="admin-product-line">
-        <span className="admin-product-label">Model</span>
-        <strong className="admin-product-value">{buildProductName(row) || "-"}</strong>
-      </div>
-
-      <div className="admin-product-line">
-        <span className="admin-product-label">Güç</span>
-        <strong className="admin-product-value">{getPowerText(row)}</strong>
-      </div>
+      <div className={`product-name ${brandClass(row.marka)}`}>{buildProductName(row) || "-"}</div>
     </div>
   );
 }
@@ -415,6 +374,11 @@ export default function AdminClient({ initialRows }) {
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState("");
 
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedBrand, setSelectedBrand] = useState("all");
+  const [selectedModel, setSelectedModel] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     setRows(initialHydrated);
     setSavedRows(initialHydrated);
@@ -439,6 +403,71 @@ export default function AdminClient({ initialRows }) {
       return (categoryOrder[aKey] ?? 999) - (categoryOrder[bKey] ?? 999);
     });
   }, [rows]);
+
+  const availableBrands = useMemo(() => {
+    const source =
+      selectedCategory === "all"
+        ? rows
+        : rows.filter((r) => norm(r.kategori) === selectedCategory);
+
+    return [...new Set(source.map((r) => norm(r.marka)).filter(Boolean))].sort((a, b) =>
+      a.localeCompare(b, "tr")
+    );
+  }, [rows, selectedCategory]);
+
+  const availableModels = useMemo(() => {
+    let source = rows;
+
+    if (selectedCategory !== "all") {
+      source = source.filter((r) => norm(r.kategori) === selectedCategory);
+    }
+
+    if (selectedBrand !== "all") {
+      source = source.filter((r) => norm(r.marka) === selectedBrand);
+    }
+
+    return [...new Set(source.map((r) => norm(r.model)).filter(Boolean))].sort((a, b) =>
+      a.localeCompare(b, "tr")
+    );
+  }, [rows, selectedCategory, selectedBrand]);
+
+  const filteredRows = useMemo(() => {
+    return rows.filter((row) => {
+      const categoryOk =
+        selectedCategory === "all" || norm(row.kategori) === selectedCategory;
+
+      const brandOk = selectedBrand === "all" || norm(row.marka) === selectedBrand;
+
+      const modelOk = selectedModel === "all" || norm(row.model) === selectedModel;
+
+      const text = trKey(
+        `${row.kategori || ""} ${row.marka || ""} ${row.model || ""} ${row.alt_model || ""}`
+      );
+
+      const searchOk = !searchTerm || text.includes(trKey(searchTerm));
+
+      return categoryOk && brandOk && modelOk && searchOk;
+    });
+  }, [rows, selectedCategory, selectedBrand, selectedModel, searchTerm]);
+
+  const filteredCategories = useMemo(() => {
+    return [...new Set(filteredRows.map((r) => norm(r.kategori)).filter(Boolean))].sort(
+      (a, b) => {
+        const aKey = trKey(a).replace(/\s+/g, "");
+        const bKey = trKey(b).replace(/\s+/g, "");
+        return (categoryOrder[aKey] ?? 999) - (categoryOrder[bKey] ?? 999);
+      }
+    );
+  }, [filteredRows]);
+
+  useEffect(() => {
+    setSelectedBrand("all");
+    setSelectedModel("all");
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    setSelectedModel("all");
+  }, [selectedBrand]);
 
   const dirtyCount = dirtyIds.size;
 
@@ -599,11 +628,55 @@ export default function AdminClient({ initialRows }) {
         </div>
       </div>
 
+      <div className="card panel admin-filter-bar">
+        <div className="admin-filter-stats">
+          <strong>Toplam ürün: {filteredRows.length}</strong>
+          <span>Kategori: {filteredCategories.length}</span>
+          <span>Marka: {availableBrands.length}</span>
+        </div>
+
+        <div className="admin-filter-grid">
+          <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+            <option value="all">Tüm kategoriler</option>
+            {categories.map((kategori) => (
+              <option key={kategori} value={kategori}>
+                {kategori}
+              </option>
+            ))}
+          </select>
+
+          <select value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)}>
+            <option value="all">Tüm markalar</option>
+            {availableBrands.map((marka) => (
+              <option key={marka} value={marka}>
+                {marka}
+              </option>
+            ))}
+          </select>
+
+          <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)}>
+            <option value="all">Tüm modeller</option>
+            {availableModels.map((model) => (
+              <option key={model} value={model}>
+                {model}
+              </option>
+            ))}
+          </select>
+
+          <input
+            type="text"
+            placeholder="Ara: model / güç / marka"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
       {notice ? <div className="notice ok">{notice}</div> : null}
 
-      {categories.map((kategori) => {
+      {filteredCategories.map((kategori) => {
         const categoryRows = sortRowsForCategory(
-          rows.filter((r) => norm(r.kategori) === kategori),
+          filteredRows.filter((r) => norm(r.kategori) === kategori),
           kategori
         );
 
