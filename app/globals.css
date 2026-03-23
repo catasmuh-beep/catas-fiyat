@@ -2255,3 +2255,6 @@ h2.category-title,
   background: rgba(225,29,72,0.10);
   border-color: rgba(225,29,72,0.25);
 }
+.product-top-line-protherm {
+  background: linear-gradient(90deg,#e11d48,#fb7185);
+}
