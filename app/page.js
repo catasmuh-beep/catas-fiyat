@@ -328,17 +328,19 @@ return aText.localeCompare(bText, "tr");
                                 </div>
 
                                 <div className="field-box">
-                                  <label>Montaj</label>
-                                  <input defaultValue={item.montaj_maliyeti} readOnly className="readonly-input" />
+                              <div className="field-box field-box-red">
+  <label className="label-red">Montaj</label>
+  <input defaultValue={item.montaj_maliyeti} readOnly className="readonly-input input-red" />
+</div>
+<div className="field-box field-box-green">
+  <label className="label-green">Puan</label>
+  <input defaultValue={item.puan} readOnly className="readonly-input input-green" />
+</div>
                                 </div>
-
-                                <div className="field-box">
-                                  <label>Puan</label>
-                                  <input defaultValue={item.puan} readOnly className="readonly-input" />
-                                </div>
-
-                                <div className="field-box">
-                                 <input defaultValue={item.fayda} readOnly className="readonly-input" />
+<div className="field-box field-box-green">
+  <label className="label-green">Fayda</label>
+  <input defaultValue={item.fayda} readOnly className="readonly-input input-green" />
+</div>
                                  </div>
                               </div>
                             </div>
