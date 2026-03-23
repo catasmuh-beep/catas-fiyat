@@ -1823,3 +1823,79 @@ h2.category-title,
   color: #0054a6;
   border-color: #0054a6;
 }
+/* KATEGORI BASLIKLARI */
+.category-title {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 14px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.4px;
+  color: #fff !important;
+  margin-bottom: 14px;
+}
+
+.category-title.kombi {
+  background: linear-gradient(135deg, #ff9900, #ff7a00);
+}
+
+.category-title.klima {
+  background: linear-gradient(135deg, #00917e, #0ea5a4);
+}
+
+.category-title.sofben {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.category-title.elk-kombi {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+}
+
+/* MARKA ETIKETLERI */
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 13px;
+  margin-bottom: 10px;
+  border: 2px solid transparent;
+}
+
+.brand-badge.vaillant {
+  background: rgba(0, 145, 126, 0.10);
+  color: #00917e;
+  border-color: #00917e;
+}
+
+.brand-badge.baymak {
+  background: rgba(0, 146, 69, 0.10);
+  color: #009245;
+  border-color: #009245;
+}
+
+.brand-badge.demirdokum {
+  background: rgba(0, 102, 204, 0.10);
+  color: #0066cc;
+  border-color: #0066cc;
+}
+
+.brand-badge.eca {
+  background: rgba(0, 84, 166, 0.10);
+  color: #0054a6;
+  border-color: #0054a6;
+}
+
+.admin-mobile-brand.brand-badge {
+  margin-bottom: 8px;
+}
+
+.admin-table td .brand-badge {
+  margin-bottom: 8px;
+}
+
+.admin-table td strong {
+  display: block;
+}
