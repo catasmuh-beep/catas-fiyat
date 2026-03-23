@@ -1,8 +1,8 @@
-
-export function round500(value) {
+export function round1000(value) {
   if (!value) return 0;
-  return Math.ceil(Number(value) / 500) * 500;
+  return Math.ceil(Number(value) / 1000) * 1000;
 }
+
 export function computeDerived(input) {
   const alis = Number(input.alis_fiyati || 0);
   const puan = Number(input.puan || 0);
@@ -12,18 +12,10 @@ export function computeDerived(input) {
   const net_bedel = Math.max(0, alis + montaj - puan - fayda);
   const kampanya_maliyeti = net_bedel - montaj;
 
-  const nakit_satis = net_bedel > 0 ? round500(net_bedel * 1.09) : 0;
+  const nakit_satis = net_bedel > 0 ? round1000(net_bedel * 1.09) : 0;
   const kar = nakit_satis - net_bedel;
-  const kart_satis = nakit_satis > 0 ? round500(nakit_satis * 1.18) : 0;
+  const kart_satis = nakit_satis > 0 ? round1000(nakit_satis * 1.18) : 0;
 
-  return {
-    kampanya_maliyeti,
-    net_bedel,
-    kar,
-    nakit_satis,
-    kart_satis,
-  };
-}
   return {
     kampanya_maliyeti,
     net_bedel,
