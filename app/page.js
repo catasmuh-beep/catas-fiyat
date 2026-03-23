@@ -15,7 +15,6 @@ function calcNakitCarpani(item) {
   const nakit = toNumber(item.nakit_satis);
 
   if (!net || !nakit || nakit <= net) return 0;
-
   return Math.floor(((nakit - net) / net) * 100);
 }
 
@@ -24,7 +23,6 @@ function calcKartKomisyonu(item) {
   const kart = toNumber(item.kart_satis);
 
   if (!nakit || !kart || kart <= nakit) return 0;
-
   return Math.floor(((kart - nakit) / nakit) * 100);
 }
 
@@ -42,15 +40,19 @@ function trKey(value) {
     .trim();
 }
 
+function buildDisplayName(item) {
+  return `${norm(item.model)} ${norm(item.alt_model)}`.trim();
+}
+
 export default function HomePage() {
   const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     kategori: "",
     marka: "",
     model: "",
     arama: "",
   });
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -67,7 +69,7 @@ export default function HomePage() {
       if (!active) return;
 
       if (error) {
-        console.error(error);
+        console.error("Products load error:", error);
         setRows([]);
         setLoading(false);
         return;
@@ -139,7 +141,6 @@ export default function HomePage() {
 
         const aCat = categoryOrder[aCatKey] ?? 999;
         const bCat = categoryOrder[bCatKey] ?? 999;
-
         if (aCat !== bCat) return aCat - bCat;
 
         const aBrandKey = trKey(a.marka).replace(/\s+/g, "");
@@ -174,12 +175,10 @@ export default function HomePage() {
 
         const aPrice = Number(a.nakit_satis || 0);
         const bPrice = Number(b.nakit_satis || 0);
-
         if (aPrice !== bPrice) return aPrice - bPrice;
 
         const aText = `${norm(a.model)} ${norm(a.alt_model)}`;
         const bText = `${norm(b.model)} ${norm(b.alt_model)}`;
-
         return aText.localeCompare(bText, "tr");
       });
 
@@ -230,12 +229,18 @@ export default function HomePage() {
     return map;
   }, [filtered]);
 
+  const updateFilter = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
   return (
     <div className="price-page">
       <div className="price-shell">
         <div className="topbar">
           <span className="badge">Personel görünümü</span>
-          <a href="/admin" className="button primary">Yönetici Girişi</a>
+          <a href="/admin" className="button primary">
+            Yönetici Girişi
+          </a>
         </div>
 
         <div className="top-panel">
@@ -272,7 +277,7 @@ export default function HomePage() {
             <select
               className="soft-select"
               value={filters.kategori}
-              onChange={(e) => setFilters((s) => ({ ...s, kategori: e.target.value }))}
+              onChange={(e) => updateFilter("kategori", e.target.value)}
             >
               <option value="">Tüm kategoriler</option>
               {options.kategori.map((v) => (
@@ -285,7 +290,7 @@ export default function HomePage() {
             <select
               className="soft-select"
               value={filters.marka}
-              onChange={(e) => setFilters((s) => ({ ...s, marka: e.target.value }))}
+              onChange={(e) => updateFilter("marka", e.target.value)}
             >
               <option value="">Tüm markalar</option>
               {options.marka.map((v) => (
@@ -298,7 +303,7 @@ export default function HomePage() {
             <select
               className="soft-select"
               value={filters.model}
-              onChange={(e) => setFilters((s) => ({ ...s, model: e.target.value }))}
+              onChange={(e) => updateFilter("model", e.target.value)}
             >
               <option value="">Tüm modeller</option>
               {options.model.map((v) => (
@@ -312,7 +317,7 @@ export default function HomePage() {
               className="soft-input"
               placeholder="Ara: model / güç / marka"
               value={filters.arama}
-              onChange={(e) => setFilters((s) => ({ ...s, arama: e.target.value }))}
+              onChange={(e) => updateFilter("arama", e.target.value)}
             />
           </div>
         </div>
@@ -333,21 +338,20 @@ export default function HomePage() {
                   <div className="table-wrap">
                     <div className="cards-wrap">
                       {items.map((item) => {
-                        const kar = (item.nakit_satis || 0) - (item.net_bedel || 0);
+                        const kar = toNumber(item.nakit_satis) - toNumber(item.net_bedel);
                         const nakitCarpaniYuzde = calcNakitCarpani(item);
                         const kartKomisyonuYuzde = calcKartKomisyonu(item);
+                        const modelName = buildDisplayName(item);
 
                         return (
-                          <div className="product-card" key={item.id}>
+                          <article className="product-card" key={item.id}>
                             <div className="product-top-line" />
 
                             <div className="product-inner">
                               <div className="card-head">
                                 <div>
-                                  <div className="brand-pill">{item.marka}</div>
-                                  <h3 className="model-title">
-                                    {item.model} {item.alt_model || ""}
-                                  </h3>
+                                  <div className="brand-pill">{norm(item.marka)}</div>
+                                  <h3 className="model-title">{modelName}</h3>
                                 </div>
 
                                 <div className="settings-placeholder" />
@@ -403,23 +407,19 @@ export default function HomePage() {
 
                                   <div className="summary-box">
                                     <div className="summary-label">Nakit Çarpanı</div>
-                                    <div className="summary-value">
-                                      %{nakitCarpaniYuzde}
-                                    </div>
+                                    <div className="summary-value">%{nakitCarpaniYuzde}</div>
                                   </div>
 
                                   <div className="summary-box">
                                     <div className="summary-label">Kart Komisyon</div>
-                                    <div className="summary-value">
-                                      %{kartKomisyonuYuzde}
-                                    </div>
+                                    <div className="summary-value">%{kartKomisyonuYuzde}</div>
                                   </div>
                                 </div>
 
                                 <div className="field-box">
                                   <label>Alış</label>
                                   <input
-                                    defaultValue={item.alis_fiyati}
+                                    value={item.alis_fiyati ?? ""}
                                     readOnly
                                     className="readonly-input"
                                   />
@@ -428,7 +428,7 @@ export default function HomePage() {
                                 <div className="field-box field-box-red">
                                   <label className="label-red">Montaj</label>
                                   <input
-                                    defaultValue={item.montaj_maliyeti}
+                                    value={item.montaj_maliyeti ?? ""}
                                     readOnly
                                     className="readonly-input input-red"
                                   />
@@ -437,7 +437,7 @@ export default function HomePage() {
                                 <div className="field-box field-box-green">
                                   <label className="label-green">Puan</label>
                                   <input
-                                    defaultValue={item.puan}
+                                    value={item.puan ?? ""}
                                     readOnly
                                     className="readonly-input input-green"
                                   />
@@ -446,14 +446,14 @@ export default function HomePage() {
                                 <div className="field-box field-box-green">
                                   <label className="label-green">Fayda</label>
                                   <input
-                                    defaultValue={item.fayda}
+                                    value={item.fayda ?? ""}
                                     readOnly
                                     className="readonly-input input-green"
                                   />
                                 </div>
                               </div>
                             </div>
-                          </div>
+                          </article>
                         );
                       })}
                     </div>
