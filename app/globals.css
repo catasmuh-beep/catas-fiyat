@@ -1687,3 +1687,27 @@ textarea {
     white-space: normal !important;
   }
 }
+/* ALIŞ FİYATI ALANINI VURGULA */
+
+.admin-field input[name="purchase_price"],
+.admin-field input[name="alis_fiyati"],
+.admin-field input.purchase-price {
+  border: 2px solid #ff9900 !important;
+  background: linear-gradient(180deg,#fff7ed,#ffffff);
+  font-weight: 800;
+  color: #9a3412;
+  box-shadow: 0 4px 12px rgba(255,153,0,0.25);
+}
+
+/* label daha dikkat çekici */
+
+.admin-field label {
+  font-weight: 700;
+}
+
+.admin-field label:has(+ input[name="purchase_price"]),
+.admin-field label:has(+ input[name="alis_fiyati"]) {
+  color: #ea580c;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+}
