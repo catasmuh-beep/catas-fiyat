@@ -3,7 +3,28 @@
 
 import { useMemo, useState } from "react";
 import { computeDerived, formatMoney, norm } from "../lib/pricing";
+function toNumber(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
 
+function calcNakitCarpani(netBedel, nakitSatis) {
+  const net = toNumber(netBedel);
+  const nakit = toNumber(nakitSatis);
+
+  if (!net || !nakit || nakit <= net) return 0;
+
+  return Math.floor(((nakit - net) / net) * 100);
+}
+
+function calcKartKomisyonu(nakitSatis, kartSatis) {
+  const nakit = toNumber(nakitSatis);
+  const kart = toNumber(kartSatis);
+
+  if (!nakit || !kart || kart <= nakit) return 0;
+
+  return Math.floor(((kart - nakit) / nakit) * 100);
+}
 function numericFields() {
   return ["alis_fiyati", "puan", "fayda", "montaj_maliyeti"];
 }
