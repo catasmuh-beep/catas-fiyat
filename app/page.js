@@ -37,6 +37,7 @@ function trKey(value) {
     .replace(/ş/g, "s")
     .replace(/ç/g, "c")
     .replace(/ğ/g, "g")
+    .replace(/\.(?=\d)/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -113,25 +114,24 @@ export default function HomePage() {
         "confeo premix 35": 14,
       };
 
-     const klimaModelOrder = {
-  "spaylos pro 9000": 1,
-  "spaylos pro 12000": 2,
-  "spaylos pro 18000": 3,
-  "spaylos pro 24000": 4,
-  "spylos pro 9000": 1,
-  "spylos pro 12000": 2,
-  "spylos pro 18000": 3,
-  "spylos pro 24000": 4,
-
-  "ecotech 9000": 5,
-  "ecotech 12000": 6,
-  "ecotech 18000": 7,
-  "ecotech 24000": 8,
-  "ecotec 9000": 5,
-  "ecotec 12000": 6,
-  "ecotec 18000": 7,
-  "ecotec 24000": 8,
-};
+      const klimaModelOrder = {
+        "spaylos pro 9000": 1,
+        "spaylos pro 12000": 2,
+        "spaylos pro 18000": 3,
+        "spaylos pro 24000": 4,
+        "spylos pro 9000": 1,
+        "spylos pro 12000": 2,
+        "spylos pro 18000": 3,
+        "spylos pro 24000": 4,
+        "ecotech 9000": 5,
+        "ecotech 12000": 6,
+        "ecotech 18000": 7,
+        "ecotech 24000": 8,
+        "ecotec 9000": 5,
+        "ecotec 12000": 6,
+        "ecotec 18000": 7,
+        "ecotec 24000": 8,
+      };
 
       const sorted = [...(data || [])].sort((a, b) => {
         const aCatKey = trKey(a.kategori).replace(/\s+/g, "");
