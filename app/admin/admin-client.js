@@ -1,6 +1,21 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
+
+/* VAİLLANT KLİMA SIRALAMASI */
+const VAILLANT_CLIMATE_ORDER = [
+  "climavair pure 9000",
+  "climavair pure 12000",
+  "climavair pure 18000",
+  "climavair pure 24000",
+  "climavair pro 9000",
+  "climavair pro 12000",
+  "climavair pro 18000",
+  "climavair pro 24000",
+];
 import { computeDerived, formatMoney, norm } from "../lib/pricing";
 
 function numericFields() {
