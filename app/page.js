@@ -5,6 +5,29 @@ import Image from "next/image";
 import { getBrowserSupabase } from "./lib/supabase";
 import { formatMoney, norm } from "./lib/pricing";
 
+function toNumber(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function calcNakitCarpani(item) {
+  const net = toNumber(item.net_bedel);
+  const nakit = toNumber(item.nakit_satis);
+
+  if (!net || !nakit || nakit <= net) return 0;
+
+  return Math.floor(((nakit - net) / net) * 100);
+}
+
+function calcKartKomisyonu(item) {
+  const nakit = toNumber(item.nakit_satis);
+  const kart = toNumber(item.kart_satis);
+
+  if (!nakit || !kart || kart <= nakit) return 0;
+
+  return Math.floor(((kart - nakit) / nakit) * 100);
+}
+
 export default function HomePage() {
   const [rows, setRows] = useState([]);
   const [filters, setFilters] = useState({
@@ -117,8 +140,7 @@ export default function HomePage() {
 
   const filtered = useMemo(() => {
     return rows.filter((r) => {
-      const text =
-        `${norm(r.kategori)} ${norm(r.marka)} ${norm(r.model)} ${norm(r.alt_model)}`.toLowerCase();
+      const text = `${norm(r.kategori)} ${norm(r.marka)} ${norm(r.model)} ${norm(r.alt_model)}`.toLowerCase();
 
       return (
         (!filters.kategori || norm(r.kategori) === filters.kategori) &&
@@ -248,6 +270,8 @@ export default function HomePage() {
                     <div className="cards-wrap">
                       {items.map((item) => {
                         const kar = (item.nakit_satis || 0) - (item.net_bedel || 0);
+                        const nakitCarpaniYuzde = calcNakitCarpani(item);
+                        const kartKomisyonuYuzde = calcKartKomisyonu(item);
 
                         return (
                           <div className="product-card" key={item.id}>
@@ -316,14 +340,14 @@ export default function HomePage() {
                                   <div className="summary-box">
                                     <div className="summary-label">Nakit Çarpanı</div>
                                     <div className="summary-value">
-                                      {item.nakit_carpani ? item.nakit_carpani : "-"}
+                                      %{nakitCarpaniYuzde}
                                     </div>
                                   </div>
 
                                   <div className="summary-box">
                                     <div className="summary-label">Kart Komisyon</div>
                                     <div className="summary-value">
-                                      {item.kart_komisyonu ? `%${item.kart_komisyonu}` : "-"}
+                                      %{kartKomisyonuYuzde}
                                     </div>
                                   </div>
                                 </div>
