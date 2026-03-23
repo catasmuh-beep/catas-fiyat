@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 :root {
   --bg: #f4efe6;
   --card: #ffffff;
@@ -13,11 +14,16 @@
   --warning: #fff9e8;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html,
+html {
+  min-height: 100%;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -25,9 +31,6 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
-}
-
-body {
   overflow-x: hidden;
 }
 
@@ -44,6 +47,12 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+input,
+select,
+textarea {
+  color: var(--text);
 }
 
 a {
@@ -114,12 +123,22 @@ a {
   cursor: pointer;
   font-weight: 800;
   font-size: 15px;
-  transition: 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
 }
 
 .button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+  transform: none;
 }
 
 .button.primary {
@@ -137,6 +156,8 @@ a {
   background: var(--danger);
   color: #fff;
 }
+
+/* ADMIN */
 
 .admin-page-shell {
   padding-bottom: 90px;
@@ -164,8 +185,8 @@ a {
 
 .admin-top-actions {
   display: flex;
-  gap: 10px;
   flex-wrap: wrap;
+  gap: 10px;
   margin-top: 16px;
 }
 
@@ -178,6 +199,7 @@ a {
 }
 
 .table-wrap {
+  width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -187,6 +209,7 @@ a {
   border-collapse: collapse;
   table-layout: fixed;
   font-size: 14px;
+  background: transparent;
 }
 
 .admin-table th,
@@ -204,16 +227,19 @@ a {
   text-align: left;
 }
 
-.admin-table input[type="number"] {
+.admin-table input[type="number"],
+.admin-table input[type="text"],
+.admin-table select {
   width: 100%;
   min-width: 88px;
-  max-width: 110px;
+  max-width: 120px;
   padding: 8px 10px;
   border: 1px solid #d8d8d8;
   border-radius: 12px;
   font-size: 14px;
   background: #fff;
   color: var(--text);
+  outline: none;
 }
 
 .admin-table input[type="checkbox"] {
@@ -255,9 +281,9 @@ a {
 
 .admin-mobile-head {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  align-items: flex-start;
   margin-bottom: 12px;
 }
 
@@ -270,21 +296,21 @@ a {
 }
 
 .admin-mobile-model {
+  margin-top: 4px;
   font-size: 18px;
   font-weight: 800;
   color: var(--text);
-  margin-top: 4px;
   line-height: 1.25;
 }
 
 .admin-active-toggle {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 6px;
   font-size: 12px;
   font-weight: 700;
   color: var(--muted);
-  align-items: center;
 }
 
 .admin-active-toggle input[type="checkbox"] {
@@ -308,9 +334,9 @@ a {
 
 .admin-mobile-stats span {
   display: block;
+  margin-bottom: 4px;
   font-size: 12px;
   color: var(--muted);
-  margin-bottom: 4px;
 }
 
 .admin-mobile-stats strong {
@@ -333,7 +359,9 @@ a {
   color: var(--muted);
 }
 
-.admin-mobile-fields input[type="number"] {
+.admin-mobile-fields input[type="number"],
+.admin-mobile-fields input[type="text"],
+.admin-mobile-fields select {
   width: 100%;
   padding: 12px;
   border-radius: 14px;
@@ -341,6 +369,7 @@ a {
   background: #fff;
   color: var(--text);
   font-size: 16px;
+  outline: none;
 }
 
 @media (max-width: 900px) {
