@@ -1742,3 +1742,37 @@ table th:nth-child(2) {
   color: #ea580c;
   font-weight: 800;
 }
+/* KATEGORI BASLIKLARI */
+.category-title,
+h2.category-title,
+.section-category-title {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 14px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.4px;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+/* kategori bazlı renkler */
+.category-title.kombi,
+.section-category-title.kombi {
+  background: linear-gradient(135deg, #ff9900, #ff7a00);
+}
+
+.category-title.klima,
+.section-category-title.klima {
+  background: linear-gradient(135deg, #00917e, #0ea5a4);
+}
+
+.category-title.sofben,
+.section-category-title.sofben {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.category-title.elk-kombi,
+.section-category-title.elk-kombi {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+}
