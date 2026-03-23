@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { computeDerived, formatMoney, norm } from "../lib/pricing";
 
 function numericFields() {
@@ -84,6 +84,37 @@ const ecaKlimaModelOrder = {
   "ecotec 24000": 8,
 };
 
+function hydrateRows(rows) {
+  return (rows || []).map((row) => ({
+    ...row,
+    ...computeDerived(row),
+  }));
+}
+
+function buildPayload(row) {
+  const derived = computeDerived(row);
+
+  return {
+    kategori: norm(row.kategori),
+    marka: norm(row.marka),
+    model: norm(row.model),
+    alt_model: norm(row.alt_model),
+
+    alis_fiyati: Number(row.alis_fiyati || 0),
+    puan: Number(row.puan || 0),
+    fayda: Number(row.fayda || 0),
+    montaj_maliyeti: Number(row.montaj_maliyeti || 0),
+
+    kampanya_maliyeti: derived.kampanya_maliyeti,
+    net_bedel: derived.net_bedel,
+    kar: derived.kar,
+    nakit_satis: derived.nakit_satis,
+    kart_satis: derived.kart_satis,
+
+    aktif: !!row.aktif,
+  };
+}
+
 function sortRowsForCategory(items, kategori) {
   return [...items].sort((a, b) => {
     const kategoriKey = trKey(kategori).replace(/\s+/g, "");
@@ -129,11 +160,30 @@ function sortRowsForCategory(items, kategori) {
 }
 
 export default function AdminClient({ initialRows }) {
-  const [rows, setRows] = useState(
-    (initialRows || []).map((row) => ({ ...row, ...computeDerived(row) }))
-  );
-  const [savingId, setSavingId] = useState("");
+  const initialHydrated = useMemo(() => hydrateRows(initialRows), [initialRows]);
+
+  const [rows, setRows] = useState(initialHydrated);
+  const [savedRows, setSavedRows] = useState(initialHydrated);
+  const [dirtyIds, setDirtyIds] = useState(new Set());
+  const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    setRows(initialHydrated);
+    setSavedRows(initialHydrated);
+    setDirtyIds(new Set());
+  }, [initialHydrated]);
+
+  useEffect(() => {
+    const handler = (event) => {
+      if (dirtyIds.size === 0) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [dirtyIds]);
 
   const categories = useMemo(() => {
     return [...new Set(rows.map((r) => norm(r.kategori)).filter(Boolean))].sort((a, b) => {
@@ -143,90 +193,183 @@ export default function AdminClient({ initialRows }) {
     });
   }, [rows]);
 
-  async function saveRow(row) {
-    setSavingId(row.id);
-    setNotice("");
+  const dirtyCount = dirtyIds.size;
 
-    const derived = computeDerived(row);
-
-    const payload = {
-      kategori: norm(row.kategori),
-      marka: norm(row.marka),
-      model: norm(row.model),
-      alt_model: norm(row.alt_model),
-
-      alis_fiyati: Number(row.alis_fiyati || 0),
-      puan: Number(row.puan || 0),
-      fayda: Number(row.fayda || 0),
-      montaj_maliyeti: Number(row.montaj_maliyeti || 0),
-
-      kampanya_maliyeti: derived.kampanya_maliyeti,
-      net_bedel: derived.net_bedel,
-      kar: derived.kar,
-      nakit_satis: derived.nakit_satis,
-      kart_satis: derived.kart_satis,
-
-      aktif: !!row.aktif,
-    };
-
-    const res = await fetch(`/api/products/${row.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+  function markDirty(id) {
+    setDirtyIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
     });
+  }
 
-    const json = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      setNotice(json.error || "Kayıt kaydedilemedi.");
-      setSavingId("");
-      return;
-    }
-
-    setRows((prev) =>
-      prev.map((r) =>
-        r.id === row.id ? { ...(json.row || r), ...computeDerived(json.row || r) } : r
-      )
-    );
-    setSavingId("");
-    setNotice("Kayıt güncellendi.");
+  function clearDirty(ids) {
+    setDirtyIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.delete(id));
+      return next;
+    });
   }
 
   function updateField(id, field, value) {
+    setNotice("");
+
     setRows((prev) =>
-      prev.map((r) => {
-        if (r.id !== id) return r;
+      prev.map((row) => {
+        if (row.id !== id) return row;
+
         const next = {
-          ...r,
+          ...row,
           [field]: numericFields().includes(field)
             ? Number(value === "" ? 0 : value)
             : value,
         };
+
         return { ...next, ...computeDerived(next) };
       })
     );
+
+    markDirty(id);
+  }
+
+  async function saveAllChanges() {
+    if (dirtyIds.size === 0 || saving) return;
+
+    setSaving(true);
+    setNotice("");
+
+    const idsToSave = Array.from(dirtyIds);
+    const rowsToSave = rows.filter((row) => dirtyIds.has(row.id));
+
+    const results = await Promise.all(
+      rowsToSave.map(async (row) => {
+        const payload = buildPayload(row);
+
+        try {
+          const res = await fetch(`/api/products/${row.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          const json = await res.json().catch(() => ({}));
+
+          if (!res.ok) {
+            return {
+              ok: false,
+              id: row.id,
+              error: json.error || "Kayıt kaydedilemedi.",
+            };
+          }
+
+          return {
+            ok: true,
+            id: row.id,
+            row: { ...(json.row || row), ...computeDerived(json.row || row) },
+          };
+        } catch (error) {
+          return {
+            ok: false,
+            id: row.id,
+            error: "Bağlantı hatası oluştu.",
+          };
+        }
+      })
+    );
+
+    const failed = results.filter((r) => !r.ok);
+    const succeeded = results.filter((r) => r.ok);
+
+    if (succeeded.length > 0) {
+      const nextRowsMap = new Map(rows.map((row) => [row.id, row]));
+      succeeded.forEach((item) => {
+        nextRowsMap.set(item.id, item.row);
+      });
+
+      const nextRows = Array.from(nextRowsMap.values());
+      setRows(nextRows);
+      setSavedRows(nextRows);
+      clearDirty(succeeded.map((item) => item.id));
+    }
+
+    if (failed.length > 0) {
+      setNotice(
+        `${succeeded.length} kayıt kaydedildi, ${failed.length} kayıt kaydedilemedi.`
+      );
+    } else {
+      setNotice(`${succeeded.length} kayıt başarıyla güncellendi.`);
+    }
+
+    setSaving(false);
+  }
+
+  function revertAllChanges() {
+    setRows(savedRows);
+    setDirtyIds(new Set());
+    setNotice("Kaydedilmemiş değişiklikler geri alındı.");
   }
 
   async function logout() {
+    if (dirtyIds.size > 0) {
+      const ok = window.confirm(
+        "Kaydedilmemiş değişiklikler var. Çıkmak istediğine emin misin?"
+      );
+      if (!ok) return;
+    }
+
     await fetch("/api/logout", { method: "POST" });
     window.location.href = "/";
   }
 
   return (
-    <main className="container">
-      <div className="admin-actions">
+    <main className="container" style={{ paddingBottom: 90 }}>
+      <div
+        className="admin-actions"
+        style={{
+          position: "sticky",
+          top: 8,
+          zIndex: 20,
+          background: "#f7f4ee",
+          border: "1px solid #e7dfd2",
+          borderRadius: 16,
+          padding: 14,
+          marginBottom: 16,
+        }}
+      >
         <div>
           <span className="badge">Yönetici paneli</span>
           <div className="small" style={{ marginTop: 8 }}>
             Fiyatları burada değiştirince personel ekranı otomatik yeni veriyi gösterir.
           </div>
+          <div className="small" style={{ marginTop: 6, fontWeight: 700 }}>
+            {dirtyCount > 0
+              ? `${dirtyCount} satırda kaydedilmemiş değişiklik var`
+              : "Kaydedilmemiş değişiklik yok"}
+          </div>
         </div>
 
-        <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button
+            className="button primary"
+            onClick={saveAllChanges}
+            disabled={saving || dirtyCount === 0}
+          >
+            {saving ? "Kaydediliyor..." : "Tüm Değişiklikleri Kaydet"}
+          </button>
+
+          <button
+            className="button secondary"
+            onClick={revertAllChanges}
+            disabled={saving || dirtyCount === 0}
+          >
+            Değişiklikleri Geri Al
+          </button>
+
           <a href="/" className="button secondary">
             Personel görünümüne dön
           </a>
-          <button className="button danger" onClick={logout}>
+
+          <button className="button danger" onClick={logout} disabled={saving}>
             Çıkış
           </button>
         </div>
@@ -262,73 +405,75 @@ export default function AdminClient({ initialRows }) {
                     <th>Nakit</th>
                     <th>Kart</th>
                     <th>Aktif</th>
-                    <th className="save-cell">Kaydet</th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {categoryRows.map((row) => (
-                    <tr key={row.id}>
-                      <td>{norm(row.marka)}</td>
-                      <td>{norm(row.model)}</td>
-                      <td>{norm(row.alt_model)}</td>
+                  {categoryRows.map((row) => {
+                    const isDirty = dirtyIds.has(row.id);
 
-                      <td>
-                        <input
-                          type="number"
-                          value={row.alis_fiyati ?? 0}
-                          onChange={(e) => updateField(row.id, "alis_fiyati", e.target.value)}
-                        />
-                      </td>
+                    return (
+                      <tr
+                        key={row.id}
+                        style={{
+                          background: isDirty ? "#fff9e8" : "transparent",
+                        }}
+                      >
+                        <td>{norm(row.marka)}</td>
+                        <td>{norm(row.model)}</td>
+                        <td>{norm(row.alt_model)}</td>
 
-                      <td>
-                        <input
-                          type="number"
-                          value={row.puan ?? 0}
-                          onChange={(e) => updateField(row.id, "puan", e.target.value)}
-                        />
-                      </td>
+                        <td>
+                          <input
+                            type="number"
+                            value={row.alis_fiyati ?? 0}
+                            onChange={(e) =>
+                              updateField(row.id, "alis_fiyati", e.target.value)
+                            }
+                          />
+                        </td>
 
-                      <td>
-                        <input
-                          type="number"
-                          value={row.fayda ?? 0}
-                          onChange={(e) => updateField(row.id, "fayda", e.target.value)}
-                        />
-                      </td>
+                        <td>
+                          <input
+                            type="number"
+                            value={row.puan ?? 0}
+                            onChange={(e) => updateField(row.id, "puan", e.target.value)}
+                          />
+                        </td>
 
-                      <td>
-                        <input
-                          type="number"
-                          value={row.montaj_maliyeti ?? 0}
-                          onChange={(e) => updateField(row.id, "montaj_maliyeti", e.target.value)}
-                        />
-                      </td>
+                        <td>
+                          <input
+                            type="number"
+                            value={row.fayda ?? 0}
+                            onChange={(e) => updateField(row.id, "fayda", e.target.value)}
+                          />
+                        </td>
 
-                      <td>{formatMoney(row.net_bedel)}</td>
-                      <td>{formatMoney(row.kar)}</td>
-                      <td className="money">{formatMoney(row.nakit_satis)}</td>
-                      <td className="money">{formatMoney(row.kart_satis)}</td>
+                        <td>
+                          <input
+                            type="number"
+                            value={row.montaj_maliyeti ?? 0}
+                            onChange={(e) =>
+                              updateField(row.id, "montaj_maliyeti", e.target.value)
+                            }
+                          />
+                        </td>
 
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={!!row.aktif}
-                          onChange={(e) => updateField(row.id, "aktif", e.target.checked)}
-                        />
-                      </td>
+                        <td>{formatMoney(row.net_bedel)}</td>
+                        <td>{formatMoney(row.kar)}</td>
+                        <td className="money">{formatMoney(row.nakit_satis)}</td>
+                        <td className="money">{formatMoney(row.kart_satis)}</td>
 
-                      <td className="save-cell">
-                        <button
-                          className="button primary save-btn"
-                          disabled={savingId === row.id}
-                          onClick={() => saveRow(row)}
-                        >
-                          {savingId === row.id ? "Kaydediliyor..." : "Kaydet"}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                        <td style={{ textAlign: "center" }}>
+                          <input
+                            type="checkbox"
+                            checked={!!row.aktif}
+                            onChange={(e) => updateField(row.id, "aktif", e.target.checked)}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
