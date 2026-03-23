@@ -83,6 +83,7 @@ const ecaKlimaModelOrder = {
   "ecotec 18000": 7,
   "ecotec 24000": 8,
 };
+
 const vaillantKlimaModelOrder = {
   "climavair pure 9000": 1,
   "climavair pure 12000": 2,
@@ -111,6 +112,7 @@ const vaillantKlimaModelOrder = {
   "climavair pro 18.000": 7,
   "climavair pro 24.000": 8,
 };
+
 function hydrateRows(rows) {
   return (rows || []).map((row) => ({
     ...row,
@@ -137,6 +139,29 @@ function buildPayload(row) {
     kart_satis: derived.kart_satis,
     aktif: !!row.aktif,
   };
+}
+
+function categoryClass(kategori) {
+  const key = trKey(kategori).replace(/\s+/g, "");
+
+  if (key.includes("kombi") && !key.includes("elektrik")) return "kombi";
+  if (key.includes("klima")) return "klima";
+  if (key.includes("sofben")) return "sofben";
+  if (key.includes("elektrik")) return "elk-kombi";
+
+  return "";
+}
+
+function brandClass(marka) {
+  const key = trKey(marka).replace(/\s+/g, "");
+
+  if (key.includes("vaillant")) return "vaillant";
+  if (key.includes("baymak")) return "baymak";
+  if (key.includes("demirdokum")) return "demirdokum";
+  if (key.includes("eca")) return "eca";
+  if (key.includes("baykan")) return "baykan";
+
+  return "";
 }
 
 function sortRowsForCategory(items, kategori) {
@@ -168,6 +193,12 @@ function sortRowsForCategory(items, kategori) {
       const aModelFull = trKey(`${a.model} ${a.alt_model || ""}`);
       const bModelFull = trKey(`${b.model} ${b.alt_model || ""}`);
 
+      if (aBrand === "vaillant" && bBrand === "vaillant") {
+        const aOrder = vaillantKlimaModelOrder[aModelFull] ?? 999;
+        const bOrder = vaillantKlimaModelOrder[bModelFull] ?? 999;
+        if (aOrder !== bOrder) return aOrder - bOrder;
+      }
+
       if (aBrand === "eca" && bBrand === "eca") {
         const aOrder = ecaKlimaModelOrder[aModelFull] ?? 999;
         const bOrder = ecaKlimaModelOrder[bModelFull] ?? 999;
@@ -182,7 +213,7 @@ function sortRowsForCategory(items, kategori) {
 }
 
 function buildProductName(row) {
-  return `${norm(row.marka)} ${norm(row.model)} ${norm(row.alt_model)}`
+  return `${norm(row.model)} ${norm(row.alt_model)}`
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -192,7 +223,9 @@ function MobileRowCard({ row, isDirty, updateField }) {
     <div className={`admin-mobile-card${isDirty ? " dirty" : ""}`}>
       <div className="admin-mobile-head">
         <div>
-          <div className="admin-mobile-brand">{norm(row.kategori)}</div>
+          <div className={`admin-mobile-brand brand-badge ${brandClass(row.marka)}`}>
+            {norm(row.marka)}
+          </div>
           <div className="admin-mobile-model">{buildProductName(row)}</div>
         </div>
 
@@ -229,6 +262,7 @@ function MobileRowCard({ row, isDirty, updateField }) {
         <label>
           <span>Alış</span>
           <input
+            className="purchase-input"
             type="number"
             value={row.alis_fiyati ?? 0}
             onChange={(e) => updateField(row.id, "alis_fiyati", e.target.value)}
@@ -469,7 +503,13 @@ export default function AdminClient({ initialRows }) {
 
         return (
           <section key={kategori} className="card panel admin-section">
-            <h2 className="section-title admin-section-title">{kategori}</h2>
+            <h2
+              className={`section-title admin-section-title category-title ${categoryClass(
+                kategori
+              )}`}
+            >
+              {kategori}
+            </h2>
 
             <div className="admin-desktop-table">
               <div className="table-wrap">
@@ -495,11 +535,15 @@ export default function AdminClient({ initialRows }) {
                       return (
                         <tr key={row.id} className={isDirty ? "admin-row-dirty" : ""}>
                           <td>
+                            <div className={`brand-badge ${brandClass(row.marka)}`}>
+                              {norm(row.marka)}
+                            </div>
                             <strong>{buildProductName(row)}</strong>
                           </td>
 
                           <td>
                             <input
+                              className="purchase-input"
                               type="number"
                               value={row.alis_fiyati ?? 0}
                               onChange={(e) => updateField(row.id, "alis_fiyati", e.target.value)}
