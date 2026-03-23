@@ -83,7 +83,34 @@ const ecaKlimaModelOrder = {
   "ecotec 18000": 7,
   "ecotec 24000": 8,
 };
+const vaillantKlimaModelOrder = {
+  "climavair pure 9000": 1,
+  "climavair pure 12000": 2,
+  "climavair pure 18000": 3,
+  "climavair pure 24000": 4,
+  "climavair pro 9000": 5,
+  "climavair pro 12000": 6,
+  "climavair pro 18000": 7,
+  "climavair pro 24000": 8,
 
+  "climavair pure 9 000": 1,
+  "climavair pure 12 000": 2,
+  "climavair pure 18 000": 3,
+  "climavair pure 24 000": 4,
+  "climavair pro 9 000": 5,
+  "climavair pro 12 000": 6,
+  "climavair pro 18 000": 7,
+  "climavair pro 24 000": 8,
+
+  "climavair pure 9.000": 1,
+  "climavair pure 12.000": 2,
+  "climavair pure 18.000": 3,
+  "climavair pure 24.000": 4,
+  "climavair pro 9.000": 5,
+  "climavair pro 12.000": 6,
+  "climavair pro 18.000": 7,
+  "climavair pro 24.000": 8,
+};
 function hydrateRows(rows) {
   return (rows || []).map((row) => ({
     ...row,
