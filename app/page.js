@@ -44,6 +44,18 @@ function buildDisplayName(item) {
   return `${norm(item.model)} ${norm(item.alt_model)}`.trim();
 }
 
+function brandClassName(marka) {
+  const key = trKey(marka).replace(/\s+/g, "");
+
+  if (key.includes("vaillant")) return "vaillant";
+  if (key.includes("demirdokum")) return "demirdokum";
+  if (key.includes("eca")) return "eca";
+  if (key.includes("baymak")) return "baymak";
+  if (key.includes("baykan")) return "baykan";
+
+  return "default";
+}
+
 export default function HomePage() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -99,7 +111,7 @@ export default function HomePage() {
         eca: 3,
       };
 
-      const ecaModelOrder = {
+      const ecaKombiModelOrder = {
         "citius premix 20": 1,
         "citius premix 24": 2,
         "citius premix 28": 3,
@@ -114,9 +126,12 @@ export default function HomePage() {
         "confeo premix 24": 12,
         "confeo premix 30": 13,
         "confeo premix 35": 14,
+        "cofeo premix 24": 12,
+        "cofeo premix 30": 13,
+        "cofeo premix 35": 14,
       };
 
-      const klimaModelOrder = {
+      const ecaKlimaModelOrder = {
         "spaylos pro 9000": 1,
         "spaylos pro 12000": 2,
         "spaylos pro 18000": 3,
@@ -133,6 +148,35 @@ export default function HomePage() {
         "ecotec 12000": 6,
         "ecotec 18000": 7,
         "ecotec 24000": 8,
+      };
+
+      const vaillantKlimaModelOrder = {
+        "climavair pure 9000": 1,
+        "climavair pure 12000": 2,
+        "climavair pure 18000": 3,
+        "climavair pure 24000": 4,
+        "climavair pro 9000": 5,
+        "climavair pro 12000": 6,
+        "climavair pro 18000": 7,
+        "climavair pro 24000": 8,
+
+        "climavair pure 9 000": 1,
+        "climavair pure 12 000": 2,
+        "climavair pure 18 000": 3,
+        "climavair pure 24 000": 4,
+        "climavair pro 9 000": 5,
+        "climavair pro 12 000": 6,
+        "climavair pro 18 000": 7,
+        "climavair pro 24 000": 8,
+
+        "climavair pure 9.000": 1,
+        "climavair pure 12.000": 2,
+        "climavair pure 18.000": 3,
+        "climavair pure 24.000": 4,
+        "climavair pro 9.000": 5,
+        "climavair pro 12.000": 6,
+        "climavair pro 18.000": 7,
+        "climavair pro 24.000": 8,
       };
 
       const sorted = [...(data || [])].sort((a, b) => {
@@ -161,15 +205,21 @@ export default function HomePage() {
         const aModelFull = trKey(`${a.model} ${a.alt_model || ""}`);
         const bModelFull = trKey(`${b.model} ${b.alt_model || ""}`);
 
-        if (aBrandKey === "eca" && bBrandKey === "eca") {
-          const aOrder = ecaModelOrder[aModelFull] ?? 999;
-          const bOrder = ecaModelOrder[bModelFull] ?? 999;
+        if (aCatKey === "kombi" && aBrandKey === "eca" && bBrandKey === "eca") {
+          const aOrder = ecaKombiModelOrder[aModelFull] ?? 999;
+          const bOrder = ecaKombiModelOrder[bModelFull] ?? 999;
           if (aOrder !== bOrder) return aOrder - bOrder;
         }
 
-        if (aCatKey === "klima") {
-          const aOrder = klimaModelOrder[aModelFull] ?? 999;
-          const bOrder = klimaModelOrder[bModelFull] ?? 999;
+        if (aCatKey === "klima" && aBrandKey === "vaillant" && bBrandKey === "vaillant") {
+          const aOrder = vaillantKlimaModelOrder[aModelFull] ?? 999;
+          const bOrder = vaillantKlimaModelOrder[bModelFull] ?? 999;
+          if (aOrder !== bOrder) return aOrder - bOrder;
+        }
+
+        if (aCatKey === "klima" && aBrandKey === "eca" && bBrandKey === "eca") {
+          const aOrder = ecaKlimaModelOrder[aModelFull] ?? 999;
+          const bOrder = ecaKlimaModelOrder[bModelFull] ?? 999;
           if (aOrder !== bOrder) return aOrder - bOrder;
         }
 
@@ -333,7 +383,9 @@ export default function HomePage() {
 
               {[...brands.entries()].map(([marka, items]) => (
                 <div key={`${kategori}-${marka}`}>
-                  <h3 className="brand-title">{marka}</h3>
+                  <h3 className={`brand-title brand-title-${brandClassName(marka)}`}>
+                    {marka}
+                  </h3>
 
                   <div className="table-wrap">
                     <div className="cards-wrap">
@@ -342,15 +394,18 @@ export default function HomePage() {
                         const nakitCarpaniYuzde = calcNakitCarpani(item);
                         const kartKomisyonuYuzde = calcKartKomisyonu(item);
                         const modelName = buildDisplayName(item);
+                        const markaClass = brandClassName(item.marka);
 
                         return (
                           <article className="product-card" key={item.id}>
-                            <div className="product-top-line" />
+                            <div className={`product-top-line product-top-line-${markaClass}`} />
 
                             <div className="product-inner">
                               <div className="card-head">
                                 <div>
-                                  <div className="brand-pill">{norm(item.marka)}</div>
+                                  <div className={`brand-pill brand-pill-${markaClass}`}>
+                                    {norm(item.marka)}
+                                  </div>
                                   <h3 className="model-title">{modelName}</h3>
                                 </div>
 
