@@ -36,10 +36,6 @@ export default function AdminClient({ initialRows }) {
 
  const categories = useMemo(() => [...new Set(rows.map((r) => norm(r.kategori)))], [rows]);
 
- function trKey(value) {
-   return norm(value).toLowerCase();
- }
-
  async function saveRow(row) {
    setSavingId(row.id);
    setNotice("");
@@ -48,16 +44,20 @@ export default function AdminClient({ initialRows }) {
 
    const payload = {
      kategori: norm(row.kategori),
-
-   const derived = computeDerived(row);
-
-   const payload = {
-     kategori: norm(row.kategori),
-  alt_model: norm(row.alt_model),
-
-  alis_fiyati: Number(row.alis_fiyati || 0),
-  puan: Number(row.puan || 0),
-  fayda: Number(row.fayda || 0),
+     marka: norm(row.marka),
+     model: norm(row.model),
+     alt_model: norm(row.alt_model),
+     alis_fiyati: Number(row.alis_fiyati || 0),
+     puan: Number(row.puan || 0),
+     fayda: Number(row.fayda || 0),
+     montaj_maliyeti: Number(row.montaj_maliyeti || 0),
+     kampanya_maliyeti: derived.kampanya_maliyeti,
+     net_bedel: derived.net_bedel,
+     kar: derived.kar,
+     nakit_satis: derived.nakit_satis,
+     kart_satis: derived.kart_satis,
+     aktif: !!row.aktif,
+   };
   montaj_maliyeti: Number(row.montaj_maliyeti || 0),
 
   kampanya_maliyeti: derived.kampanya_maliyeti,
