@@ -32,22 +32,27 @@ function numericFields() {
 export default function AdminClient({ initialRows }) {
   const [rows, setRows] = useState(initialRows);
   const [savingId, setSavingId] = useState("");
-  35 const [notice, setNotice] = useState("");
+   const [notice, setNotice] = useState("");
 
-36 const categories = useMemo(() => [...new Set(rows.map((r) => norm(r.kategori)))], [rows]);
+ const categories = useMemo(() => [...new Set(rows.map((r) => norm(r.kategori)))], [rows]);
 
-37 function trKey(value) {
-38   return norm(value).toLowerCase();
-39 }
+ function trKey(value) {
+   return norm(value).toLowerCase();
+ }
 
-40 async function saveRow(row) {
-41   setSavingId(row.id);
-42   setNotice("");
+ async function saveRow(row) {
+   setSavingId(row.id);
+   setNotice("");
 
-43   const derived = computeDerived(row);
+   const derived = computeDerived(row);
 
-44   const payload = {
-45     kategori: norm(row.kategori),
+   const payload = {
+     kategori: norm(row.kategori),
+
+   const derived = computeDerived(row);
+
+   const payload = {
+     kategori: norm(row.kategori),
   alt_model: norm(row.alt_model),
 
   alis_fiyati: Number(row.alis_fiyati || 0),
