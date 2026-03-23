@@ -525,3 +525,73 @@ body {
   color: #15803d !important;
   font-weight: 700;
 }
+.admin-table {
+  width: 100%;
+  table-layout: fixed;
+  font-size: 14px;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 8px 6px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.admin-table th {
+  font-size: 13px;
+}
+
+.admin-table input[type="number"] {
+  width: 100%;
+  min-width: 90px;
+  max-width: 110px;
+  padding: 6px 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.admin-table .money {
+  font-size: 13px;
+}
+
+.admin-table .save-cell {
+  position: sticky;
+  right: 0;
+  background: #f7f4ee;
+  z-index: 2;
+  box-shadow: -6px 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.admin-table .save-btn {
+  padding: 8px 10px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+@media (min-width: 1200px) {
+  .admin-table {
+    font-size: 13px;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 6px 5px;
+  }
+
+  .admin-table input[type="number"] {
+    min-width: 80px;
+    max-width: 95px;
+    padding: 5px 7px;
+    font-size: 13px;
+  }
+
+  .admin-table .save-btn {
+    padding: 7px 9px;
+    font-size: 12px;
+  }
+}
