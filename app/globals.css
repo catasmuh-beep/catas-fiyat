@@ -860,22 +860,31 @@ ADMIN PANEL DÜZEN
   cursor: not-allowed;
 }
 
-/* Mobilde butonlar çakışmasın */
+/* MOBİLDE ADMIN ÜST BUTONLAR - KESİN ÇÖZÜM */
 @media (max-width: 640px) {
   .admin-top-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+    width: 100% !important;
   }
 
   .admin-top-actions .button,
   .admin-top-actions button,
   .admin-top-actions a {
-    width: 100%;
-    min-width: 0;
-    padding: 0 10px;
-    font-size: 14px;
-    text-align: center;
+    display: flex !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 46px !important;
+    padding: 0 12px !important;
+    margin: 0 !important;
+    font-size: 14px !important;
+    text-align: center !important;
+    justify-content: center !important;
+    white-space: normal !important;
+    box-sizing: border-box !important;
   }
 }
 
