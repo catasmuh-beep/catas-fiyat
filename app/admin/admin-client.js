@@ -4,6 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 
 const API_URL = "/api/products";
 
+const CATEGORY_ORDER = [
+  "vaillant kombi",
+  "demirdöküm kombi",
+  "protherm kombi",
+  "warmhaus kombi",
+  "vaillant klima",
+  "demirdöküm klima",
+  "ticari ürünler",
+  "aksesuar",
+];
+
 const VAILLANT_CLIMATE_ORDER = [
   "climavair pure 9000",
   "climavair pure 12000",
@@ -25,6 +36,18 @@ function normalizeText(value = "") {
 function formatCurrency(value) {
   const number = Number(value || 0);
   return number.toLocaleString("tr-TR");
+}
+
+function formatPercent(value) {
+  if (!Number.isFinite(value)) return "-";
+  return `%${value.toFixed(1).replace(".", ",")}`;
+}
+
+function getPercentDiff(base, target) {
+  const baseNum = Number(base || 0);
+  const targetNum = Number(target || 0);
+  if (!baseNum || !targetNum) return null;
+  return ((targetNum - baseNum) / baseNum) * 100;
 }
 
 function getField(product, keys, fallback = "") {
@@ -76,6 +99,12 @@ function getBenefitValue(product) {
   return getField(product, ["benefit", "fayda"], "");
 }
 
+function getCategoryOrderIndex(category) {
+  const normalized = normalizeText(category);
+  const idx = CATEGORY_ORDER.findIndex((item) => item === normalized);
+  return idx === -1 ? Number.MAX_SAFE_INTEGER : idx;
+}
+
 function getVaillantClimateIndex(product) {
   const brand = normalizeText(getBrand(product));
   const category = normalizeText(getCategory(product));
@@ -97,6 +126,10 @@ function sortProductsForStaff(list) {
     const aModel = getModel(a);
     const bModel = getModel(b);
 
+    const categoryCompare =
+      getCategoryOrderIndex(aCategory) - getCategoryOrderIndex(bCategory);
+    if (categoryCompare !== 0) return categoryCompare;
+
     if (
       aBrand === "vaillant" &&
       bBrand === "vaillant" &&
@@ -105,7 +138,6 @@ function sortProductsForStaff(list) {
     ) {
       const aIdx = getVaillantClimateIndex(a);
       const bIdx = getVaillantClimateIndex(b);
-
       if (aIdx !== bIdx) return aIdx - bIdx;
     }
 
@@ -181,8 +213,8 @@ export default function AdminClient() {
   }, []);
 
   const categories = useMemo(() => {
-    return [...new Set(products.map((p) => p.category).filter(Boolean))].sort((a, b) =>
-      String(a).localeCompare(String(b), "tr")
+    return [...new Set(products.map((p) => p.category).filter(Boolean))].sort(
+      (a, b) => getCategoryOrderIndex(a) - getCategoryOrderIndex(b)
     );
   }, [products]);
 
@@ -238,12 +270,11 @@ export default function AdminClient() {
     );
 
     setEditedRows((prev) => {
-      const currentRow =
-        products.find((item) => item.id === id) || prev[id] || {};
+      const baseItem = products.find((item) => item.id === id);
       return {
         ...prev,
         [id]: {
-          ...(prev[id] || currentRow),
+          ...(prev[id] || baseItem || {}),
           [field]: value,
         },
       };
@@ -411,109 +442,120 @@ export default function AdminClient() {
         <div className="panel-empty">Eşleşen ürün bulunamadı.</div>
       ) : isAdminView ? (
         <div className="admin-list">
-          {filteredProducts.map((item) => (
-            <div key={item.id} className="admin-product-card">
-              <div className="admin-product-head">
-                <div>
-                  <div className="admin-product-brand">{item.brand}</div>
-                  <div className="admin-product-model">{item.model}</div>
+          {filteredProducts.map((item) => {
+            const cashMargin = getPercentDiff(item.purchase_price, item.cash_price);
+            const cardDiff = getPercentDiff(item.cash_price, item.card_price);
+
+            return (
+              <div key={item.id} className="admin-product-card">
+                <div className="admin-product-head">
+                  <div>
+                    <div className="admin-product-brand">{item.brand}</div>
+                    <div className="admin-product-model">{item.model}</div>
+                  </div>
+                  <div className="admin-product-category">{item.category}</div>
                 </div>
-                <div className="admin-product-category">{item.category}</div>
+
+                <div className="admin-form-grid">
+                  <div className="admin-field admin-field-highlight">
+                    <label>
+                      ALIŞ FİYATI <span className="field-badge">EN SIK DEĞİŞEN</span>
+                    </label>
+                    <input
+                      type="number"
+                      value={item.purchase_price}
+                      onChange={(e) =>
+                        updateRow(item.id, "purchase_price", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="admin-field">
+                    <label>Nakit Satış</label>
+                    <input
+                      type="number"
+                      value={item.cash_price}
+                      onChange={(e) => updateRow(item.id, "cash_price", e.target.value)}
+                    />
+                    <small className="calc-note">
+                      Alış → Nakit: {formatPercent(cashMargin)}
+                    </small>
+                  </div>
+
+                  <div className="admin-field">
+                    <label>Kart Satış</label>
+                    <input
+                      type="number"
+                      value={item.card_price}
+                      onChange={(e) => updateRow(item.id, "card_price", e.target.value)}
+                    />
+                    <small className="calc-note">
+                      Nakit → Kart: {formatPercent(cardDiff)}
+                    </small>
+                  </div>
+
+                  <div className="admin-field admin-field-montaj">
+                    <label>Montaj</label>
+                    <input
+                      type="number"
+                      value={item.installation_cost}
+                      onChange={(e) =>
+                        updateRow(item.id, "installation_cost", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="admin-field admin-field-puan">
+                    <label>Puan</label>
+                    <input
+                      type="number"
+                      value={item.points}
+                      onChange={(e) => updateRow(item.id, "points", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="admin-field admin-field-fayda">
+                    <label>Fayda</label>
+                    <input
+                      type="number"
+                      value={item.benefit}
+                      onChange={(e) => updateRow(item.id, "benefit", e.target.value)}
+                    />
+                  </div>
+                </div>
               </div>
-
-              <div className="admin-form-grid">
-                <div className="admin-field admin-field-highlight">
-                  <label>
-                    ALIŞ FİYATI <span className="field-badge">EN SIK DEĞİŞEN</span>
-                  </label>
-                  <input
-                    type="number"
-                    value={item.purchase_price}
-                    onChange={(e) =>
-                      updateRow(item.id, "purchase_price", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="admin-field">
-                  <label>Nakit Satış</label>
-                  <input
-                    type="number"
-                    value={item.cash_price}
-                    onChange={(e) => updateRow(item.id, "cash_price", e.target.value)}
-                  />
-                </div>
-
-                <div className="admin-field">
-                  <label>Kart Satış</label>
-                  <input
-                    type="number"
-                    value={item.card_price}
-                    onChange={(e) => updateRow(item.id, "card_price", e.target.value)}
-                  />
-                </div>
-
-                <div className="admin-field admin-field-montaj">
-                  <label>Montaj</label>
-                  <input
-                    type="number"
-                    value={item.installation_cost}
-                    onChange={(e) =>
-                      updateRow(item.id, "installation_cost", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="admin-field admin-field-puan">
-                  <label>Puan</label>
-                  <input
-                    type="number"
-                    value={item.points}
-                    onChange={(e) => updateRow(item.id, "points", e.target.value)}
-                  />
-                </div>
-
-                <div className="admin-field admin-field-fayda">
-                  <label>Fayda</label>
-                  <input
-                    type="number"
-                    value={item.benefit}
-                    onChange={(e) => updateRow(item.id, "benefit", e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
-        <div className="staff-product-grid">
+        <div className="staff-list-view">
           {filteredProducts.map((item) => (
-            <div key={item.id} className="staff-product-card">
-              <div className="staff-product-card-inner">
+            <div key={item.id} className="staff-list-row">
+              <div className="staff-list-main">
                 <div className="staff-card-category">{item.category}</div>
                 <div className="staff-card-brand">{item.brand}</div>
                 <div className="staff-card-model">{item.model}</div>
+              </div>
 
-                <div className="staff-price-list">
-                  <div className="staff-price-row">
-                    <span>Alış</span>
-                    <strong>{formatCurrency(item.purchase_price)} ₺</strong>
-                  </div>
-                  <div className="staff-price-row">
-                    <span>Nakit</span>
-                    <strong>{formatCurrency(item.cash_price)} ₺</strong>
-                  </div>
-                  <div className="staff-price-row">
-                    <span>Kart</span>
-                    <strong>{formatCurrency(item.card_price)} ₺</strong>
-                  </div>
+              <div className="staff-list-prices">
+                <div className="staff-price-row">
+                  <span>Alış</span>
+                  <strong>{formatCurrency(item.purchase_price)} ₺</strong>
                 </div>
+                <div className="staff-price-row">
+                  <span>Nakit</span>
+                  <strong>{formatCurrency(item.cash_price)} ₺</strong>
+                </div>
+                <div className="staff-price-row">
+                  <span>Kart</span>
+                  <strong>{formatCurrency(item.card_price)} ₺</strong>
+                </div>
+              </div>
 
-                <div className="staff-benefit-strip">
-                  <span className="pill red">Montaj: {formatCurrency(item.installation_cost)}</span>
-                  <span className="pill blue">Puan: {formatCurrency(item.points)}</span>
-                  <span className="pill green">Fayda: {formatCurrency(item.benefit)}</span>
-                </div>
+              <div className="staff-benefit-strip">
+                <span className="pill red">Montaj: {formatCurrency(item.installation_cost)}</span>
+                <span className="pill blue">Puan: {formatCurrency(item.points)}</span>
+                <span className="pill green">Fayda: {formatCurrency(item.benefit)}</span>
               </div>
             </div>
           ))}
