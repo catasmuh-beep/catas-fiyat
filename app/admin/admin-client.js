@@ -4,7 +4,10 @@ import { useMemo, useState } from "react";
 import { computeDerived, formatMoney, norm } from "../lib/pricing";
 
 function numericFields() {
-  function trKey(value) {
+  return ["alis_fiyati", "puan", "fayda", "montaj_maliyeti"];
+}
+
+function trKey(value) {
   return norm(value)
     .toLowerCase()
     .replace(/ö/g, "o")
@@ -40,18 +43,19 @@ const klimaBrandOrder = {
   baymak: 2,
   eca: 3,
 };
-  return ["alis_fiyati", "puan", "fayda", "montaj_maliyeti"];
-}
 
 export default function AdminClient({ initialRows }) {
   const [rows, setRows] = useState(initialRows);
   const [savingId, setSavingId] = useState("");
   const [notice, setNotice] = useState("");
 
-  const categories = useMemo(
-    () => [...new Set(rows.map((r) => norm(r.kategori)))],
-    [rows]
-  );
+  const categories = useMemo(() => {
+    return [...new Set(rows.map((r) => norm(r.kategori)))].sort((a, b) => {
+      const aKey = trKey(a).replace(/\s+/g, "");
+      const bKey = trKey(b).replace(/\s+/g, "");
+      return (categoryOrder[aKey] ?? 999) - (categoryOrder[bKey] ?? 999);
+    });
+  }, [rows]);
 
   async function saveRow(row) {
     setSavingId(row.id);
@@ -154,6 +158,29 @@ export default function AdminClient({ initialRows }) {
               <tbody>
                 {rows
                   .filter((r) => norm(r.kategori) === kategori)
+                  .sort((a, b) => {
+                    const kategoriKey = trKey(kategori).replace(/\s+/g, "");
+
+                    const aBrand = trKey(a.marka).replace(/\s+/g, "");
+                    const bBrand = trKey(b.marka).replace(/\s+/g, "");
+
+                    if (kategoriKey === "kombi") {
+                      const aOrder = combiBrandOrder[aBrand] ?? 999;
+                      const bOrder = combiBrandOrder[bBrand] ?? 999;
+                      if (aOrder !== bOrder) return aOrder - bOrder;
+                    }
+
+                    if (kategoriKey === "klima") {
+                      const aOrder = klimaBrandOrder[aBrand] ?? 999;
+                      const bOrder = klimaBrandOrder[bBrand] ?? 999;
+                      if (aOrder !== bOrder) return aOrder - bOrder;
+                    }
+
+                    const aText = `${norm(a.marka)} ${norm(a.model)} ${norm(a.alt_model)}`;
+                    const bText = `${norm(b.marka)} ${norm(b.model)} ${norm(b.alt_model)}`;
+
+                    return aText.localeCompare(bText, "tr");
+                  })
                   .map((row) => (
                     <tr key={row.id}>
                       <td>{norm(row.marka)}</td>
