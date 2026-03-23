@@ -1629,3 +1629,41 @@ textarea {
     justify-content: center;
   }
 }
+/* MOBILDE YÖNETİCİ ÜST BUTONLARI DÜZELT */
+@media (max-width: 640px) {
+  .admin-topbar {
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+
+  .admin-topbar-actions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .topbar-btn {
+    width: 100% !important;
+    min-height: 48px !important;
+    height: 48px !important;
+    padding: 0 14px !important;
+    border-radius: 12px !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: normal !important;
+  }
+
+  .admin-page-title {
+    font-size: 22px !important;
+  }
+
+  .admin-page-subtitle {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
+}
