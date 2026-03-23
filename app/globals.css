@@ -707,3 +707,46 @@
     text-align: center;
   }
 }
+/* ======================
+ADMIN PANEL DÜZEN
+====================== */
+
+.admin-page-shell table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.admin-page-shell th{
+  text-align:left;
+  padding:12px 10px;
+  font-weight:700;
+  border-bottom:2px solid #e5e5e5;
+}
+
+.admin-page-shell td{
+  padding:10px;
+  border-bottom:1px solid #eee;
+  vertical-align:middle;
+}
+
+/* inputlar */
+.admin-page-shell input{
+  width:100%;
+  min-width:80px;
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid #d8d8d8;
+  font-size:14px;
+  box-sizing:border-box;
+}
+
+/* checkbox */
+.admin-page-shell input[type="checkbox"]{
+  width:18px;
+  height:18px;
+}
+
+/* tablo kaymasın */
+.admin-page-shell .table-wrap{
+  overflow-x:auto;
+}
