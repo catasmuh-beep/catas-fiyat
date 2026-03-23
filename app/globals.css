@@ -1551,3 +1551,81 @@ textarea {
     width: 100%;
   }
 }
+.calc-note {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #667085;
+}
+
+.staff-list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.staff-list-row {
+  background: #fff;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid #edf0f2;
+}
+
+.staff-list-main {
+  margin-bottom: 12px;
+}
+
+.staff-list-prices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid #eef2f4;
+  border-bottom: 1px solid #eef2f4;
+}
+
+.staff-list-prices .staff-price-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0;
+}
+
+.staff-list-prices .staff-price-row span {
+  font-size: 13px;
+  color: #667085;
+}
+
+.staff-list-prices .staff-price-row strong {
+  font-size: 16px;
+}
+
+@media (max-width: 640px) {
+  .staff-list-row {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .staff-list-prices {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .staff-list-prices .staff-price-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+  }
+
+  .staff-benefit-strip {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .staff-benefit-strip .pill {
+    justify-content: center;
+  }
+}
