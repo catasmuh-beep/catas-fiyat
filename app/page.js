@@ -21,6 +21,19 @@ function brandColor(brand) {
   return "#1f3b64";
 }
 
+async function safeReadJson(res) {
+  const text = await res.text();
+  if (!text) {
+    throw new Error("API boş cevap döndü.");
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error("API geçerli JSON döndürmedi.");
+  }
+}
+
 export default function Page() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,7 +52,7 @@ export default function Page() {
         setError("");
 
         const res = await fetch("/api/products", { cache: "no-store" });
-        const json = await res.json();
+        const json = await safeReadJson(res);
 
         if (!res.ok || !json?.ok) {
           throw new Error(json?.error || "Ürünler alınamadı.");
@@ -139,16 +152,21 @@ export default function Page() {
   return (
     <main className="page-shell">
       <div className="topbar">
-        <button className="switch-btn">Personel görünümü</button>
-        <a href="/admin" className="admin-btn">Yönetici Girişi</a>
+        <button className="switch-btn" type="button">
+          Personel görünümü
+        </button>
+        <a href="/admin" className="admin-btn">
+          Yönetici Girişi
+        </a>
       </div>
 
       <div className="logo-area">
         <img
           src="/logo.png"
           alt="Çataş Mühendislik"
-          style={{ maxWidth: 380, width: "100%", height: "auto" }}
+          className="main-logo"
         />
+
         <div className="stats">
           <span>Toplam ürün: {activeProducts.length}</span>
           <span>Kategori: {categories.length}</span>
@@ -157,24 +175,43 @@ export default function Page() {
       </div>
 
       <div className="filters">
-        <select value={category} onChange={(e) => { setCategory(e.target.value); setBrand(""); setModel(""); }}>
+        <select
+          value={category}
+          onChange={(e) => {
+            setCategory(e.target.value);
+            setBrand("");
+            setModel("");
+          }}
+        >
           <option value="">Tüm kategoriler</option>
           {categories.map((item) => (
-            <option key={item} value={item}>{item}</option>
+            <option key={item} value={item}>
+              {item}
+            </option>
           ))}
         </select>
 
-        <select value={brand} onChange={(e) => { setBrand(e.target.value); setModel(""); }}>
+        <select
+          value={brand}
+          onChange={(e) => {
+            setBrand(e.target.value);
+            setModel("");
+          }}
+        >
           <option value="">Tüm markalar</option>
           {brands.map((item) => (
-            <option key={item} value={item}>{item}</option>
+            <option key={item} value={item}>
+              {item}
+            </option>
           ))}
         </select>
 
         <select value={model} onChange={(e) => setModel(e.target.value)}>
           <option value="">Tüm modeller</option>
           {models.map((item) => (
-            <option key={item} value={item}>{item}</option>
+            <option key={item} value={item}>
+              {item}
+            </option>
           ))}
         </select>
 
@@ -221,30 +258,37 @@ export default function Page() {
                             <span className="label orange">Nakit</span>
                             <strong>{formatTL(pricing.nakit)}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label blue">Kart</span>
                             <strong>{formatTL(pricing.kart)}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label gray">Net</span>
                             <strong>{formatTL(pricing.netMaliyet)}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label green">Kar</span>
                             <strong>{formatTL(pricing.kar)}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label">Kampanya</span>
                             <strong>{formatTL(pricing.kampanya)}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label">Net Bedel</span>
                             <strong>{formatTL(pricing.netMaliyet)}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label">Nakit Çarpanı</span>
                             <strong>%{pricing.nakitCarpani}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label">Kart Komisyon</span>
                             <strong>%{pricing.kartKomisyon}</strong>
@@ -256,16 +300,19 @@ export default function Page() {
                             <label>Alış</label>
                             <input readOnly value={pricing.alis} />
                           </div>
+
                           <div>
-                            <label style={{ color: "#ff4d3d" }}>Montaj</label>
+                            <label className="label-red">Montaj</label>
                             <input readOnly value={pricing.montaj} />
                           </div>
+
                           <div>
-                            <label style={{ color: "#00917e" }}>Puan</label>
+                            <label className="label-teal">Puan</label>
                             <input readOnly value={pricing.puan} />
                           </div>
+
                           <div>
-                            <label style={{ color: "#00917e" }}>Fayda</label>
+                            <label className="label-teal">Fayda</label>
                             <input readOnly value={pricing.fayda} />
                           </div>
                         </div>
