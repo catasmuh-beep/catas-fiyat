@@ -28,68 +28,68 @@ function calcProduct(row) {
   const puan = num(row.puan);
   const fayda = num(row.fayda);
 
- const net_bedel =
-  row.net_bedel !== null && row.net_bedel !== undefined && row.net_bedel !== ""
-    ? num(row.net_bedel)
-    : alis + montaj;
+  const net_bedel =
+    row.net_bedel !== null && row.net_bedel !== undefined && row.net_bedel !== ""
+      ? num(row.net_bedel)
+      : alis + montaj;
 
-const nakit_carpani = num(row.nakit_carpani);
-const kart_komisyon = num(row.kart_komisyon);
+  const nakit_carpani = num(row.nakit_carpani);
+  const kart_komisyon = num(row.kart_komisyon);
 
-const storedNakit = num(row.nakit);
-const storedKart = num(row.kart);
-const storedKar = num(row.kar);
+  const storedNakit = num(row.nakit);
+  const storedKart = num(row.kart);
+  const storedKar = num(row.kar);
 
-const nakit =
-  row.nakit !== null &&
-  row.nakit !== undefined &&
-  row.nakit !== "" &&
-  storedNakit > 0
-    ? storedNakit
-    : Math.round(net_bedel * (1 + nakit_carpani / 100));
+  const nakit =
+    row.nakit !== null &&
+    row.nakit !== undefined &&
+    row.nakit !== "" &&
+    storedNakit > 0
+      ? storedNakit
+      : Math.round(net_bedel * (1 + nakit_carpani / 100));
 
-const kart =
-  row.kart !== null &&
-  row.kart !== undefined &&
-  row.kart !== "" &&
-  storedKart > 0
-    ? storedKart
-    : Math.round(nakit * (1 + kart_komisyon / 100));
+  const kart =
+    row.kart !== null &&
+    row.kart !== undefined &&
+    row.kart !== "" &&
+    storedKart > 0
+      ? storedKart
+      : Math.round(nakit * (1 + kart_komisyon / 100));
 
-const kar =
-  row.kar !== null &&
-  row.kar !== undefined &&
-  row.kar !== "" &&
-  storedKar > 0
-    ? storedKar
-    : Math.max(0, nakit - net_bedel + puan + fayda);
+  const kar =
+    row.kar !== null &&
+    row.kar !== undefined &&
+    row.kar !== "" &&
+    storedKar > 0
+      ? storedKar
+      : Math.max(0, nakit - net_bedel + puan + fayda);
 
-const kampanya =
-  row.kampanya !== null &&
-  row.kampanya !== undefined &&
-  row.kampanya !== ""
-    ? num(row.kampanya)
-    : 0;
+  const kampanya =
+    row.kampanya !== null &&
+    row.kampanya !== undefined &&
+    row.kampanya !== ""
+      ? num(row.kampanya)
+      : 0;
 
-return {
-  ...row,
-  kategori: row.kategori || "",
-  marka: row.marka || "",
-  model: row.model || "",
-  alt_model_guc: row.alt_model_guc || row.alt_model || "",
-  alis_fiyati: alis,
-  montaj_maliyeti: montaj,
-  puan,
-  fayda,
-  net_bedel,
-  nakit_carpani,
-  kart_komisyon,
-  nakit,
-  kart,
-  kar,
-  kampanya,
-  aktif: Boolean(row.aktif),
-};
+  return {
+    ...row,
+    kategori: row.kategori || "",
+    marka: row.marka || "",
+    model: row.model || "",
+    alt_model_guc: row.alt_model_guc || row.alt_model || "",
+    alis_fiyati: alis,
+    montaj_maliyeti: montaj,
+    puan,
+    fayda,
+    net_bedel,
+    nakit_carpani,
+    kart_komisyon,
+    nakit,
+    kart,
+    kar,
+    kampanya,
+    aktif: Boolean(row.aktif),
+  };
 }
 
 export async function GET() {
@@ -105,20 +105,23 @@ export async function GET() {
       .order("model", { ascending: true });
 
     if (error) {
-     return NextResponse.json(
-  {
-    ok: true,
-    products: (data || []).map(calcProduct),
-  },
-  {
-    status: 200,
-    headers: {
-      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-      Pragma: "no-cache",
-      Expires: "0",
-    },
-  }
-);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(
+      {
+        ok: true,
+        products: (data || []).map(calcProduct),
+      },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
   } catch (err) {
     return NextResponse.json(
       { error: err.message || "Ürünler alınamadı." },
