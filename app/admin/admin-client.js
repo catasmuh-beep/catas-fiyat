@@ -8,56 +8,43 @@ function toNumber(value, fallback = 0) {
   return Number.isFinite(n) ? n : fallback;
 }
 
-function normalizeProduct(product = {}) {
+function recalculateProduct(product = {}) {
   const alis = toNumber(product.alis_fiyati);
   const montaj = toNumber(product.montaj_maliyeti);
   const puan = toNumber(product.puan);
   const fayda = toNumber(product.fayda);
 
-  const netBedel =
-    product.net_bedel !== null &&
-    product.net_bedel !== undefined &&
-    product.net_bedel !== ""
-      ? toNumber(product.net_bedel)
-      : alis + montaj;
+  const nakitCarpani = toNumber(
+    product.nakit_carpani ?? product.nakitCarpani ?? 0
+  );
 
-  const nakitCarpani = toNumber(product.nakit_carpani);
-  const kartKomisyon = toNumber(product.kart_komisyon);
+  const kartKomisyon = toNumber(
+    product.kart_komisyon ??
+      product.kart_komisyonu ??
+      product.kartKomisyon ??
+      0
+  );
 
+  const kampanya = toNumber(
+    product.kampanya ?? product.kampanya_fiyati ?? 0
+  );
+
+  // Mevcut yapıyı bozmadan: net bedel alış + montaj
+  const netBedel = alis + montaj;
+
+  // Kampanya varsa nakit onu baz alsın, yoksa çarpanlı hesaplansın
   const nakit =
-    product.nakit !== null &&
-    product.nakit !== undefined &&
-    product.nakit !== ""
-      ? toNumber(product.nakit)
+    kampanya > 0
+      ? Math.round(kampanya)
       : Math.round(netBedel * (1 + nakitCarpani / 100));
 
-  const kart =
-    product.kart !== null &&
-    product.kart !== undefined &&
-    product.kart !== ""
-      ? toNumber(product.kart)
-      : Math.round(nakit * (1 + kartKomisyon / 100));
+  const kart = Math.round(nakit * (1 + kartKomisyon / 100));
 
-  const kar =
-    product.kar !== null &&
-    product.kar !== undefined &&
-    product.kar !== ""
-      ? toNumber(product.kar)
-      : Math.max(0, nakit - netBedel + puan + fayda);
-
-  const kampanya =
-    product.kampanya !== null &&
-    product.kampanya !== undefined &&
-    product.kampanya !== ""
-      ? toNumber(product.kampanya)
-      : 0;
+  // Mevcut mantığa sadık: kar hesabında puan ve fayda pozitif katkı
+  const kar = Math.max(0, nakit - netBedel + puan + fayda);
 
   return {
-    id: product.id,
-    kategori: product.kategori || "",
-    marka: product.marka || "",
-    model: product.model || "",
-    alt_model_guc: product.alt_model_guc || product.alt_model || "",
+    ...product,
     alis_fiyati: alis,
     montaj_maliyeti: montaj,
     puan,
@@ -70,6 +57,18 @@ function normalizeProduct(product = {}) {
     kar,
     kampanya,
     aktif: Boolean(product.aktif),
+  };
+}
+
+function normalizeProduct(product = {}) {
+  return {
+    id: product.id,
+    kategori: product.kategori || "",
+    marka: product.marka || "",
+    model: product.model || "",
+    alt_model_guc:
+      product.alt_model_guc || product.alt_model || product.guc || "",
+    ...recalculateProduct(product),
   };
 }
 
@@ -126,89 +125,118 @@ export default function AdminClient({ initialProducts = [] }) {
   }
 
   async function addNewProduct() {
-  setMessage("");
+    setMessage("");
 
-  if (!newProduct.kategori.trim() || !newProduct.marka.trim() || !newProduct.model.trim()) {
-    setMessage("Kategori, marka ve model alanları zorunludur.");
-    return;
-  }
-
-  try {
-    setSaving(true);
-
-    const alis = toNumber(newProduct.alis_fiyati);
-    const montaj = toNumber(newProduct.montaj_maliyeti);
-    const puan = toNumber(newProduct.puan);
-    const fayda = toNumber(newProduct.fayda);
-
-    const net_bedel = alis + montaj;
-
-    // Yeni ürün ekleme alanında oran girişi yoksa şimdilik 0
-    const nakit_carpani = 0;
-    const kart_komisyon = 0;
-
-    const nakit = Math.round(net_bedel * (1 + nakit_carpani / 100));
-    const kart = Math.round(nakit * (1 + kart_komisyon / 100));
-    const kar = Math.max(0, nakit - net_bedel + puan + fayda);
-    const kampanya = 0;
-
-    const payload = {
-      kategori: newProduct.kategori.trim(),
-      marka: newProduct.marka.trim(),
-      model: newProduct.model.trim(),
-      alt_model_guc: newProduct.alt_model_guc.trim(),
-
-      alis_fiyati: alis,
-      montaj_maliyeti: montaj,
-      puan: puan,
-      fayda: fayda,
-
-      net_bedel: net_bedel,
-      nakit_carpani: nakit_carpani,
-      kart_komisyon: kart_komisyon,
-      nakit: nakit,
-      kart: kart,
-      kar: kar,
-      kampanya: kampanya,
-
-      aktif: Boolean(newProduct.aktif),
-    };
-
-    const res = await fetch("/api/products", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "no-cache",
-      },
-      body: JSON.stringify({
-        action: "create",
-        product: payload,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data?.error || "Yeni ürün eklenemedi.");
+    if (
+      !newProduct.kategori.trim() ||
+      !newProduct.marka.trim() ||
+      !newProduct.model.trim()
+    ) {
+      setMessage("Kategori, marka ve model alanları zorunludur.");
+      return;
     }
 
-    if (data?.product) {
-      setProducts((prev) => [...prev, normalizeProduct(data.product)]);
-    }
+    try {
+      setSaving(true);
 
-    setNewProduct(emptyNewProduct());
-    setMessage("Yeni ürün başarıyla eklendi.");
-  } catch (error) {
-    setMessage(error.message || "Yeni ürün eklenirken hata oluştu.");
-  } finally {
-    setSaving(false);
+      const calculated = recalculateProduct({
+        kategori: newProduct.kategori.trim(),
+        marka: newProduct.marka.trim(),
+        model: newProduct.model.trim(),
+        alt_model_guc: newProduct.alt_model_guc.trim(),
+        alis_fiyati: newProduct.alis_fiyati,
+        montaj_maliyeti: newProduct.montaj_maliyeti,
+        puan: newProduct.puan,
+        fayda: newProduct.fayda,
+        // Yeni ürün ekleme ekranında bu alanlar yoksa 0 kalsın
+        nakit_carpani: 0,
+        kart_komisyon: 0,
+        kampanya: 0,
+        aktif: Boolean(newProduct.aktif),
+      });
+
+      const payload = {
+        kategori: newProduct.kategori.trim(),
+        marka: newProduct.marka.trim(),
+        model: newProduct.model.trim(),
+        alt_model_guc: newProduct.alt_model_guc.trim(),
+
+        alis_fiyati: calculated.alis_fiyati,
+        montaj_maliyeti: calculated.montaj_maliyeti,
+        puan: calculated.puan,
+        fayda: calculated.fayda,
+
+        net_bedel: calculated.net_bedel,
+        nakit_carpani: calculated.nakit_carpani,
+        kart_komisyon: calculated.kart_komisyon,
+        nakit: calculated.nakit,
+        kart: calculated.kart,
+        kar: calculated.kar,
+        kampanya: calculated.kampanya,
+
+        aktif: calculated.aktif,
+      };
+
+      const res = await fetch("/api/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
+        body: JSON.stringify({
+          action: "create",
+          product: payload,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Yeni ürün eklenemedi.");
+      }
+
+      if (data?.product) {
+        setProducts((prev) => [...prev, normalizeProduct(data.product)]);
+      }
+
+      setNewProduct(emptyNewProduct());
+      setMessage("Yeni ürün başarıyla eklendi.");
+    } catch (error) {
+      setMessage(error.message || "Yeni ürün eklenirken hata oluştu.");
+    } finally {
+      setSaving(false);
+    }
   }
-}
+
   async function saveAllChanges() {
     setMessage("");
 
     try {
       setSaving(true);
+
+      const payloadProducts = products.map((item) => {
+        const calculated = recalculateProduct(item);
+
+        return {
+          id: item.id,
+          kategori: item.kategori,
+          marka: item.marka,
+          model: item.model,
+          alt_model_guc: item.alt_model_guc,
+          alis_fiyati: calculated.alis_fiyati,
+          montaj_maliyeti: calculated.montaj_maliyeti,
+          puan: calculated.puan,
+          fayda: calculated.fayda,
+          net_bedel: calculated.net_bedel,
+          nakit_carpani: calculated.nakit_carpani,
+          kart_komisyon: calculated.kart_komisyon,
+          nakit: calculated.nakit,
+          kart: calculated.kart,
+          kar: calculated.kar,
+          kampanya: calculated.kampanya,
+          aktif: Boolean(calculated.aktif),
+        };
+      });
 
       const res = await fetch("/api/products", {
         method: "PUT",
@@ -217,25 +245,7 @@ export default function AdminClient({ initialProducts = [] }) {
           "Cache-Control": "no-cache",
         },
         body: JSON.stringify({
-          products: products.map((item) => ({
-            id: item.id,
-            kategori: item.kategori,
-            marka: item.marka,
-            model: item.model,
-            alt_model_guc: item.alt_model_guc,
-            alis_fiyati: toNumber(item.alis_fiyati),
-            montaj_maliyeti: toNumber(item.montaj_maliyeti),
-            puan: toNumber(item.puan),
-            fayda: toNumber(item.fayda),
-            net_bedel: toNumber(item.net_bedel),
-            nakit_carpani: toNumber(item.nakit_carpani),
-            kart_komisyon: toNumber(item.kart_komisyon),
-            nakit: toNumber(item.nakit),
-            kart: toNumber(item.kart),
-            kar: toNumber(item.kar),
-            kampanya: toNumber(item.kampanya),
-            aktif: Boolean(item.aktif),
-          })),
+          products: payloadProducts,
         }),
       });
 
@@ -247,6 +257,8 @@ export default function AdminClient({ initialProducts = [] }) {
 
       if (Array.isArray(data?.products)) {
         setProducts(data.products.map(normalizeProduct));
+      } else {
+        setProducts(payloadProducts.map(normalizeProduct));
       }
 
       setMessage("Tüm değişiklikler kaydedildi.");
@@ -258,7 +270,9 @@ export default function AdminClient({ initialProducts = [] }) {
   }
 
   function resetChanges() {
-    setProducts(Array.isArray(initialProducts) ? initialProducts.map(normalizeProduct) : []);
+    setProducts(
+      Array.isArray(initialProducts) ? initialProducts.map(normalizeProduct) : []
+    );
     setNewProduct(emptyNewProduct());
     setMessage("Değişiklikler geri alındı.");
   }
