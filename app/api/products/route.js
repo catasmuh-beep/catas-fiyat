@@ -36,21 +36,33 @@ function calcProduct(row) {
   const nakit_carpani = num(row.nakit_carpani);
   const kart_komisyon = num(row.kart_komisyon);
 
-  const nakit =
-    row.nakit !== null && row.nakit !== undefined && row.nakit !== ""
-      ? num(row.nakit)
-      : Math.round(net_bedel * (1 + nakit_carpani / 100));
+const storedNakit = num(row.nakit);
+const storedKart = num(row.kart);
+const storedKar = num(row.kar);
 
-  const kart =
-    row.kart !== null && row.kart !== undefined && row.kart !== ""
-      ? num(row.kart)
-      : Math.round(nakit * (1 + kart_komisyon / 100));
+const nakit =
+  row.nakit !== null &&
+  row.nakit !== undefined &&
+  row.nakit !== "" &&
+  storedNakit > 0
+    ? storedNakit
+    : Math.round(net_bedel * (1 + nakit_carpani / 100));
 
-  const kar =
-    row.kar !== null && row.kar !== undefined && row.kar !== ""
-      ? num(row.kar)
-      : Math.max(0, nakit - net_bedel + puan + fayda);
+const kart =
+  row.kart !== null &&
+  row.kart !== undefined &&
+  row.kart !== "" &&
+  storedKart > 0
+    ? storedKart
+    : Math.round(nakit * (1 + kart_komisyon / 100));
 
+const kar =
+  row.kar !== null &&
+  row.kar !== undefined &&
+  row.kar !== "" &&
+  storedKar > 0
+    ? storedKar
+    : Math.max(0, nakit - net_bedel + puan + fayda);
   const kampanya =
     row.kampanya !== null && row.kampanya !== undefined && row.kampanya !== ""
       ? num(row.kampanya)
