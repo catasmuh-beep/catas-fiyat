@@ -1,5 +1,5 @@
 // lib/pricing.js
-
+import { calculateProduct, formatTL } from "../lib/pricing";
 export function toNumber(val) {
   if (val === null || val === undefined || val === "") return 0;
 
