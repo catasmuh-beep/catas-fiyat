@@ -7,10 +7,15 @@ export function toNumber(val) {
     return Number.isFinite(val) ? val : 0;
   }
 
-  const normalized = String(val)
+  const str = String(val).trim();
+
+  if (!str) return 0;
+
+  // Türkçe sayı formatı destek
+  const normalized = str
+    .replace(/₺/g, "")
+    .replace(/%/g, "")
     .replace(/\s/g, "")
-    .replace("₺", "")
-    .replace("%", "")
     .replace(/\./g, "")
     .replace(",", ".");
 
@@ -19,25 +24,18 @@ export function toNumber(val) {
 }
 
 export function calculateProduct(product) {
-  const alis = toNumber(product.alis_fiyati ?? product.alis ?? product.buying_price);
-  const montaj = toNumber(product.montaj_maliyeti ?? product.montaj ?? product.installation_cost);
-  const puan = toNumber(product.puan ?? product.points_discount);
-  const fayda = toNumber(product.fayda ?? product.benefit_discount);
-  const nakitCarpani = toNumber(product.nakit_carpani ?? product.cash_multiplier);
-  const kartKomisyon = toNumber(product.kart_komisyonu ?? product.kart_komisyon ?? product.card_commission);
-  const kampanya = toNumber(product.kampanya_fiyati ?? product.kampanya ?? product.campaign_price);
+  const alis = toNumber(product.alis_fiyati ?? product.alis ?? 0);
+  const montaj = toNumber(product.montaj_maliyeti ?? product.montaj ?? 0);
+  const puan = toNumber(product.puan ?? 0);
+  const fayda = toNumber(product.fayda ?? 0);
+  const nakitCarpani = toNumber(product.nakit_carpani ?? 0);
+  const kartKomisyonu = toNumber(product.kart_komisyonu ?? product.kart_komisyon ?? 0);
+  const kampanya = toNumber(product.kampanya_fiyati ?? product.kampanya ?? 0);
 
-  // Net maliyet
-  const net = Math.max(0, alis + montaj - puan - fayda);
-
-  // Nakit satış
-  const nakit = Math.round(net * (1 + nakitCarpani / 100));
-
-  // Kart satış
-  const kart = Math.round(nakit * (1 + kartKomisyon / 100));
-
-  // Kar
-  const kar = Math.max(0, nakit - net);
+  const netBedel = Math.max(0, alis + montaj - puan - fayda);
+  const nakitSatis = Math.round(netBedel * (1 + nakitCarpani / 100));
+  const kartliSatis = Math.round(nakitSatis * (1 + kartKomisyonu / 100));
+  const kar = Math.max(0, nakitSatis - netBedel);
 
   return {
     ...product,
@@ -46,12 +44,15 @@ export function calculateProduct(product) {
     puan,
     fayda,
     nakit_carpani: nakitCarpani,
-    kart_komisyonu: kartKomisyon,
+    kart_komisyonu: kartKomisyonu,
     kampanya_fiyati: kampanya,
-
-    net_bedel: net,
-    nakit_satis: nakit,
-    kartli_satis: kart,
+    net_bedel: netBedel,
+    nakit_satis: nakitSatis,
+    kartli_satis: kartliSatis,
     kar,
   };
+}
+
+export function formatTL(value) {
+  return `₺${toNumber(value).toLocaleString("tr-TR")}`;
 }
