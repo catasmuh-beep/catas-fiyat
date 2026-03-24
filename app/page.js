@@ -23,9 +23,7 @@ function brandColor(brand) {
 
 async function safeReadJson(res) {
   const text = await res.text();
-  if (!text) {
-    throw new Error("API boş cevap döndü.");
-  }
+  if (!text) throw new Error("API boş cevap döndü.");
 
   try {
     return JSON.parse(text);
@@ -67,14 +65,11 @@ export default function Page() {
           setError(err?.message || "Bir hata oluştu.");
         }
       } finally {
-        if (active) {
-          setLoading(false);
-        }
+        if (active) setLoading(false);
       }
     }
 
     loadProducts();
-
     return () => {
       active = false;
     };
@@ -119,9 +114,7 @@ export default function Page() {
         safeText(p?.marka),
         safeText(p?.model),
         safeText(p?.urun_adi),
-      ]
-        .join(" ")
-        .toLowerCase();
+      ].join(" ").toLowerCase();
 
       const searchOk = q ? text.includes(q) : true;
 
@@ -138,7 +131,6 @@ export default function Page() {
 
       if (!result[kategori]) result[kategori] = {};
       if (!result[kategori][marka]) result[kategori][marka] = [];
-
       result[kategori][marka].push(product);
     }
 
@@ -161,11 +153,7 @@ export default function Page() {
       </div>
 
       <div className="logo-area">
-        <img
-          src="/logo.png"
-          alt="Çataş Mühendislik"
-          className="main-logo"
-        />
+        <img src="/logo.png" alt="Çataş Mühendislik" className="main-logo" />
 
         <div className="stats">
           <span>Toplam ürün: {activeProducts.length}</span>
@@ -258,37 +246,30 @@ export default function Page() {
                             <span className="label orange">Nakit</span>
                             <strong>{formatTL(pricing.nakit)}</strong>
                           </div>
-
                           <div className="price-box">
                             <span className="label blue">Kart</span>
                             <strong>{formatTL(pricing.kart)}</strong>
                           </div>
-
                           <div className="price-box">
                             <span className="label gray">Net</span>
                             <strong>{formatTL(pricing.netMaliyet)}</strong>
                           </div>
-
                           <div className="price-box">
                             <span className="label green">Kar</span>
                             <strong>{formatTL(pricing.kar)}</strong>
                           </div>
-
                           <div className="price-box">
                             <span className="label">Kampanya</span>
                             <strong>{formatTL(pricing.kampanya)}</strong>
                           </div>
-
                           <div className="price-box">
                             <span className="label">Net Bedel</span>
                             <strong>{formatTL(pricing.netMaliyet)}</strong>
                           </div>
-
                           <div className="price-box">
                             <span className="label">Nakit Çarpanı</span>
                             <strong>%{pricing.nakitCarpani}</strong>
                           </div>
-
                           <div className="price-box">
                             <span className="label">Kart Komisyon</span>
                             <strong>%{pricing.kartKomisyon}</strong>
@@ -300,17 +281,14 @@ export default function Page() {
                             <label>Alış</label>
                             <input readOnly value={pricing.alis} />
                           </div>
-
                           <div>
                             <label className="label-red">Montaj</label>
                             <input readOnly value={pricing.montaj} />
                           </div>
-
                           <div>
                             <label className="label-teal">Puan</label>
                             <input readOnly value={pricing.puan} />
                           </div>
-
                           <div>
                             <label className="label-teal">Fayda</label>
                             <input readOnly value={pricing.fayda} />
