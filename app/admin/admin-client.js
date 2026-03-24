@@ -5,7 +5,7 @@ import {
   CATEGORY_ORDER,
   BRAND_ORDER_BY_CATEGORY,
   sortProducts,
-} from "./lib/catalog";
+} from "../lib/catalog";
 
 const EMPTY_PRODUCT = {
   active: true,
