@@ -149,8 +149,8 @@ export default function AdminClient({ initialProducts = [] }) {
         puan: newProduct.puan,
         fayda: newProduct.fayda,
         // Yeni ürün ekleme ekranında bu alanlar yoksa 0 kalsın
-        nakit_carpani: 0,
-        kart_komisyon: 0,
+        nakit_carpani: 9,
+        kart_komisyon: 18,
         kampanya: 0,
         aktif: Boolean(newProduct.aktif),
       });
