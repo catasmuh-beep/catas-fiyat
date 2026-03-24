@@ -10,7 +10,10 @@ function getSupabase() {
   }
 
   return createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
   });
 }
 
@@ -18,7 +21,6 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const products = Array.isArray(body.products) ? body.products : [];
-
     const supabase = getSupabase();
 
     const payload = products.map((item) => ({
