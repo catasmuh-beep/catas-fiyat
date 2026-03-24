@@ -7,7 +7,6 @@ function toNumber(value, fallback = 0) {
   const n = Number(value);
   return Number.isFinite(n) ? n : fallback;
 }
-
 function recalculateProduct(product = {}) {
   const alis = toNumber(product.alis_fiyati);
   const montaj = toNumber(product.montaj_maliyeti);
@@ -19,20 +18,35 @@ function recalculateProduct(product = {}) {
   );
 
   const kartKomisyon = toNumber(
-    product.kart_komisyon ??
-      product.kart_komisyonu ??
+    product.kart_komisyonu ??
+      product.kart_komisyon ??
       product.kartKomisyon ??
       0
   );
 
   const kampanya = toNumber(
-    product.kampanya ?? product.kampanya_fiyati ?? 0
+    product.kampanya_fiyati ?? product.kampanya ?? 0
   );
 
-  // Mevcut yapıyı bozmadan: net bedel alış + montaj
+  if (alis <= 0 && montaj <= 0) {
+    return {
+      ...product,
+      alis_fiyati: 0,
+      montaj_maliyeti: 0,
+      puan,
+      fayda,
+      net_bedel: 0,
+      nakit_carpani: nakitCarpani,
+      kart_komisyon: kartKomisyon,
+      nakit: 0,
+      kart: 0,
+      kar: 0,
+      kampanya: 0,
+      aktif: Boolean(product.aktif),
+    };
+  }
   const netBedel = alis + montaj;
 
-  // Kampanya varsa nakit onu baz alsın, yoksa çarpanlı hesaplansın
   const nakit =
     kampanya > 0
       ? Math.round(kampanya)
@@ -40,7 +54,6 @@ function recalculateProduct(product = {}) {
 
   const kart = Math.round(nakit * (1 + kartKomisyon / 100));
 
-  // Mevcut mantığa sadık: kar hesabında puan ve fayda pozitif katkı
   const kar = Math.max(0, nakit - netBedel + puan + fayda);
 
   return {
