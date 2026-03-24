@@ -2,9 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 const CATEGORY_ORDER = ["Kombi", "Klima", "Şofben", "Elektrikli Kombi"];
 const BRAND_ORDER = ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"];
 
@@ -36,21 +33,32 @@ export default function HomePage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
+    let mounted = true;
+
     async function load() {
-      const res = await fetch("/api/products", {
-        cache: "no-store",
-        headers: { "Cache-Control": "no-cache" },
-      });
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setProducts(sortProducts(data.filter((x) => x.aktif)));
+      try {
+        const res = await fetch("/api/products", {
+          cache: "no-store",
+          headers: { "Cache-Control": "no-cache" },
+        });
+
+        const data = await res.json();
+
+        if (mounted && Array.isArray(data)) {
+          setProducts(sortProducts(data.filter((x) => x.aktif)));
+        }
+      } catch (error) {
+        console.error("Ürünler alınamadı:", error);
       }
     }
 
     load();
-
     const interval = setInterval(load, 8000);
-    return () => clearInterval(interval);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const categories = useMemo(() => {
