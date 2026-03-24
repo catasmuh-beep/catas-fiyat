@@ -10,17 +10,17 @@ function toNumber(value) {
   return Number.isFinite(n) ? n : 0;
 }
 
-function calcNakitCarpani(item) {
+ffunction calcNakitCarpani(item) {
   const net = toNumber(item.net_bedel);
-  const nakit = toNumber(item.nakit_satis);
+  const nakit = toNumber(item.nakit ?? item.nakit_satis);
 
   if (!net || !nakit || nakit <= net) return 0;
   return Math.floor(((nakit - net) / net) * 100);
 }
 
 function calcKartKomisyonu(item) {
-  const nakit = toNumber(item.nakit_satis);
-  const kart = toNumber(item.kart_satis);
+  const nakit = toNumber(item.nakit ?? item.nakit_satis);
+  const kart = toNumber(item.kart ?? item.kart_satis);
 
   if (!nakit || !kart || kart <= nakit) return 0;
   return Math.floor(((kart - nakit) / nakit) * 100);
