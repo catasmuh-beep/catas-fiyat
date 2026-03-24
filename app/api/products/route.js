@@ -3,90 +3,80 @@ import { createClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 
-function getSupabase() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error("Supabase env bilgileri eksik.");
+  if (!url || !serviceKey) {
+    throw new Error("Supabase ortam değişkenleri eksik.");
   }
 
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: { persistSession: false },
+  return createClient(url, serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
   });
 }
 
-function toNumber(value, fallback = 0) {
-  if (value === null || value === undefined || value === "") return fallback;
-  const n = Number(value);
+function num(v, fallback = 0) {
+  if (v === null || v === undefined || v === "") return fallback;
+  const n = Number(v);
   return Number.isFinite(n) ? n : fallback;
 }
 
-function enrichProduct(product) {
-  const alis = toNumber(product.alis_fiyati);
-  const montaj = toNumber(product.montaj_maliyeti);
-  const puan = toNumber(product.puan);
-  const fayda = toNumber(product.fayda);
+function enrichProduct(row) {
+  const alis = num(row.alis_fiyati);
+  const montaj = num(row.montaj_maliyeti);
+  const puan = num(row.puan);
+  const fayda = num(row.fayda);
 
-  const netBedel =
-    product.net_bedel !== null &&
-    product.net_bedel !== undefined &&
-    product.net_bedel !== ""
-      ? toNumber(product.net_bedel)
+  const net_bedel =
+    row.net_bedel !== null && row.net_bedel !== undefined && row.net_bedel !== ""
+      ? num(row.net_bedel)
       : alis + montaj;
 
-  const nakitCarpani = toNumber(product.nakit_carpani);
-  const kartKomisyon = toNumber(product.kart_komisyon);
+  const nakit_carpani = num(row.nakit_carpani);
+  const kart_komisyon = num(row.kart_komisyon);
 
   const nakit =
-    product.nakit !== null &&
-    product.nakit !== undefined &&
-    product.nakit !== ""
-      ? toNumber(product.nakit)
-      : Math.round(netBedel * (1 + nakitCarpani / 100));
+    row.nakit !== null && row.nakit !== undefined && row.nakit !== ""
+      ? num(row.nakit)
+      : Math.round(net_bedel * (1 + nakit_carpani / 100));
 
   const kart =
-    product.kart !== null &&
-    product.kart !== undefined &&
-    product.kart !== ""
-      ? toNumber(product.kart)
-      : Math.round(nakit * (1 + kartKomisyon / 100));
+    row.kart !== null && row.kart !== undefined && row.kart !== ""
+      ? num(row.kart)
+      : Math.round(nakit * (1 + kart_komisyon / 100));
 
   const kar =
-    product.kar !== null &&
-    product.kar !== undefined &&
-    product.kar !== ""
-      ? toNumber(product.kar)
-      : Math.max(0, nakit - netBedel + puan + fayda);
+    row.kar !== null && row.kar !== undefined && row.kar !== ""
+      ? num(row.kar)
+      : Math.max(0, nakit - net_bedel + puan + fayda);
 
   const kampanya =
-    product.kampanya !== null &&
-    product.kampanya !== undefined &&
-    product.kampanya !== ""
-      ? toNumber(product.kampanya)
+    row.kampanya !== null && row.kampanya !== undefined && row.kampanya !== ""
+      ? num(row.kampanya)
       : 0;
 
   return {
-    ...product,
-    alt_model_guc: product.alt_model_guc || product.alt_model || "",
+    ...row,
+    alt_model_guc: row.alt_model_guc || row.alt_model || "",
     alis_fiyati: alis,
     montaj_maliyeti: montaj,
     puan,
     fayda,
-    net_bedel: netBedel,
-    nakit_carpani: nakitCarpani,
-    kart_komisyon: kartKomisyon,
+    net_bedel,
+    nakit_carpani,
+    kart_komisyon,
     nakit,
     kart,
     kar,
     kampanya,
-    aktif: Boolean(product.aktif),
+    aktif: Boolean(row.aktif),
   };
 }
 
 export async function GET() {
   try {
-    const supabase = getSupabase();
+    const supabase = getSupabaseAdmin();
 
     const { data, error } = await supabase
       .from("products")
@@ -101,15 +91,16 @@ export async function GET() {
     }
 
     return NextResponse.json((data || []).map(enrichProduct), {
+      status: 200,
       headers: {
         "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
         Pragma: "no-cache",
         Expires: "0",
       },
     });
-  } catch (error) {
+  } catch (err) {
     return NextResponse.json(
-      { error: error.message || "Ürünler alınamadı." },
+      { error: err.message || "Ürünler alınamadı." },
       { status: 500 }
     );
   }
@@ -117,25 +108,26 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const supabase = getSupabase();
+    const supabase = getSupabaseAdmin();
     const body = await request.json();
 
     if (body?.action !== "create" || !body?.product) {
       return NextResponse.json({ error: "Geçersiz istek." }, { status: 400 });
     }
 
-    const product = body.product;
+    const p = body.product;
 
     const payload = enrichProduct({
-      kategori: product.kategori || "",
-      marka: product.marka || "",
-      model: product.model || "",
-      alt_model_guc: product.alt_model_guc || "",
-      alis_fiyati: toNumber(product.alis_fiyati),
-      montaj_maliyeti: toNumber(product.montaj_maliyeti),
-      puan: toNumber(product.puan),
-      fayda: toNumber(product.fayda),
-      aktif: product.aktif ?? true,
+      kategori: (p.kategori || "").trim(),
+      marka: (p.marka || "").trim(),
+      model: (p.model || "").trim(),
+      alt_model_guc: (p.alt_model_guc || "").trim(),
+      alis_fiyati: num(p.alis_fiyati),
+      montaj_maliyeti: num(p.montaj_maliyeti),
+      puan: num(p.puan),
+      fayda: num(p.fayda),
+      aktif: p.aktif ?? true,
+      updated_at: new Date().toISOString(),
     });
 
     const { data, error } = await supabase
@@ -151,14 +143,15 @@ export async function POST(request) {
     return NextResponse.json(
       { ok: true, product: enrichProduct(data) },
       {
+        status: 200,
         headers: {
           "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
         },
       }
     );
-  } catch (error) {
+  } catch (err) {
     return NextResponse.json(
-      { error: error.message || "Yeni ürün eklenemedi." },
+      { error: err.message || "Yeni ürün eklenemedi." },
       { status: 500 }
     );
   }
@@ -166,7 +159,7 @@ export async function POST(request) {
 
 export async function PUT(request) {
   try {
-    const supabase = getSupabase();
+    const supabase = getSupabaseAdmin();
     const body = await request.json();
     const products = Array.isArray(body?.products) ? body.products : [];
 
@@ -181,17 +174,17 @@ export async function PUT(request) {
         marka: item.marka || "",
         model: item.model || "",
         alt_model_guc: item.alt_model_guc || "",
-        alis_fiyati: toNumber(item.alis_fiyati),
-        montaj_maliyeti: toNumber(item.montaj_maliyeti),
-        puan: toNumber(item.puan),
-        fayda: toNumber(item.fayda),
-        net_bedel: toNumber(item.net_bedel),
-        nakit_carpani: toNumber(item.nakit_carpani),
-        kart_komisyon: toNumber(item.kart_komisyon),
-        nakit: toNumber(item.nakit),
-        kart: toNumber(item.kart),
-        kar: toNumber(item.kar),
-        kampanya: toNumber(item.kampanya),
+        alis_fiyati: num(item.alis_fiyati),
+        montaj_maliyeti: num(item.montaj_maliyeti),
+        puan: num(item.puan),
+        fayda: num(item.fayda),
+        net_bedel: num(item.net_bedel),
+        nakit_carpani: num(item.nakit_carpani),
+        kart_komisyon: num(item.kart_komisyon),
+        nakit: num(item.nakit),
+        kart: num(item.kart),
+        kar: num(item.kar),
+        kampanya: num(item.kampanya),
         aktif: Boolean(item.aktif),
         updated_at: new Date().toISOString(),
       })
@@ -209,14 +202,15 @@ export async function PUT(request) {
     return NextResponse.json(
       { ok: true, products: (data || []).map(enrichProduct) },
       {
+        status: 200,
         headers: {
           "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
         },
       }
     );
-  } catch (error) {
+  } catch (err) {
     return NextResponse.json(
-      { error: error.message || "Güncelleme yapılamadı." },
+      { error: err.message || "Ürünler kaydedilemedi." },
       { status: 500 }
     );
   }
