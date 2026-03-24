@@ -124,6 +124,8 @@ const emptyNewProduct = {
   montaj_maliyeti: 0,
   puan: 0,
   fayda: 0,
+  nakit_carpani: 9,
+  kart_komisyon: 18,
   aktif: true,
 };
 
