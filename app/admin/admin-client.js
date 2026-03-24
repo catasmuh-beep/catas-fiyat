@@ -654,7 +654,7 @@ export default function AdminClient({ initialRows }) {
     markDirty(id);
   }
 
-  function updateNewProduct(field, value) {
+ function updateNewProduct(field, value) {
   setNewProduct((prev) => ({
     ...prev,
     [field]: [
