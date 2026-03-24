@@ -2,278 +2,347 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-const CATEGORY_ORDER = ["Kombi", "Klima", "Şofben", "Elektrikli Kombi"];
-const BRAND_ORDER = ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"];
-
-function num(v, fallback = 0) {
-  if (v === null || v === undefined || v === "") return fallback;
-  const n = Number(v);
+function toNumber(value, fallback = 0) {
+  if (value === null || value === undefined || value === "") return fallback;
+  const n = Number(value);
   return Number.isFinite(n) ? n : fallback;
 }
 
-function emptyProduct() {
-  return {
-    id: crypto.randomUUID(),
-    kategori: "",
-    marka: "",
-    model: "",
-    alt_model_guc: "",
-    alis_fiyati: 0,
-    montaj_maliyeti: 0,
-    puan: 0,
-    fayda: 0,
-    net_bedel: 0,
-    nakit_carpani: 0,
-    kart_komisyon: 0,
-    nakit: 0,
-    kart: 0,
-    kar: 0,
-    kampanya: 0,
-    aktif: true,
-    _isNew: true,
-  };
-}
+function normalizeProduct(product = {}) {
+  const alis = toNumber(product.alis_fiyati);
+  const montaj = toNumber(product.montaj_maliyeti);
+  const puan = toNumber(product.puan);
+  const fayda = toNumber(product.fayda);
 
-function enrich(row) {
-  const alis = num(row.alis_fiyati);
-  const montaj = num(row.montaj_maliyeti);
-  const puan = num(row.puan);
-  const fayda = num(row.fayda);
+  const netBedel =
+    product.net_bedel !== null &&
+    product.net_bedel !== undefined &&
+    product.net_bedel !== ""
+      ? toNumber(product.net_bedel)
+      : alis + montaj;
 
-  const net_bedel = row.net_bedel !== null && row.net_bedel !== undefined
-    ? num(row.net_bedel)
-    : alis + montaj;
+  const nakitCarpani = toNumber(product.nakit_carpani);
+  const kartKomisyon = toNumber(product.kart_komisyon);
 
-  const nakit_carpani = num(row.nakit_carpani);
-  const kart_komisyon = num(row.kart_komisyon);
+  const nakit =
+    product.nakit !== null &&
+    product.nakit !== undefined &&
+    product.nakit !== ""
+      ? toNumber(product.nakit)
+      : Math.round(netBedel * (1 + nakitCarpani / 100));
 
-  const nakit = row.nakit !== null && row.nakit !== undefined
-    ? num(row.nakit)
-    : Math.round(net_bedel * (1 + nakit_carpani / 100));
+  const kart =
+    product.kart !== null &&
+    product.kart !== undefined &&
+    product.kart !== ""
+      ? toNumber(product.kart)
+      : Math.round(nakit * (1 + kartKomisyon / 100));
 
-  const kart = row.kart !== null && row.kart !== undefined
-    ? num(row.kart)
-    : Math.round(nakit * (1 + kart_komisyon / 100));
+  const kar =
+    product.kar !== null &&
+    product.kar !== undefined &&
+    product.kar !== ""
+      ? toNumber(product.kar)
+      : Math.max(0, nakit - netBedel + puan + fayda);
 
-  const kar = row.kar !== null && row.kar !== undefined
-    ? num(row.kar)
-    : Math.max(0, nakit - net_bedel + fayda + puan);
-
-  const kampanya = row.kampanya !== null && row.kampanya !== undefined
-    ? num(row.kampanya)
-    : nakit;
+  const kampanya =
+    product.kampanya !== null &&
+    product.kampanya !== undefined &&
+    product.kampanya !== ""
+      ? toNumber(product.kampanya)
+      : 0;
 
   return {
-    ...row,
-    kategori: row.kategori || "",
-    marka: row.marka || "",
-    model: row.model || "",
-    alt_model_guc: row.alt_model_guc || "",
+    id: product.id,
+    kategori: product.kategori || "",
+    marka: product.marka || "",
+    model: product.model || "",
+    alt_model_guc: product.alt_model_guc || product.alt_model || "",
     alis_fiyati: alis,
     montaj_maliyeti: montaj,
     puan,
     fayda,
-    net_bedel,
-    nakit_carpani,
-    kart_komisyon,
+    net_bedel: netBedel,
+    nakit_carpani: nakitCarpani,
+    kart_komisyon: kartKomisyon,
     nakit,
     kart,
     kar,
     kampanya,
-    aktif: Boolean(row.aktif),
+    aktif: Boolean(product.aktif),
   };
 }
 
-function sortProducts(list) {
-  return [...list].sort((a, b) => {
-    const catA = CATEGORY_ORDER.indexOf(a.kategori);
-    const catB = CATEGORY_ORDER.indexOf(b.kategori);
-    if (catA !== catB) return (catA === -1 ? 999 : catA) - (catB === -1 ? 999 : catB);
-
-    const brandA = BRAND_ORDER.indexOf(a.marka);
-    const brandB = BRAND_ORDER.indexOf(b.marka);
-    if (brandA !== brandB) return (brandA === -1 ? 999 : brandA) - (brandB === -1 ? 999 : brandB);
-
-    return `${a.model} ${a.alt_model_guc}`.localeCompare(`${b.model} ${b.alt_model_guc}`, "tr");
-  });
+function emptyNewProduct() {
+  return {
+    kategori: "",
+    marka: "",
+    model: "",
+    alt_model_guc: "",
+    alis_fiyati: "",
+    montaj_maliyeti: "",
+    puan: "",
+    fayda: "",
+    aktif: true,
+  };
 }
 
 export default function AdminClient({ initialProducts = [] }) {
-  const [products, setProducts] = useState(sortProducts(initialProducts.map(enrich)));
-  const [original, setOriginal] = useState(sortProducts(initialProducts.map(enrich)));
-  const [newProduct, setNewProduct] = useState(emptyProduct());
+  const [products, setProducts] = useState(
+    Array.isArray(initialProducts) ? initialProducts.map(normalizeProduct) : []
+  );
+  const [newProduct, setNewProduct] = useState(emptyNewProduct());
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
-
-  async function reloadProducts() {
-    const res = await fetch("/api/products", { cache: "no-store" });
-    const data = await res.json();
-    if (Array.isArray(data)) {
-      const ready = sortProducts(data.map(enrich));
-      setProducts(ready);
-      setOriginal(ready);
-    }
-  }
+  const [searchKategori, setSearchKategori] = useState("");
+  const [searchMarka, setSearchMarka] = useState("");
+  const [searchModel, setSearchModel] = useState("");
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    reloadProducts();
-  }, []);
-
-  const grouped = useMemo(() => {
-    const map = {};
-    for (const p of sortProducts(products)) {
-      if (!map[p.kategori]) map[p.kategori] = [];
-      map[p.kategori].push(p);
+    if (Array.isArray(initialProducts)) {
+      setProducts(initialProducts.map(normalizeProduct));
     }
-    return map;
-  }, [products]);
+  }, [initialProducts]);
 
-  function updateRow(id, field, value) {
+  function updateProduct(id, field, value) {
     setProducts((prev) =>
-      prev.map((p) => {
-        if (p.id !== id) return p;
-        const next = enrich({ ...p, [field]: value });
-        return next;
-      })
+      prev.map((item) =>
+        item.id === id
+          ? normalizeProduct({
+              ...item,
+              [field]: field === "aktif" ? value : value,
+            })
+          : item
+      )
     );
   }
 
   function updateNewProduct(field, value) {
-    setNewProduct((prev) => enrich({ ...prev, [field]: value }));
+    setNewProduct((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   }
 
-  function addNewProduct() {
-    if (!newProduct.kategori || !newProduct.marka || !newProduct.model) {
-      setMessage("Kategori, marka ve model zorunlu.");
+  async function addNewProduct() {
+    setMessage("");
+
+    if (!newProduct.kategori.trim() || !newProduct.marka.trim() || !newProduct.model.trim()) {
+      setMessage("Kategori, marka ve model alanları zorunludur.");
       return;
     }
 
-    const ready = enrich({
-      ...newProduct,
-      aktif: Boolean(newProduct.aktif),
-    });
-
-    setProducts((prev) => sortProducts([...prev, ready]));
-    setNewProduct(emptyProduct());
-    setMessage("Yeni ürün listeye eklendi. Kalıcı olması için üstteki 'Tüm Değişiklikleri Kaydet' butonuna bas.");
-  }
-
-  function revertChanges() {
-    setProducts(sortProducts(original.map(enrich)));
-    setNewProduct(emptyProduct());
-    setMessage("Değişiklikler geri alındı.");
-  }
-
-  async function saveAll() {
     try {
       setSaving(true);
-      setMessage("");
+
+      const payload = {
+        kategori: newProduct.kategori.trim(),
+        marka: newProduct.marka.trim(),
+        model: newProduct.model.trim(),
+        alt_model_guc: newProduct.alt_model_guc.trim(),
+        alis_fiyati: toNumber(newProduct.alis_fiyati),
+        montaj_maliyeti: toNumber(newProduct.montaj_maliyeti),
+        puan: toNumber(newProduct.puan),
+        fayda: toNumber(newProduct.fayda),
+        aktif: Boolean(newProduct.aktif),
+      };
 
       const res = await fetch("/api/products", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        cache: "no-store",
-        body: JSON.stringify({ products }),
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
+        body: JSON.stringify({
+          action: "create",
+          product: payload,
+        }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data?.error || "Kaydetme başarısız.");
+        throw new Error(data?.error || "Yeni ürün eklenemedi.");
       }
 
-      const ready = sortProducts((data.products || []).map(enrich));
-      setProducts(ready);
-      setOriginal(ready);
-      setMessage("Tüm değişiklikler başarıyla kaydedildi. Personel ekranına da yansır.");
-    } catch (err) {
-      setMessage(err.message || "Kaydetme sırasında hata oluştu.");
+      if (data?.product) {
+        setProducts((prev) => [...prev, normalizeProduct(data.product)]);
+      }
+
+      setNewProduct(emptyNewProduct());
+      setMessage("Yeni ürün başarıyla eklendi.");
+    } catch (error) {
+      setMessage(error.message || "Yeni ürün eklenirken hata oluştu.");
     } finally {
       setSaving(false);
     }
   }
 
-  async function deleteRow(id) {
-    const filtered = products.filter((p) => p.id !== id);
-    setProducts(filtered);
-    setMessage("Ürün listeden kaldırıldı. Kalıcı olması için kaydet butonuna bas.");
+  async function saveAllChanges() {
+    setMessage("");
+
+    try {
+      setSaving(true);
+
+      const res = await fetch("/api/products", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
+        body: JSON.stringify({
+          products: products.map((item) => ({
+            id: item.id,
+            kategori: item.kategori,
+            marka: item.marka,
+            model: item.model,
+            alt_model_guc: item.alt_model_guc,
+            alis_fiyati: toNumber(item.alis_fiyati),
+            montaj_maliyeti: toNumber(item.montaj_maliyeti),
+            puan: toNumber(item.puan),
+            fayda: toNumber(item.fayda),
+            net_bedel: toNumber(item.net_bedel),
+            nakit_carpani: toNumber(item.nakit_carpani),
+            kart_komisyon: toNumber(item.kart_komisyon),
+            nakit: toNumber(item.nakit),
+            kart: toNumber(item.kart),
+            kar: toNumber(item.kar),
+            kampanya: toNumber(item.kampanya),
+            aktif: Boolean(item.aktif),
+          })),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Değişiklikler kaydedilemedi.");
+      }
+
+      if (Array.isArray(data?.products)) {
+        setProducts(data.products.map(normalizeProduct));
+      }
+
+      setMessage("Tüm değişiklikler kaydedildi.");
+    } catch (error) {
+      setMessage(error.message || "Kaydetme sırasında hata oluştu.");
+    } finally {
+      setSaving(false);
+    }
   }
 
+  function resetChanges() {
+    setProducts(Array.isArray(initialProducts) ? initialProducts.map(normalizeProduct) : []);
+    setNewProduct(emptyNewProduct());
+    setMessage("Değişiklikler geri alındı.");
+  }
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((item) => {
+      const okKategori = !searchKategori || item.kategori === searchKategori;
+      const okMarka = !searchMarka || item.marka === searchMarka;
+      const okModel = !searchModel || item.model === searchModel;
+
+      const q = searchText.trim().toLocaleLowerCase("tr");
+      const haystack =
+        `${item.kategori} ${item.marka} ${item.model} ${item.alt_model_guc}`.toLocaleLowerCase("tr");
+
+      const okText = !q || haystack.includes(q);
+
+      return okKategori && okMarka && okModel && okText;
+    });
+  }, [products, searchKategori, searchMarka, searchModel, searchText]);
+
+  const kategoriler = [...new Set(products.map((x) => x.kategori).filter(Boolean))];
+  const markalar = [...new Set(products.map((x) => x.marka).filter(Boolean))];
+  const modeller = [...new Set(products.map((x) => x.model).filter(Boolean))];
+
   return (
-    <div className="admin-page">
-      <div className="admin-topbar">
-        <button className="btn btn-primary" onClick={saveAll} disabled={saving}>
+    <div className="admin-client-page">
+      <div className="admin-top-actions">
+        <button className="save-all-btn" onClick={saveAllChanges} disabled={saving}>
           {saving ? "Kaydediliyor..." : "Tüm Değişiklikleri Kaydet"}
         </button>
 
-        <button className="btn btn-secondary" onClick={revertChanges}>
+        <button className="ghost-btn" onClick={resetChanges} disabled={saving}>
           Değişiklikleri Geri Al
         </button>
 
-        <a className="btn btn-outline" href="/">
+        <a className="outline-btn" href="/">
           Personel görünümüne dön
         </a>
 
-        <a className="btn btn-light" href="/api/admin/logout">
+        <a className="logout-btn" href="/api/admin/logout">
           Çıkış
         </a>
       </div>
 
       {message ? <div className="admin-message">{message}</div> : null}
 
-      <section className="new-product-box">
+      <div className="new-product-section">
         <h3>Yeni ürün ekle</h3>
 
         <div className="new-product-grid">
           <input
+            type="text"
+            placeholder="Kategori"
             value={newProduct.kategori}
             onChange={(e) => updateNewProduct("kategori", e.target.value)}
-            placeholder="Kategori"
           />
+
           <input
+            type="text"
+            placeholder="Marka"
             value={newProduct.marka}
             onChange={(e) => updateNewProduct("marka", e.target.value)}
-            placeholder="Marka"
           />
+
           <input
+            type="text"
+            placeholder="Model"
             value={newProduct.model}
             onChange={(e) => updateNewProduct("model", e.target.value)}
-            placeholder="Model"
           />
+
           <input
+            type="text"
+            placeholder="Alt model / güç"
             value={newProduct.alt_model_guc}
             onChange={(e) => updateNewProduct("alt_model_guc", e.target.value)}
-            placeholder="Alt model / güç"
           />
 
           <input
             type="number"
+            placeholder="Alış"
             value={newProduct.alis_fiyati}
             onChange={(e) => updateNewProduct("alis_fiyati", e.target.value)}
-            placeholder="Alış fiyatı"
           />
+
           <input
             type="number"
+            placeholder="Montaj Maliyeti"
             value={newProduct.montaj_maliyeti}
             onChange={(e) => updateNewProduct("montaj_maliyeti", e.target.value)}
-            placeholder="Montaj maliyeti"
           />
+
           <input
             type="number"
+            placeholder="Puan"
             value={newProduct.puan}
             onChange={(e) => updateNewProduct("puan", e.target.value)}
-            placeholder="Puan"
           />
+
           <input
             type="number"
+            placeholder="Fayda"
             value={newProduct.fayda}
             onChange={(e) => updateNewProduct("fayda", e.target.value)}
-            placeholder="Fayda"
           />
         </div>
 
-        <div className="new-product-actions">
-          <label className="checkbox-row">
+        <div className="new-product-bottom">
+          <label className="active-checkbox">
             <span>Aktif</span>
             <input
               type="checkbox"
@@ -282,97 +351,80 @@ export default function AdminClient({ initialProducts = [] }) {
             />
           </label>
 
-          <button className="btn btn-success" onClick={addNewProduct}>
+          <button className="add-product-btn" onClick={addNewProduct} disabled={saving}>
             Yeni Ürün Ekle
           </button>
         </div>
-      </section>
+      </div>
 
-      {Object.entries(grouped).map(([kategori, items]) => (
-        <section key={kategori} className="category-block">
-          <div className="category-chip">{kategori}</div>
+      <div className="admin-filters">
+        <select value={searchKategori} onChange={(e) => setSearchKategori(e.target.value)}>
+          <option value="">Tüm kategoriler</option>
+          {kategoriler.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
 
-          <div className="table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Ürün Bilgisi</th>
-                  <th>Alış</th>
-                  <th>Montaj Maliyeti</th>
-                  <th>Puan</th>
-                  <th>Fayda</th>
-                  <th>Net Maliyet</th>
-                  <th>Kar</th>
-                  <th>Nakit</th>
-                  <th>Kart</th>
-                  <th>Aktif</th>
-                  <th>Sil</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((p) => (
-                  <tr key={p.id}>
-                    <td>
-                      <strong>{p.marka}</strong> {p.model} {p.alt_model_guc}
-                    </td>
+        <select value={searchMarka} onChange={(e) => setSearchMarka(e.target.value)}>
+          <option value="">Tüm markalar</option>
+          {markalar.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
 
-                    <td>
-                      <input
-                        type="number"
-                        value={p.alis_fiyati}
-                        onChange={(e) => updateRow(p.id, "alis_fiyati", e.target.value)}
-                      />
-                    </td>
+        <select value={searchModel} onChange={(e) => setSearchModel(e.target.value)}>
+          <option value="">Tüm modeller</option>
+          {modeller.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
 
-                    <td>
-                      <input
-                        type="number"
-                        value={p.montaj_maliyeti}
-                        onChange={(e) => updateRow(p.id, "montaj_maliyeti", e.target.value)}
-                      />
-                    </td>
+        <input
+          type="text"
+          placeholder="Ara: model / güç / marka"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+      </div>
 
-                    <td>
-                      <input
-                        type="number"
-                        value={p.puan}
-                        onChange={(e) => updateRow(p.id, "puan", e.target.value)}
-                      />
-                    </td>
+      <div className="admin-products-list">
+        {filteredProducts.map((item) => (
+          <div key={item.id} className="admin-product-row">
+            <div className="admin-product-title">
+              {item.kategori} / {item.marka} / {item.model} {item.alt_model_guc}
+            </div>
 
-                    <td>
-                      <input
-                        type="number"
-                        value={p.fayda}
-                        onChange={(e) => updateRow(p.id, "fayda", e.target.value)}
-                      />
-                    </td>
-
-                    <td>₺{enrich(p).net_bedel.toLocaleString("tr-TR")}</td>
-                    <td>₺{enrich(p).kar.toLocaleString("tr-TR")}</td>
-                    <td>₺{enrich(p).nakit.toLocaleString("tr-TR")}</td>
-                    <td>₺{enrich(p).kart.toLocaleString("tr-TR")}</td>
-
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={Boolean(p.aktif)}
-                        onChange={(e) => updateRow(p.id, "aktif", e.target.checked)}
-                      />
-                    </td>
-
-                    <td>
-                      <button className="btn btn-light" onClick={() => deleteRow(p.id)}>
-                        Sil
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="admin-product-grid">
+              <input
+                type="number"
+                value={item.alis_fiyati}
+                onChange={(e) => updateProduct(item.id, "alis_fiyati", e.target.value)}
+              />
+              <input
+                type="number"
+                value={item.montaj_maliyeti}
+                onChange={(e) => updateProduct(item.id, "montaj_maliyeti", e.target.value)}
+              />
+              <input
+                type="number"
+                value={item.puan}
+                onChange={(e) => updateProduct(item.id, "puan", e.target.value)}
+              />
+              <input
+                type="number"
+                value={item.fayda}
+                onChange={(e) => updateProduct(item.id, "fayda", e.target.value)}
+              />
+            </div>
           </div>
-        </section>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
