@@ -47,17 +47,6 @@ a {
   background: white;
 }
 
-.logo-box {
-  display: flex;
-  justify-content: center;
-  margin: 16px 0;
-}
-
-.logo-img {
-  max-width: 220px;
-  height: auto;
-}
-
 .stats-row {
   display: flex;
   gap: 12px;
