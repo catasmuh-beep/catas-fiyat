@@ -1,34 +1,45 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { calculatePricing, formatTL } from "./lib/pricing";
 
-const CATEGORY_ORDER = ["Kombi", "Klima", "Şofben", "Elektrikli Kombi"];
-const BRAND_ORDER = ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"];
-
-function toNumber(value, fallback = 0) {
-  if (value === null || value === undefined || value === "") return fallback;
-  const n = Number(value);
-  return Number.isFinite(n) ? n : fallback;
+function safeText(value) {
+  return String(value ?? "").trim();
 }
 
-function sortProducts(list) {
-  return [...list].sort((a, b) => {
-    const aCat = CATEGORY_ORDER.indexOf(a.kategori);
-    const bCat = CATEGORY_ORDER.indexOf(b.kategori);
-    if (aCat !== bCat) return (aCat === -1 ? 999 : aCat) - (bCat === -1 ? 999 : bCat);
+function brandColor(brand) {
+  const b = safeText(brand).toLowerCase();
 
-    const aBrand = BRAND_ORDER.indexOf(a.marka);
-    const bBrand = BRAND_ORDER.indexOf(b.marka);
-    if (aBrand !== bBrand) return (aBrand === -1 ? 999 : aBrand) - (bBrand === -1 ? 999 : bBrand);
+  if (b.includes("vaillant")) return "#009c95";
+  if (b.includes("demirdöküm") || b.includes("demirdokum")) return "#005bbb";
+  if (b.includes("protherm")) return "#cf102d";
+  if (b.includes("warmhaus")) return "#f28c00";
+  if (b.includes("baymak")) return "#00a651";
+  if (b.includes("eca")) return "#005bbb";
+  if (b.includes("baykan")) return "#d4aa00";
 
-    return `${a.model} ${a.alt_model_guc}`.localeCompare(`${b.model} ${b.alt_model_guc}`, "tr");
-  });
+  return "#1f3b64";
 }
 
-export default function HomePage() {
+async function safeReadJson(res) {
+  const text = await res.text();
+  if (!text) {
+    throw new Error("API boş cevap döndü.");
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error("API geçerli JSON döndürmedi.");
+  }
+}
+
+export default function Page() {
   const [products, setProducts] = useState([]);
-  const [kategori, setKategori] = useState("");
-  const [marka, setMarka] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [category, setCategory] = useState("");
+  const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [search, setSearch] = useState("");
 
@@ -37,105 +48,143 @@ export default function HomePage() {
 
     async function loadProducts() {
       try {
-        const res = await fetch("/api/products", {
-          cache: "no-store",
-          headers: {
-            "Cache-Control": "no-cache",
-          },
-        });
+        setLoading(true);
+        setError("");
 
-        const data = await res.json();
+        const res = await fetch("/api/products", { cache: "no-store" });
+        const json = await safeReadJson(res);
 
-        if (active && Array.isArray(data)) {
-          setProducts(sortProducts(data));
+        if (!res.ok || !json?.ok) {
+          throw new Error(json?.error || "Ürünler alınamadı.");
         }
-      } catch (error) {
-        console.error("Ürünler alınamadı:", error);
+
+        if (active) {
+          setProducts(Array.isArray(json.products) ? json.products : []);
+        }
+      } catch (err) {
+        if (active) {
+          setProducts([]);
+          setError(err?.message || "Bir hata oluştu.");
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
     }
 
     loadProducts();
-    const timer = setInterval(loadProducts, 5000);
 
     return () => {
       active = false;
-      clearInterval(timer);
     };
   }, []);
 
-  const kategoriOptions = useMemo(
-    () => [...new Set(products.map((x) => x.kategori).filter(Boolean))],
-    [products]
-  );
+  const activeProducts = useMemo(() => {
+    return products.filter((p) => p?.aktif !== false);
+  }, [products]);
 
-  const markaOptions = useMemo(() => {
-    return [
-      ...new Set(
-        products
-          .filter((x) => !kategori || x.kategori === kategori)
-          .map((x) => x.marka)
-          .filter(Boolean)
-      ),
-    ];
-  }, [products, kategori]);
+  const categories = useMemo(() => {
+    return [...new Set(activeProducts.map((p) => safeText(p?.kategori)).filter(Boolean))];
+  }, [activeProducts]);
 
-  const modelOptions = useMemo(() => {
-    return [
-      ...new Set(
-        products
-          .filter((x) => (!kategori || x.kategori === kategori) && (!marka || x.marka === marka))
-          .map((x) => x.model)
-          .filter(Boolean)
-      ),
-    ];
-  }, [products, kategori, marka]);
+  const brands = useMemo(() => {
+    const filtered = category
+      ? activeProducts.filter((p) => safeText(p?.kategori) === category)
+      : activeProducts;
+
+    return [...new Set(filtered.map((p) => safeText(p?.marka)).filter(Boolean))];
+  }, [activeProducts, category]);
+
+  const models = useMemo(() => {
+    const filtered = activeProducts.filter((p) => {
+      const kategoriOk = category ? safeText(p?.kategori) === category : true;
+      const markaOk = brand ? safeText(p?.marka) === brand : true;
+      return kategoriOk && markaOk;
+    });
+
+    return [...new Set(filtered.map((p) => safeText(p?.model)).filter(Boolean))];
+  }, [activeProducts, category, brand]);
 
   const filteredProducts = useMemo(() => {
-    return sortProducts(
-      products.filter((item) => {
-        const okKategori = !kategori || item.kategori === kategori;
-        const okMarka = !marka || item.marka === marka;
-        const okModel = !model || item.model === model;
+    const q = safeText(search).toLowerCase();
 
-        const q = search.trim().toLocaleLowerCase("tr");
-        const haystack =
-          `${item.kategori} ${item.marka} ${item.model} ${item.alt_model_guc}`.toLocaleLowerCase("tr");
-        const okSearch = !q || haystack.includes(q);
+    return activeProducts.filter((p) => {
+      const kategoriOk = category ? safeText(p?.kategori) === category : true;
+      const markaOk = brand ? safeText(p?.marka) === brand : true;
+      const modelOk = model ? safeText(p?.model) === model : true;
 
-        return okKategori && okMarka && okModel && okSearch;
-      })
-    );
-  }, [products, kategori, marka, model, search]);
+      const text = [
+        safeText(p?.kategori),
+        safeText(p?.marka),
+        safeText(p?.model),
+        safeText(p?.urun_adi),
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      const searchOk = q ? text.includes(q) : true;
+
+      return kategoriOk && markaOk && modelOk && searchOk;
+    });
+  }, [activeProducts, category, brand, model, search]);
 
   const grouped = useMemo(() => {
     const result = {};
-    for (const item of filteredProducts) {
-      if (!result[item.kategori]) result[item.kategori] = {};
-      if (!result[item.kategori][item.marka]) result[item.kategori][item.marka] = [];
-      result[item.kategori][item.marka].push(item);
+
+    for (const product of filteredProducts) {
+      const kategori = safeText(product?.kategori) || "Diğer";
+      const marka = safeText(product?.marka) || "Diğer";
+
+      if (!result[kategori]) result[kategori] = {};
+      if (!result[kategori][marka]) result[kategori][marka] = [];
+
+      result[kategori][marka].push(product);
     }
+
     return result;
   }, [filteredProducts]);
 
+  const brandCount = useMemo(() => {
+    return new Set(activeProducts.map((p) => safeText(p?.marka)).filter(Boolean)).size;
+  }, [activeProducts]);
+
   return (
-    <main>
-      <div className="stats-row">
-        <span>Toplam ürün: {filteredProducts.length}</span>
-        <span>Kategori: {kategoriOptions.length}</span>
-        <span>Marka: {markaOptions.length}</span>
+    <main className="page-shell">
+      <div className="topbar">
+        <button className="switch-btn" type="button">
+          Personel görünümü
+        </button>
+        <a href="/admin" className="admin-btn">
+          Yönetici Girişi
+        </a>
       </div>
 
-      <div className="filters-row">
+      <div className="logo-area">
+        <img
+          src="/logo.png"
+          alt="Çataş Mühendislik"
+          className="main-logo"
+        />
+
+        <div className="stats">
+          <span>Toplam ürün: {activeProducts.length}</span>
+          <span>Kategori: {categories.length}</span>
+          <span>Marka: {brandCount}</span>
+        </div>
+      </div>
+
+      <div className="filters">
         <select
-          value={kategori}
+          value={category}
           onChange={(e) => {
-            setKategori(e.target.value);
-            setMarka("");
+            setCategory(e.target.value);
+            setBrand("");
             setModel("");
           }}
         >
           <option value="">Tüm kategoriler</option>
-          {kategoriOptions.map((item) => (
+          {categories.map((item) => (
             <option key={item} value={item}>
               {item}
             </option>
@@ -143,14 +192,14 @@ export default function HomePage() {
         </select>
 
         <select
-          value={marka}
+          value={brand}
           onChange={(e) => {
-            setMarka(e.target.value);
+            setBrand(e.target.value);
             setModel("");
           }}
         >
           <option value="">Tüm markalar</option>
-          {markaOptions.map((item) => (
+          {brands.map((item) => (
             <option key={item} value={item}>
               {item}
             </option>
@@ -159,7 +208,7 @@ export default function HomePage() {
 
         <select value={model} onChange={(e) => setModel(e.target.value)}>
           <option value="">Tüm modeller</option>
-          {modelOptions.map((item) => (
+          {models.map((item) => (
             <option key={item} value={item}>
               {item}
             </option>
@@ -174,91 +223,107 @@ export default function HomePage() {
         />
       </div>
 
-      {Object.entries(grouped).map(([kategoriName, brands]) => (
-        <section key={kategoriName}>
-          <h1>{kategoriName}</h1>
+      {loading && <div className="state-box">Yükleniyor...</div>}
+      {!loading && error && <div className="state-box error">{error}</div>}
+      {!loading && !error && filteredProducts.length === 0 && (
+        <div className="state-box">Ürün bulunamadı.</div>
+      )}
 
-          {Object.entries(brands).map(([brandName, items]) => (
-            <div key={brandName}>
-              <h2>{brandName}</h2>
+      {!loading &&
+        !error &&
+        Object.entries(grouped).map(([kategori, brandsObj]) => (
+          <section key={kategori} className="category-section">
+            <h1 className="category-title">{kategori}</h1>
 
-              {items.map((item) => (
-                <article key={item.id} className="product-card">
-                  <div className="brand-pill">{item.marka}</div>
+            {Object.entries(brandsObj).map(([marka, items]) => (
+              <div key={marka} className="brand-section">
+                <h2 className="brand-title" style={{ color: brandColor(marka) }}>
+                  {marka}
+                </h2>
 
-                  <h3>
-                    {item.model} {item.alt_model_guc}
-                  </h3>
+                <div className="cards">
+                  {items.map((product) => {
+                    const pricing = calculatePricing(product);
 
-                  <div className="mini-grid">
-                    <div className="mini-box">
-                      <span>Nakit</span>
-                      <strong>₺{toNumber(item.nakit).toLocaleString("tr-TR")}</strong>
-                    </div>
+                    return (
+                      <article key={product.id} className="product-card">
+                        <div className="brand-badge">{safeText(product?.marka)}</div>
 
-                    <div className="mini-box">
-                      <span>Kart</span>
-                      <strong>₺{toNumber(item.kart).toLocaleString("tr-TR")}</strong>
-                    </div>
+                        <h3 className="product-title">
+                          {safeText(product?.model) || safeText(product?.urun_adi)}
+                        </h3>
 
-                    <div className="mini-box">
-                      <span>Net</span>
-                      <strong>₺{toNumber(item.net_bedel).toLocaleString("tr-TR")}</strong>
-                    </div>
+                        <div className="price-grid">
+                          <div className="price-box">
+                            <span className="label orange">Nakit</span>
+                            <strong>{formatTL(pricing.nakit)}</strong>
+                          </div>
 
-                    <div className="mini-box">
-                      <span>Kar</span>
-                      <strong>₺{toNumber(item.kar).toLocaleString("tr-TR")}</strong>
-                    </div>
+                          <div className="price-box">
+                            <span className="label blue">Kart</span>
+                            <strong>{formatTL(pricing.kart)}</strong>
+                          </div>
 
-                    <div className="mini-box">
-                      <span>Kampanya</span>
-                      <strong>₺{toNumber(item.kampanya).toLocaleString("tr-TR")}</strong>
-                    </div>
+                          <div className="price-box">
+                            <span className="label gray">Net</span>
+                            <strong>{formatTL(pricing.netMaliyet)}</strong>
+                          </div>
 
-                    <div className="mini-box">
-                      <span>Net Bedel</span>
-                      <strong>₺{toNumber(item.net_bedel).toLocaleString("tr-TR")}</strong>
-                    </div>
+                          <div className="price-box">
+                            <span className="label green">Kar</span>
+                            <strong>{formatTL(pricing.kar)}</strong>
+                          </div>
 
-                    <div className="mini-box">
-                      <span>Nakit Çarpanı</span>
-                      <strong>%{toNumber(item.nakit_carpani).toLocaleString("tr-TR")}</strong>
-                    </div>
+                          <div className="price-box">
+                            <span className="label">Kampanya</span>
+                            <strong>{formatTL(pricing.kampanya)}</strong>
+                          </div>
 
-                    <div className="mini-box">
-                      <span>Kart Komisyon</span>
-                      <strong>%{toNumber(item.kart_komisyon).toLocaleString("tr-TR")}</strong>
-                    </div>
-                  </div>
+                          <div className="price-box">
+                            <span className="label">Net Bedel</span>
+                            <strong>{formatTL(pricing.netMaliyet)}</strong>
+                          </div>
 
-                  <div className="detail-grid">
-                    <div>
-                      <label>Alış</label>
-                      <input readOnly value={toNumber(item.alis_fiyati)} />
-                    </div>
+                          <div className="price-box">
+                            <span className="label">Nakit Çarpanı</span>
+                            <strong>%{pricing.nakitCarpani}</strong>
+                          </div>
 
-                    <div>
-                      <label>Montaj</label>
-                      <input readOnly value={toNumber(item.montaj_maliyeti)} />
-                    </div>
+                          <div className="price-box">
+                            <span className="label">Kart Komisyon</span>
+                            <strong>%{pricing.kartKomisyon}</strong>
+                          </div>
+                        </div>
 
-                    <div>
-                      <label>Puan</label>
-                      <input readOnly value={toNumber(item.puan)} />
-                    </div>
+                        <div className="detail-grid">
+                          <div>
+                            <label>Alış</label>
+                            <input readOnly value={pricing.alis} />
+                          </div>
 
-                    <div>
-                      <label>Fayda</label>
-                      <input readOnly value={toNumber(item.fayda)} />
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          ))}
-        </section>
-      ))}
+                          <div>
+                            <label className="label-red">Montaj</label>
+                            <input readOnly value={pricing.montaj} />
+                          </div>
+
+                          <div>
+                            <label className="label-teal">Puan</label>
+                            <input readOnly value={pricing.puan} />
+                          </div>
+
+                          <div>
+                            <label className="label-teal">Fayda</label>
+                            <input readOnly value={pricing.fayda} />
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </section>
+        ))}
     </main>
   );
 }
