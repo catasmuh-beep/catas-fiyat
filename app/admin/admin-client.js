@@ -7,18 +7,19 @@ import {
   sortProducts,
 } from "../../lib/catalog";
 
-const EMPTY_PRODUCT = {
+cconst EMPTY_PRODUCT = {
   active: true,
-  category: "Kombi",
-  brand: "Vaillant",
+  category: "",
+  brand: "",
   model: "",
-  purchase_price: 0,
+  submodel: "",
+  purchase_price: "",
+  installation_cost: "",
+  score: "",
+  benefit: "",
   net_price: 0,
   cash_price: 0,
   card_price: 0,
-  installation_cost: 0,
-  benefit: 0,
-  score: 0,
   cash_multiplier: 0,
   card_commission: 0,
 };
