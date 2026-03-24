@@ -1,39 +1,68 @@
-export function round1000(value) {
-  if (!value) return 0;
-  return Math.ceil(Number(value) / 1000) * 1000;
+// lib/pricing.js
+
+export function toNumber(value) {
+  if (value === null || value === undefined || value === "") return 0;
+  const normalized = String(value).replace(",", ".").replace(/[^\d.-]/g, "");
+  const num = Number(normalized);
+  return Number.isFinite(num) ? num : 0;
 }
 
-export function computeDerived(input) {
-  const alis = Number(input.alis_fiyati || 0);
-  const puan = Number(input.puan || 0);
-  const fayda = Number(input.fayda || 0);
-  const montaj = Number(input.montaj_maliyeti || 0);
+export function calculateProductPricing(product) {
+  const alis = toNumber(
+    product.alis ??
+    product.alis_fiyati ??
+    product.purchase_price ??
+    0
+  );
 
-  const net_bedel = Math.max(0, alis + montaj - puan - fayda);
-  const kampanya_maliyeti = net_bedel - montaj;
+  const montaj = toNumber(
+    product.montaj ??
+    product.montaj_maliyeti ??
+    product.installation_cost ??
+    0
+  );
 
-  const nakit_satis = net_bedel > 0 ? round1000(net_bedel * 1.09) : 0;
-  const kar = nakit_satis - net_bedel;
-  const kart_satis = nakit_satis > 0 ? round1000(nakit_satis * 1.18) : 0;
+  const puan = toNumber(product.puan ?? 0);
+  const fayda = toNumber(product.fayda ?? 0);
+
+  const nakitCarpani = toNumber(
+    product.nakit_carpani ??
+    product.nakit_carpan ??
+    0
+  );
+
+  const kartKomisyon = toNumber(
+    product.kart_komisyon ??
+    product.kart_komisyonu ??
+    0
+  );
+
+  const netMaliyet = alis + montaj + puan - fayda;
+  const kar = fayda;
+  const nakit = Math.round(netMaliyet * (1 + nakitCarpani / 100));
+  const kart = Math.round(nakit * (1 + kartKomisyon / 100));
+  const kampanya = nakit;
 
   return {
-    kampanya_maliyeti,
-    net_bedel,
+    alis,
+    montaj,
+    puan,
+    fayda,
+    nakitCarpani,
+    kartKomisyon,
+    netMaliyet,
     kar,
-    nakit_satis,
-    kart_satis,
+    nakit,
+    kart,
+    kampanya,
   };
 }
 
-export function formatMoney(value) {
-  const n = Number(value || 0);
+export function formatTL(value) {
+  const number = toNumber(value);
   return new Intl.NumberFormat("tr-TR", {
     style: "currency",
     currency: "TRY",
     maximumFractionDigits: 0,
-  }).format(n);
-}
-
-export function norm(value) {
-  return String(value || "").trim();
+  }).format(number);
 }
