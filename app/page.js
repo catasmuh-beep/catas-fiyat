@@ -7,7 +7,7 @@ import {
   BRAND_ORDER_BY_CATEGORY,
   formatCurrency,
   sortProducts,
-} from "@/lib/catalog";
+} from "../lib/catalog";
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -76,6 +76,7 @@ export default function HomePage() {
       map[category] = {};
 
       const brandOrder = BRAND_ORDER_BY_CATEGORY[category] || [];
+
       for (const brand of brandOrder) {
         const brandItems = itemsInCategory
           .filter((p) => p.brand === brand)
@@ -129,10 +130,6 @@ export default function HomePage() {
         <a href="/admin" className="admin-link">Yönetici Girişi</a>
       </div>
 
-      <div className="logo-box">
-        <img src="/logo.png" alt="Çataş Mühendislik" className="logo-img" />
-      </div>
-
       <div className="stats-row">
         <span>Toplam ürün: {stats.productCount}</span>
         <span>Kategori: {stats.categoryCount}</span>
@@ -156,7 +153,7 @@ export default function HomePage() {
 
         <input
           type="text"
-          placeholder="Tüm modeller"
+          placeholder="Marka / model ara"
           value={modelFilter}
           onChange={(e) => setModelFilter(e.target.value)}
         />
