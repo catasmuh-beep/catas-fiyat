@@ -105,19 +105,20 @@ export async function GET() {
       .order("model", { ascending: true });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    const products = (data || []).map(calcProduct);
-
-    return NextResponse.json(products, {
-      status: 200,
-      headers: {
-        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-    });
+     return NextResponse.json(
+  {
+    ok: true,
+    products: (data || []).map(calcProduct),
+  },
+  {
+    status: 200,
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      Pragma: "no-cache",
+      Expires: "0",
+    },
+  }
+);
   } catch (err) {
     return NextResponse.json(
       { error: err.message || "Ürünler alınamadı." },
