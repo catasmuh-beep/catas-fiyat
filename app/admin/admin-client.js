@@ -1,18 +1,42 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  CATEGORY_ORDER,
-  BRAND_ORDER_BY_CATEGORY,
-  sortProducts,
-} from "../lib/catalog";
+
+const CATEGORY_ORDER = ["Kombi", "Klima", "Şofben", "Elektrikli Kombi"];
+
+const BRAND_ORDER_BY_CATEGORY = {
+  Kombi: ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
+  Klima: ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
+  "Şofben": ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
+  "Elektrikli Kombi": ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
+};
+
+function sortProducts(products = []) {
+  return [...products].sort((a, b) => {
+    const c1 = CATEGORY_ORDER.indexOf(a.category);
+    const c2 = CATEGORY_ORDER.indexOf(b.category);
+    const ci1 = c1 === -1 ? 999 : c1;
+    const ci2 = c2 === -1 ? 999 : c2;
+
+    if (ci1 !== ci2) return ci1 - ci2;
+
+    const brands = BRAND_ORDER_BY_CATEGORY[a.category] || [];
+    const b1 = brands.indexOf(a.brand);
+    const b2 = brands.indexOf(b.brand);
+    const bi1 = b1 === -1 ? 999 : b1;
+    const bi2 = b2 === -1 ? 999 : b2;
+
+    if (bi1 !== bi2) return bi1 - bi2;
+
+    return (a.model || "").localeCompare(b.model || "", "tr");
+  });
+}
 
 const EMPTY_PRODUCT = {
   active: true,
   category: "",
   brand: "",
   model: "",
-  submodel: "",
   purchase_price: "",
   installation_cost: "",
   score: "",
@@ -43,9 +67,7 @@ export default function AdminClient() {
       const res = await fetch("/api/products", { cache: "no-store" });
       const json = await res.json();
 
-      if (!res.ok) {
-        throw new Error(json.error || "Ürünler alınamadı");
-      }
+      if (!res.ok) throw new Error(json.error || "Ürünler alınamadı");
 
       const rows = sortProducts(json.products || []);
       setProducts(rows);
@@ -105,11 +127,7 @@ export default function AdminClient() {
   function updateNewProduct(field, value) {
     setNewProduct((prev) => {
       const updated = { ...prev, [field]: value };
-
-      if (field === "category") {
-        updated.brand = "";
-      }
-
+      if (field === "category") updated.brand = "";
       return updated;
     });
   }
@@ -132,9 +150,7 @@ export default function AdminClient() {
       });
 
       const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json.error || "Ürün eklenemedi");
-      }
+      if (!res.ok) throw new Error(json.error || "Ürün eklenemedi");
 
       setNewProduct(EMPTY_PRODUCT);
       await fetchProducts();
@@ -158,9 +174,7 @@ export default function AdminClient() {
       });
 
       const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json.error || "Kaydetme başarısız");
-      }
+      if (!res.ok) throw new Error(json.error || "Kaydetme başarısız");
 
       await fetchProducts();
       setMessage("Tüm değişiklikler kaydedildi.");
@@ -168,35 +182,6 @@ export default function AdminClient() {
       setMessage(error.message);
     } finally {
       setSaving(false);
-    }
-  }
-
-  function resetChanges() {
-    setDrafts(products);
-    setMessage("Değişiklikler geri alındı.");
-  }
-
-  async function deleteProduct(id) {
-    const ok = window.confirm("Bu ürünü silmek istediğinize emin misiniz?");
-    if (!ok) return;
-
-    try {
-      setMessage("");
-
-      const res = await fetch(`/api/products/${id}`, {
-        method: "DELETE",
-      });
-
-      const json = await res.json();
-
-      if (!res.ok) {
-        throw new Error(json.error || "Ürün silinemedi");
-      }
-
-      await fetchProducts();
-      setMessage("Ürün silindi.");
-    } catch (error) {
-      setMessage(error.message);
     }
   }
 
@@ -217,16 +202,8 @@ export default function AdminClient() {
   return (
     <main className="admin-page">
       <div className="admin-actions-top">
-        <button
-          className="primary-btn"
-          onClick={saveAllChanges}
-          disabled={saving}
-        >
+        <button className="primary-btn" onClick={saveAllChanges} disabled={saving}>
           {saving ? "Kaydediliyor..." : "Tüm Değişiklikleri Kaydet"}
-        </button>
-
-        <button className="ghost-btn" onClick={resetChanges}>
-          Değişiklikleri Geri Al
         </button>
 
         <a href="/" className="ghost-btn">
@@ -248,9 +225,7 @@ export default function AdminClient() {
           >
             <option value="">Kategori</option>
             {CATEGORY_ORDER.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
+              <option key={category} value={category}>{category}</option>
             ))}
           </select>
 
@@ -261,9 +236,7 @@ export default function AdminClient() {
           >
             <option value="">Marka</option>
             {(BRAND_ORDER_BY_CATEGORY[newProduct.category] || []).map((brand) => (
-              <option key={brand} value={brand}>
-                {brand}
-              </option>
+              <option key={brand} value={brand}>{brand}</option>
             ))}
           </select>
 
@@ -272,13 +245,6 @@ export default function AdminClient() {
             placeholder="Model"
             value={newProduct.model}
             onChange={(e) => updateNewProduct("model", e.target.value)}
-          />
-
-          <input
-            type="text"
-            placeholder="Alt model / güç"
-            value={newProduct.submodel || ""}
-            onChange={(e) => updateNewProduct("submodel", e.target.value)}
           />
 
           <input
@@ -329,7 +295,6 @@ export default function AdminClient() {
       <section className="admin-card">
         <div className="admin-list-top">
           <h2>Ürünleri Düzenle</h2>
-
           <input
             type="text"
             className="search-input"
@@ -353,7 +318,6 @@ export default function AdminClient() {
                 <th>Nakit</th>
                 <th>Kart</th>
                 <th>Aktif</th>
-                <th>Sil</th>
               </tr>
             </thead>
             <tbody>
@@ -419,15 +383,6 @@ export default function AdminClient() {
                           updateDraft(item.id, "active", e.target.checked)
                         }
                       />
-                    </td>
-
-                    <td>
-                      <button
-                        className="ghost-btn"
-                        onClick={() => deleteProduct(item.id)}
-                      >
-                        Sil
-                      </button>
                     </td>
                   </tr>
                 );
