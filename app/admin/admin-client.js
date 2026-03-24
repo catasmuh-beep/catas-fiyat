@@ -1107,11 +1107,16 @@ export default function AdminClient({ initialRows }) {
 
         <div className="admin-create-grid">
           <input
-            type="text"
-            placeholder="Kategori"
-            value={newProduct.kategori}
-            onChange={(e) => updateNewProduct("kategori", e.target.value)}
-          />
+           <select
+  value={newProduct.kategori}
+  onChange={(e) => updateNewProduct("kategori", e.target.value)}
+>
+  <option value="">Kategori seç</option>
+  <option value="Kombi">Kombi</option>
+  <option value="Klima">Klima</option>
+  <option value="Şofben">Şofben</option>
+  <option value="Elektrikli Kombi">Elektrikli Kombi</option>
+</select>
           <input
             type="text"
             placeholder="Marka"
