@@ -1,334 +1,419 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { calculatePricing, formatTL } from "../lib/pricing";
+import {
+  CATEGORY_ORDER,
+  BRAND_ORDER_BY_CATEGORY,
+  sortProducts,
+} from "@/lib/catalog";
 
-function emptyProduct() {
-  return {
-    kategori: "",
-    marka: "",
-    model: "",
-    urun_adi: "",
-    alis: 0,
-    montaj: 0,
-    puan: 0,
-    fayda: 0,
-    nakit_carpani: 0,
-    kart_komisyon: 0,
-    aktif: true,
-  };
-}
-
-function safeText(value) {
-  return String(value ?? "").trim();
-}
-
-async function safeReadJson(res) {
-  const text = await res.text();
-  if (!text) throw new Error("API boş cevap döndü.");
-
-  try {
-    return JSON.parse(text);
-  } catch {
-    throw new Error("API geçerli JSON döndürmedi.");
-  }
-}
+const EMPTY_PRODUCT = {
+  active: true,
+  category: "Kombi",
+  brand: "Vaillant",
+  model: "",
+  purchase_price: 0,
+  net_price: 0,
+  cash_price: 0,
+  card_price: 0,
+  installation_cost: 0,
+  benefit: 0,
+  score: 0,
+  cash_multiplier: 0,
+  card_commission: 0,
+};
 
 export default function AdminClient() {
   const [products, setProducts] = useState([]);
-  const [newProduct, setNewProduct] = useState(emptyProduct());
+  const [drafts, setDrafts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [newProduct, setNewProduct] = useState(EMPTY_PRODUCT);
   const [message, setMessage] = useState("");
 
-  async function loadProducts() {
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  async function fetchProducts() {
     try {
       setLoading(true);
-      setError("");
-
       const res = await fetch("/api/products", { cache: "no-store" });
-      const json = await safeReadJson(res);
+      const json = await res.json();
 
-      if (!res.ok || !json?.ok) {
-        throw new Error(json?.error || "Ürünler alınamadı.");
-      }
+      if (!res.ok) throw new Error(json.error || "Ürünler alınamadı");
 
-      setProducts(Array.isArray(json.products) ? json.products : []);
-    } catch (err) {
+      const rows = sortProducts(json.products || []);
+      setProducts(rows);
+      setDrafts(rows);
+    } catch (error) {
+      console.error(error);
       setProducts([]);
-      setError(err?.message || "Yükleme hatası.");
+      setDrafts([]);
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  const grouped = useMemo(() => {
-    const result = {};
-
-    for (const product of products) {
-      const kategori = safeText(product?.kategori) || "Diğer";
-      if (!result[kategori]) result[kategori] = [];
-      result[kategori].push(product);
-    }
-
-    return result;
-  }, [products]);
-
-  function updateNewProduct(field, value) {
-    setNewProduct((prev) => ({
-      ...prev,
-      [field]:
-        field === "aktif"
-          ? value
-          : ["kategori", "marka", "model", "urun_adi"].includes(field)
-          ? value
-          : Number(value || 0),
-    }));
-  }
-
-  function updateRow(id, field, value) {
-    setProducts((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              [field]:
-                field === "aktif"
-                  ? value
-                  : ["kategori", "marka", "model", "urun_adi"].includes(field)
-                  ? value
-                  : Number(value || 0),
-            }
-          : item
-      )
+  function updateDraft(id, field, value) {
+    setDrafts((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );
   }
 
-  async function handleCreate() {
+  function updateNewProduct(field, value) {
+    setNewProduct((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function addProduct() {
     try {
-      setSaving(true);
-      setError("");
       setMessage("");
 
-      const payload = {
-        ...newProduct,
-        urun_adi: newProduct.urun_adi || newProduct.model,
-      };
+      if (!newProduct.category || !newProduct.brand || !newProduct.model) {
+        setMessage("Kategori, marka ve model zorunludur.");
+        return;
+      }
 
       const res = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(newProduct),
       });
 
-      const json = await safeReadJson(res);
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Ürün eklenemedi");
 
-      if (!res.ok || !json?.ok) {
-        throw new Error(json?.error || "Ürün eklenemedi.");
-      }
-
-      setMessage("Ürün başarıyla eklendi.");
-      setNewProduct(emptyProduct());
-      await loadProducts();
-    } catch (err) {
-      setError(err?.message || "Kaydetme hatası.");
-    } finally {
-      setSaving(false);
+      setNewProduct(EMPTY_PRODUCT);
+      await fetchProducts();
+      setMessage("Yeni ürün eklendi.");
+    } catch (error) {
+      setMessage(error.message);
     }
   }
 
-  async function handleUpdate(product) {
+  async function saveAllChanges() {
     try {
       setSaving(true);
-      setError("");
       setMessage("");
 
-      const res = await fetch("/api/products", {
-        method: "PUT",
+      const res = await fetch("/api/products/bulk", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(product),
+        body: JSON.stringify({ products: drafts }),
       });
 
-      const json = await safeReadJson(res);
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Kaydetme başarısız");
 
-      if (!res.ok || !json?.ok) {
-        throw new Error(json?.error || "Güncelleme yapılamadı.");
-      }
-
-      setMessage("Ürün güncellendi.");
-      await loadProducts();
-    } catch (err) {
-      setError(err?.message || "Güncelleme hatası.");
+      await fetchProducts();
+      setMessage("Tüm değişiklikler kaydedildi.");
+    } catch (error) {
+      setMessage(error.message);
     } finally {
       setSaving(false);
     }
   }
 
-  async function handleDelete(id) {
-    try {
-      setSaving(true);
-      setError("");
-      setMessage("");
+  const filteredDrafts = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return drafts;
 
-      const res = await fetch(`/api/products?id=${id}`, {
-        method: "DELETE",
-      });
+    return drafts.filter((item) => {
+      const text = `${item.category} ${item.brand} ${item.model}`.toLowerCase();
+      return text.includes(q);
+    });
+  }, [drafts, search]);
 
-      const json = await safeReadJson(res);
-
-      if (!res.ok || !json?.ok) {
-        throw new Error(json?.error || "Silme işlemi başarısız.");
-      }
-
-      setMessage("Ürün silindi.");
-      await loadProducts();
-    } catch (err) {
-      setError(err?.message || "Silme hatası.");
-    } finally {
-      setSaving(false);
-    }
+  if (loading) {
+    return <div className="admin-loading">Yükleniyor...</div>;
   }
 
   return (
-    <div className="admin-shell">
-      <h1 className="admin-main-title">Yönetici Paneli</h1>
+    <main className="admin-page">
+      <div className="admin-header">
+        <div>
+          <h1>Yönetici Paneli</h1>
+          <p>Ürün ekle, filtrele, düzenle ve tek tuşla kaydet.</p>
+        </div>
+        <div className="admin-actions-top">
+          <a href="/" className="ghost-btn">Personel görünümüne dön</a>
+          <a href="/admin/logout" className="ghost-btn">Çıkış</a>
+        </div>
+      </div>
 
-      {error ? <div className="state-box error">{error}</div> : null}
-      {message ? <div className="state-box">{message}</div> : null}
-
-      <section className="admin-create-card">
+      <section className="admin-card">
         <h2>Yeni Ürün Ekle</h2>
 
-        <div className="admin-grid">
-          <input placeholder="Kategori" value={newProduct.kategori} onChange={(e) => updateNewProduct("kategori", e.target.value)} />
-          <input placeholder="Marka" value={newProduct.marka} onChange={(e) => updateNewProduct("marka", e.target.value)} />
-          <input placeholder="Model" value={newProduct.model} onChange={(e) => updateNewProduct("model", e.target.value)} />
-          <input placeholder="Ürün Adı" value={newProduct.urun_adi} onChange={(e) => updateNewProduct("urun_adi", e.target.value)} />
-          <input type="number" placeholder="Alış" value={newProduct.alis} onChange={(e) => updateNewProduct("alis", e.target.value)} />
-          <input type="number" placeholder="Montaj" value={newProduct.montaj} onChange={(e) => updateNewProduct("montaj", e.target.value)} />
-          <input type="number" placeholder="Puan" value={newProduct.puan} onChange={(e) => updateNewProduct("puan", e.target.value)} />
-          <input type="number" placeholder="Fayda" value={newProduct.fayda} onChange={(e) => updateNewProduct("fayda", e.target.value)} />
-          <input type="number" placeholder="Nakit Çarpanı" value={newProduct.nakit_carpani} onChange={(e) => updateNewProduct("nakit_carpani", e.target.value)} />
-          <input type="number" placeholder="Kart Komisyon" value={newProduct.kart_komisyon} onChange={(e) => updateNewProduct("kart_komisyon", e.target.value)} />
+        <div className="admin-form-grid">
+          <select
+            value={newProduct.category}
+            onChange={(e) => updateNewProduct("category", e.target.value)}
+          >
+            {CATEGORY_ORDER.map((category) => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
 
-          <label className="checkbox-row">
+          <select
+            value={newProduct.brand}
+            onChange={(e) => updateNewProduct("brand", e.target.value)}
+          >
+            {(BRAND_ORDER_BY_CATEGORY[newProduct.category] || []).map((brand) => (
+              <option key={brand} value={brand}>{brand}</option>
+            ))}
+          </select>
+
+          <input
+            type="text"
+            placeholder="Model"
+            value={newProduct.model}
+            onChange={(e) => updateNewProduct("model", e.target.value)}
+          />
+
+          <input
+            type="number"
+            placeholder="Alış Fiyatı"
+            value={newProduct.purchase_price}
+            onChange={(e) => updateNewProduct("purchase_price", Number(e.target.value))}
+          />
+
+          <input
+            type="number"
+            placeholder="Net Fiyat"
+            value={newProduct.net_price}
+            onChange={(e) => updateNewProduct("net_price", Number(e.target.value))}
+          />
+
+          <input
+            type="number"
+            placeholder="Nakit Fiyat"
+            value={newProduct.cash_price}
+            onChange={(e) => updateNewProduct("cash_price", Number(e.target.value))}
+          />
+
+          <input
+            type="number"
+            placeholder="Kart Fiyat"
+            value={newProduct.card_price}
+            onChange={(e) => updateNewProduct("card_price", Number(e.target.value))}
+          />
+
+          <input
+            type="number"
+            placeholder="Montaj Maliyeti"
+            value={newProduct.installation_cost}
+            onChange={(e) => updateNewProduct("installation_cost", Number(e.target.value))}
+          />
+
+          <input
+            type="number"
+            placeholder="Fayda"
+            value={newProduct.benefit}
+            onChange={(e) => updateNewProduct("benefit", Number(e.target.value))}
+          />
+
+          <input
+            type="number"
+            placeholder="Puan"
+            value={newProduct.score}
+            onChange={(e) => updateNewProduct("score", Number(e.target.value))}
+          />
+
+          <input
+            type="number"
+            placeholder="Nakit Çarpanı"
+            value={newProduct.cash_multiplier}
+            onChange={(e) => updateNewProduct("cash_multiplier", Number(e.target.value))}
+          />
+
+          <input
+            type="number"
+            placeholder="Kart Komisyonu"
+            value={newProduct.card_commission}
+            onChange={(e) => updateNewProduct("card_commission", Number(e.target.value))}
+          />
+        </div>
+
+        <div className="admin-inline-actions">
+          <label className="checkbox-wrap">
             <input
               type="checkbox"
-              checked={!!newProduct.aktif}
-              onChange={(e) => updateNewProduct("aktif", e.target.checked)}
+              checked={newProduct.active}
+              onChange={(e) => updateNewProduct("active", e.target.checked)}
             />
             Aktif
           </label>
-        </div>
 
-        <button className="primary-btn" onClick={handleCreate} disabled={saving}>
-          {saving ? "Kaydediliyor..." : "Ürünü Kaydet"}
-        </button>
+          <button className="primary-btn" onClick={addProduct}>
+            Yeni Ürün Ekle
+          </button>
+        </div>
       </section>
 
-      {loading ? (
-        <div className="state-box">Yükleniyor...</div>
-      ) : (
-        Object.entries(grouped).map(([kategori, items]) => (
-          <section key={kategori} className="admin-category">
-            <h2 className="admin-category-title">{kategori}</h2>
+      <section className="admin-card">
+        <div className="admin-list-top">
+          <h2>Ürünleri Düzenle</h2>
+          <input
+            type="text"
+            placeholder="Kategori / Marka / Model ara"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search-input"
+          />
+        </div>
 
-            <div className="admin-table-wrap">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>Ürün Bilgisi</th>
-                    <th>Alış</th>
-                    <th>Montaj</th>
-                    <th>Puan</th>
-                    <th>Fayda</th>
-                    <th>Net Maliyet</th>
-                    <th>Kar</th>
-                    <th>Nakit</th>
-                    <th>Kart</th>
-                    <th>Aktif</th>
-                    <th>İşlem</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((product) => {
-                    const pricing = calculatePricing(product);
+        <div className="table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Aktif</th>
+                <th>Kategori</th>
+                <th>Marka</th>
+                <th>Model</th>
+                <th>Alış</th>
+                <th>Net</th>
+                <th>Nakit</th>
+                <th>Kart</th>
+                <th>Montaj</th>
+                <th>Fayda</th>
+                <th>Puan</th>
+                <th>Nakit Çarpanı</th>
+                <th>Kart Komisyonu</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredDrafts.map((item) => (
+                <tr key={item.id}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={item.active ?? true}
+                      onChange={(e) => updateDraft(item.id, "active", e.target.checked)}
+                    />
+                  </td>
 
-                    return (
-                      <tr key={product.id}>
-                        <td>
-                          <div className="product-info-cell">
-                            <div><strong>{safeText(product?.marka)}</strong></div>
-                            <div>{safeText(product?.model)}</div>
-                          </div>
-                        </td>
+                  <td>
+                    <select
+                      value={item.category}
+                      onChange={(e) => updateDraft(item.id, "category", e.target.value)}
+                    >
+                      {CATEGORY_ORDER.map((category) => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
+                    </select>
+                  </td>
 
-                        <td>
-                          <input
-                            type="number"
-                            value={product.alis ?? 0}
-                            onChange={(e) => updateRow(product.id, "alis", e.target.value)}
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            value={product.montaj ?? 0}
-                            onChange={(e) => updateRow(product.id, "montaj", e.target.value)}
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            value={product.puan ?? 0}
-                            onChange={(e) => updateRow(product.id, "puan", e.target.value)}
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            value={product.fayda ?? 0}
-                            onChange={(e) => updateRow(product.id, "fayda", e.target.value)}
-                          />
-                        </td>
+                  <td>
+                    <select
+                      value={item.brand}
+                      onChange={(e) => updateDraft(item.id, "brand", e.target.value)}
+                    >
+                      {(BRAND_ORDER_BY_CATEGORY[item.category] || []).map((brand) => (
+                        <option key={brand} value={brand}>{brand}</option>
+                      ))}
+                    </select>
+                  </td>
 
-                        <td>{formatTL(pricing.netMaliyet)}</td>
-                        <td>{formatTL(pricing.kar)}</td>
-                        <td>{formatTL(pricing.nakit)}</td>
-                        <td>{formatTL(pricing.kart)}</td>
+                  <td>
+                    <input
+                      type="text"
+                      value={item.model || ""}
+                      onChange={(e) => updateDraft(item.id, "model", e.target.value)}
+                    />
+                  </td>
 
-                        <td>
-                          <input
-                            type="checkbox"
-                            checked={!!product.aktif}
-                            onChange={(e) => updateRow(product.id, "aktif", e.target.checked)}
-                          />
-                        </td>
+                  <td>
+                    <input
+                      type="number"
+                      value={item.purchase_price || 0}
+                      onChange={(e) => updateDraft(item.id, "purchase_price", Number(e.target.value))}
+                    />
+                  </td>
 
-                        <td>
-                          <div className="row-actions">
-                            <button className="save-btn" onClick={() => handleUpdate(product)} disabled={saving}>
-                              Kaydet
-                            </button>
-                            <button className="delete-btn" onClick={() => handleDelete(product.id)} disabled={saving}>
-                              Sil
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        ))
-      )}
-    </div>
+                  <td>
+                    <input
+                      type="number"
+                      value={item.net_price || 0}
+                      onChange={(e) => updateDraft(item.id, "net_price", Number(e.target.value))}
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      type="number"
+                      value={item.cash_price || 0}
+                      onChange={(e) => updateDraft(item.id, "cash_price", Number(e.target.value))}
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      type="number"
+                      value={item.card_price || 0}
+                      onChange={(e) => updateDraft(item.id, "card_price", Number(e.target.value))}
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      type="number"
+                      value={item.installation_cost || 0}
+                      onChange={(e) =>
+                        updateDraft(item.id, "installation_cost", Number(e.target.value))
+                      }
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      type="number"
+                      value={item.benefit || 0}
+                      onChange={(e) => updateDraft(item.id, "benefit", Number(e.target.value))}
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      type="number"
+                      value={item.score || 0}
+                      onChange={(e) => updateDraft(item.id, "score", Number(e.target.value))}
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      type="number"
+                      value={item.cash_multiplier || 0}
+                      onChange={(e) =>
+                        updateDraft(item.id, "cash_multiplier", Number(e.target.value))
+                      }
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      type="number"
+                      value={item.card_commission || 0}
+                      onChange={(e) =>
+                        updateDraft(item.id, "card_commission", Number(e.target.value))
+                      }
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="sticky-save-bar">
+          <button className="primary-btn save-all-btn" onClick={saveAllChanges} disabled={saving}>
+            {saving ? "Kaydediliyor..." : "Değişiklikleri Kaydet"}
+          </button>
+        </div>
+
+        {message ? <div className="status-msg">{message}</div> : null}
+      </section>
+    </main>
   );
 }
