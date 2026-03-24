@@ -139,21 +139,24 @@ export default function AdminClient({ initialProducts = [] }) {
     try {
       setSaving(true);
 
-      const calculated = recalculateProduct({
-        kategori: newProduct.kategori.trim(),
-        marka: newProduct.marka.trim(),
-        model: newProduct.model.trim(),
-        alt_model_guc: newProduct.alt_model_guc.trim(),
-        alis_fiyati: newProduct.alis_fiyati,
-        montaj_maliyeti: newProduct.montaj_maliyeti,
-        puan: newProduct.puan,
-        fayda: newProduct.fayda,
-        // Yeni ürün ekleme ekranında bu alanlar yoksa 0 kalsın
-        nakit_carpani: 9,
-        kart_komisyon: 18,
-        kampanya: 0,
-        aktif: Boolean(newProduct.aktif),
-      });
+     const calculated = recalculateProduct({
+  kategori: newProduct.kategori.trim(),
+  marka: newProduct.marka.trim(),
+  model: newProduct.model.trim(),
+  alt_model_guc: newProduct.alt_model_guc.trim(),
+
+  alis_fiyati: newProduct.alis_fiyati,
+  montaj_maliyeti: newProduct.montaj_maliyeti,
+  puan: newProduct.puan,
+  fayda: newProduct.fayda,
+
+  // Hesaplama için gerekli varsayılan değerler
+  nakit_carpani: 9,
+  kart_komisyonu: 18,
+  kampanya_fiyati: 0,
+
+  aktif: Boolean(newProduct.aktif),
+});
 
       const payload = {
         kategori: newProduct.kategori.trim(),
