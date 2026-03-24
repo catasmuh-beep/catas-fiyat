@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { getBrowserSupabase } from "./lib/supabase";
 import { formatMoney, norm } from "./lib/pricing";
-
 function toNumber(value) {
   if (value === null || value === undefined || value === "") return 0;
   const n = Number(value);
