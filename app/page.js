@@ -2,276 +2,231 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const CATEGORY_ORDER = ["Kombi", "Klima", "Şofben", "Elektrikli Kombi"];
+const BRAND_ORDER = ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"];
 
-const BRAND_ORDER_BY_CATEGORY = {
-  Kombi: ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
-  Klima: ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
-  "Şofben": ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
-  "Elektrikli Kombi": ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
-};
-
-const BRAND_COLORS = {
-  Vaillant: "#0a8f6a",
-  "Demirdöküm": "#005baa",
-  Baymak: "#00a651",
-  ECA: "#005baa",
-  Protherm: "#d71920",
-  Baykan: "#f2c200",
-  Warmhaus: "#e30613",
-};
-
-function sortProducts(products = []) {
-  return [...products].sort((a, b) => {
-    const c1 = CATEGORY_ORDER.indexOf(a.category);
-    const c2 = CATEGORY_ORDER.indexOf(b.category);
-    const ci1 = c1 === -1 ? 999 : c1;
-    const ci2 = c2 === -1 ? 999 : c2;
-
-    if (ci1 !== ci2) return ci1 - ci2;
-
-    const brands = BRAND_ORDER_BY_CATEGORY[a.category] || [];
-    const b1 = brands.indexOf(a.brand);
-    const b2 = brands.indexOf(b.brand);
-    const bi1 = b1 === -1 ? 999 : b1;
-    const bi2 = b2 === -1 ? 999 : b2;
-
-    if (bi1 !== bi2) return bi1 - bi2;
-
-    return (a.model || "").localeCompare(b.model || "", "tr");
-  });
+function num(v, fallback = 0) {
+  if (v === null || v === undefined || v === "") return fallback;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
 }
 
-function formatCurrency(value) {
-  const num = Number(value || 0);
-  return new Intl.NumberFormat("tr-TR", {
-    style: "currency",
-    currency: "TRY",
-    maximumFractionDigits: 0,
-  }).format(num);
+function sortProducts(list) {
+  return [...list].sort((a, b) => {
+    const catA = CATEGORY_ORDER.indexOf(a.kategori);
+    const catB = CATEGORY_ORDER.indexOf(b.kategori);
+    if (catA !== catB) return (catA === -1 ? 999 : catA) - (catB === -1 ? 999 : catB);
+
+    const brandA = BRAND_ORDER.indexOf(a.marka);
+    const brandB = BRAND_ORDER.indexOf(b.marka);
+    if (brandA !== brandB) return (brandA === -1 ? 999 : brandA) - (brandB === -1 ? 999 : brandB);
+
+    return `${a.model} ${a.alt_model_guc}`.localeCompare(`${b.model} ${b.alt_model_guc}`, "tr");
+  });
 }
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [categoryFilter, setCategoryFilter] = useState("");
-  const [brandFilter, setBrandFilter] = useState("");
-  const [modelFilter, setModelFilter] = useState("");
+  const [kategori, setKategori] = useState("");
+  const [marka, setMarka] = useState("");
+  const [model, setModel] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetchProducts();
+    async function load() {
+      const res = await fetch("/api/products", {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setProducts(sortProducts(data.filter((x) => x.aktif)));
+      }
+    }
+
+    load();
+
+    const interval = setInterval(load, 8000);
+    return () => clearInterval(interval);
   }, []);
 
-  async function fetchProducts() {
-    try {
-      setLoading(true);
-      const res = await fetch("/api/products", { cache: "no-store" });
-      const json = await res.json();
-
-      if (!res.ok) {
-        throw new Error(json.error || "Ürünler alınamadı");
-      }
-
-      setProducts(sortProducts(json.products || []));
-    } catch (error) {
-      console.error(error);
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const activeProducts = useMemo(() => {
-    return products.filter((p) => p.active !== false);
+  const categories = useMemo(() => {
+    return [...new Set(products.map((p) => p.kategori).filter(Boolean))];
   }, [products]);
 
-  const filteredProducts = useMemo(() => {
-    return activeProducts.filter((p) => {
-      const categoryOk = !categoryFilter || p.category === categoryFilter;
-      const brandOk = !brandFilter || p.brand === brandFilter;
-      const modelOk =
-        !modelFilter ||
-        `${p.brand} ${p.model}`.toLowerCase().includes(modelFilter.toLowerCase()) ||
-        (p.model || "").toLowerCase().includes(modelFilter.toLowerCase());
+  const brands = useMemo(() => {
+    return [...new Set(
+      products
+        .filter((p) => !kategori || p.kategori === kategori)
+        .map((p) => p.marka)
+        .filter(Boolean)
+    )];
+  }, [products, kategori]);
 
-      return categoryOk && brandOk && modelOk;
-    });
-  }, [activeProducts, categoryFilter, brandFilter, modelFilter]);
+  const models = useMemo(() => {
+    return [...new Set(
+      products
+        .filter((p) => (!kategori || p.kategori === kategori) && (!marka || p.marka === marka))
+        .map((p) => p.model)
+        .filter(Boolean)
+    )];
+  }, [products, kategori, marka]);
 
-  const stats = useMemo(() => {
-    const categories = new Set(filteredProducts.map((p) => p.category).filter(Boolean));
-    const brands = new Set(filteredProducts.map((p) => p.brand).filter(Boolean));
-    return {
-      productCount: filteredProducts.length,
-      categoryCount: categories.size,
-      brandCount: brands.size,
-    };
-  }, [filteredProducts]);
+  const filtered = useMemo(() => {
+    return sortProducts(
+      products.filter((p) => {
+        const okKategori = !kategori || p.kategori === kategori;
+        const okMarka = !marka || p.marka === marka;
+        const okModel = !model || p.model === model;
+        const q = search.trim().toLocaleLowerCase("tr");
+        const fullText = `${p.marka} ${p.model} ${p.alt_model_guc} ${p.kategori}`.toLocaleLowerCase("tr");
+        const okSearch = !q || fullText.includes(q);
+        return okKategori && okMarka && okModel && okSearch;
+      })
+    );
+  }, [products, kategori, marka, model, search]);
 
   const grouped = useMemo(() => {
     const map = {};
-
-    for (const category of CATEGORY_ORDER) {
-      const itemsInCategory = filteredProducts.filter((p) => p.category === category);
-      if (!itemsInCategory.length) continue;
-
-      map[category] = {};
-
-      const brandOrder = BRAND_ORDER_BY_CATEGORY[category] || [];
-
-      for (const brand of brandOrder) {
-        const brandItems = itemsInCategory
-          .filter((p) => p.brand === brand)
-          .sort((a, b) => (a.model || "").localeCompare(b.model || "", "tr"));
-
-        if (brandItems.length) {
-          map[category][brand] = brandItems;
-        }
-      }
-
-      const remainingBrands = [...new Set(itemsInCategory.map((p) => p.brand))]
-        .filter((brand) => !brandOrder.includes(brand))
-        .sort((a, b) => a.localeCompare(b, "tr"));
-
-      for (const brand of remainingBrands) {
-        const brandItems = itemsInCategory
-          .filter((p) => p.brand === brand)
-          .sort((a, b) => (a.model || "").localeCompare(b.model || "", "tr"));
-
-        if (brandItems.length) {
-          map[category][brand] = brandItems;
-        }
-      }
+    for (const p of filtered) {
+      if (!map[p.kategori]) map[p.kategori] = {};
+      if (!map[p.kategori][p.marka]) map[p.kategori][p.marka] = [];
+      map[p.kategori][p.marka].push(p);
     }
-
     return map;
-  }, [filteredProducts]);
-
-  const allBrands = useMemo(() => {
-    return [...new Set(activeProducts.map((p) => p.brand).filter(Boolean))].sort((a, b) =>
-      a.localeCompare(b, "tr")
-    );
-  }, [activeProducts]);
-
-  if (loading) {
-    return (
-      <main className="page-wrap">
-        <div className="topbar">
-          <h1>Personel görünümü</h1>
-          <a href="/admin" className="admin-link">Yönetici Girişi</a>
-        </div>
-        <div className="loading-box">Yükleniyor...</div>
-      </main>
-    );
-  }
+  }, [filtered]);
 
   return (
-    <main className="page-wrap">
-      <div className="topbar">
-        <h1>Personel görünümü</h1>
-        <a href="/admin" className="admin-link">Yönetici Girişi</a>
-      </div>
-
-      <div className="stats-row">
-        <span>Toplam ürün: {stats.productCount}</span>
-        <span>Kategori: {stats.categoryCount}</span>
-        <span>Marka: {stats.brandCount}</span>
+    <main className="personel-page">
+      <div className="top-stats">
+        <span>Toplam ürün: {filtered.length}</span>
+        <span>Kategori: {categories.length}</span>
+        <span>Marka: {brands.length}</span>
       </div>
 
       <div className="filters">
-        <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+        <select
+          value={kategori}
+          onChange={(e) => {
+            setKategori(e.target.value);
+            setMarka("");
+            setModel("");
+          }}
+        >
           <option value="">Tüm kategoriler</option>
-          {CATEGORY_ORDER.map((category) => (
-            <option key={category} value={category}>{category}</option>
+          {categories.map((x) => (
+            <option key={x} value={x}>{x}</option>
           ))}
         </select>
 
-        <select value={brandFilter} onChange={(e) => setBrandFilter(e.target.value)}>
+        <select
+          value={marka}
+          onChange={(e) => {
+            setMarka(e.target.value);
+            setModel("");
+          }}
+        >
           <option value="">Tüm markalar</option>
-          {allBrands.map((brand) => (
-            <option key={brand} value={brand}>{brand}</option>
+          {brands.map((x) => (
+            <option key={x} value={x}>{x}</option>
+          ))}
+        </select>
+
+        <select value={model} onChange={(e) => setModel(e.target.value)}>
+          <option value="">Tüm modeller</option>
+          {models.map((x) => (
+            <option key={x} value={x}>{x}</option>
           ))}
         </select>
 
         <input
           type="text"
           placeholder="Ara: model / güç / marka"
-          value={modelFilter}
-          onChange={(e) => setModelFilter(e.target.value)}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
-      {stats.productCount === 0 ? (
-        <div className="empty-box">Gösterilecek ürün bulunamadı.</div>
-      ) : (
-        CATEGORY_ORDER.map((category) => {
-          const brands = grouped[category];
-          if (!brands) return null;
+      {Object.entries(grouped).map(([catName, brandsMap]) => (
+        <section key={catName} className="category-section">
+          <h1>{catName}</h1>
 
-          return (
-            <section key={category} className="category-section">
-              <h2 className="category-title">{category}</h2>
+          {Object.entries(brandsMap).map(([brandName, items]) => (
+            <div key={brandName}>
+              <h2>{brandName}</h2>
 
-              {Object.entries(brands).map(([brand, items]) => (
-                <div key={`${category}-${brand}`} className="brand-section">
-                  <h3
-                    className="brand-title"
-                    style={{ color: BRAND_COLORS[brand] || "#00917e" }}
-                  >
-                    {brand}
-                  </h3>
+              <div className="cards">
+                {items.map((p) => (
+                  <article key={p.id} className="product-card">
+                    <div className="brand-pill">{p.marka}</div>
 
-                  <div className="product-grid">
-                    {items.map((item) => (
-                      <article key={item.id} className="product-card">
-                        <div className="product-head">
-                          <div className="product-brand">{item.brand}</div>
-                          <div className="product-model">{item.model}</div>
-                        </div>
+                    <h3>
+                      {p.model} {p.alt_model_guc}
+                    </h3>
 
-                        <div className="price-row">
-                          <span>Nakit</span>
-                          <strong>{formatCurrency(item.cash_price)}</strong>
-                        </div>
+                    <div className="mini-grid">
+                      <div className="mini-box">
+                        <span>Nakit</span>
+                        <strong>₺{num(p.nakit).toLocaleString("tr-TR")}</strong>
+                      </div>
+                      <div className="mini-box">
+                        <span>Kart</span>
+                        <strong>₺{num(p.kart).toLocaleString("tr-TR")}</strong>
+                      </div>
+                      <div className="mini-box">
+                        <span>Net</span>
+                        <strong>₺{num(p.net_bedel).toLocaleString("tr-TR")}</strong>
+                      </div>
+                      <div className="mini-box">
+                        <span>Kar</span>
+                        <strong>₺{num(p.kar).toLocaleString("tr-TR")}</strong>
+                      </div>
+                      <div className="mini-box">
+                        <span>Kampanya</span>
+                        <strong>₺{num(p.kampanya).toLocaleString("tr-TR")}</strong>
+                      </div>
+                      <div className="mini-box">
+                        <span>Net Bedel</span>
+                        <strong>₺{num(p.net_bedel).toLocaleString("tr-TR")}</strong>
+                      </div>
+                      <div className="mini-box">
+                        <span>Nakit Çarpanı</span>
+                        <strong>%{num(p.nakit_carpani).toLocaleString("tr-TR")}</strong>
+                      </div>
+                      <div className="mini-box">
+                        <span>Kart Komisyon</span>
+                        <strong>%{num(p.kart_komisyon).toLocaleString("tr-TR")}</strong>
+                      </div>
+                    </div>
 
-                        <div className="price-row">
-                          <span>Kart</span>
-                          <strong>{formatCurrency(item.card_price)}</strong>
-                        </div>
-
-                        <div className="price-row">
-                          <span>Net</span>
-                          <strong>{formatCurrency(item.net_price)}</strong>
-                        </div>
-
-                        <div className="meta-row positive">
-                          <span>Kar</span>
-                          <strong>{formatCurrency(item.benefit)}</strong>
-                        </div>
-
-                        <div className="meta-row">
-                          <span>Alış</span>
-                          <strong>{formatCurrency(item.purchase_price)}</strong>
-                        </div>
-
-                        <div className="meta-row negative">
-                          <span>Montaj</span>
-                          <strong>{formatCurrency(item.installation_cost)}</strong>
-                        </div>
-
-                        <div className="meta-row positive">
-                          <span>Puan</span>
-                          <strong>{item.score || 0}</strong>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </section>
-          );
-        })
-      )}
+                    <div className="detail-grid">
+                      <div>
+                        <label>Alış</label>
+                        <input value={num(p.alis_fiyati)} readOnly />
+                      </div>
+                      <div>
+                        <label>Montaj</label>
+                        <input value={num(p.montaj_maliyeti)} readOnly />
+                      </div>
+                      <div>
+                        <label>Puan</label>
+                        <input value={num(p.puan)} readOnly />
+                      </div>
+                      <div>
+                        <label>Fayda</label>
+                        <input value={num(p.fayda)} readOnly />
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+      ))}
     </main>
   );
 }
