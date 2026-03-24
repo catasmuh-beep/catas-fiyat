@@ -5,21 +5,21 @@ import { useEffect, useMemo, useState } from "react";
 const CATEGORY_ORDER = ["Kombi", "Klima", "Şofben", "Elektrikli Kombi"];
 const BRAND_ORDER = ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"];
 
-function num(v, fallback = 0) {
-  if (v === null || v === undefined || v === "") return fallback;
-  const n = Number(v);
+function toNumber(value, fallback = 0) {
+  if (value === null || value === undefined || value === "") return fallback;
+  const n = Number(value);
   return Number.isFinite(n) ? n : fallback;
 }
 
 function sortProducts(list) {
   return [...list].sort((a, b) => {
-    const catA = CATEGORY_ORDER.indexOf(a.kategori);
-    const catB = CATEGORY_ORDER.indexOf(b.kategori);
-    if (catA !== catB) return (catA === -1 ? 999 : catA) - (catB === -1 ? 999 : catB);
+    const aCat = CATEGORY_ORDER.indexOf(a.kategori);
+    const bCat = CATEGORY_ORDER.indexOf(b.kategori);
+    if (aCat !== bCat) return (aCat === -1 ? 999 : aCat) - (bCat === -1 ? 999 : bCat);
 
-    const brandA = BRAND_ORDER.indexOf(a.marka);
-    const brandB = BRAND_ORDER.indexOf(b.marka);
-    if (brandA !== brandB) return (brandA === -1 ? 999 : brandA) - (brandB === -1 ? 999 : brandB);
+    const aBrand = BRAND_ORDER.indexOf(a.marka);
+    const bBrand = BRAND_ORDER.indexOf(b.marka);
+    if (aBrand !== bBrand) return (aBrand === -1 ? 999 : aBrand) - (bBrand === -1 ? 999 : bBrand);
 
     return `${a.model} ${a.alt_model_guc}`.localeCompare(`${b.model} ${b.alt_model_guc}`, "tr");
   });
@@ -33,89 +33,99 @@ export default function HomePage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    let mounted = true;
+    let active = true;
 
-    async function load() {
+    async function loadProducts() {
       try {
         const res = await fetch("/api/products", {
           cache: "no-store",
-          headers: { "Cache-Control": "no-cache" },
+          headers: {
+            "Cache-Control": "no-cache",
+          },
         });
 
         const data = await res.json();
 
-        if (mounted && Array.isArray(data)) {
-          setProducts(sortProducts(data.filter((x) => x.aktif)));
+        if (active && Array.isArray(data)) {
+          setProducts(sortProducts(data));
         }
       } catch (error) {
         console.error("Ürünler alınamadı:", error);
       }
     }
 
-    load();
-    const interval = setInterval(load, 8000);
+    loadProducts();
+    const timer = setInterval(loadProducts, 5000);
 
     return () => {
-      mounted = false;
-      clearInterval(interval);
+      active = false;
+      clearInterval(timer);
     };
   }, []);
 
-  const categories = useMemo(() => {
-    return [...new Set(products.map((p) => p.kategori).filter(Boolean))];
-  }, [products]);
+  const kategoriOptions = useMemo(
+    () => [...new Set(products.map((x) => x.kategori).filter(Boolean))],
+    [products]
+  );
 
-  const brands = useMemo(() => {
-    return [...new Set(
-      products
-        .filter((p) => !kategori || p.kategori === kategori)
-        .map((p) => p.marka)
-        .filter(Boolean)
-    )];
+  const markaOptions = useMemo(() => {
+    return [
+      ...new Set(
+        products
+          .filter((x) => !kategori || x.kategori === kategori)
+          .map((x) => x.marka)
+          .filter(Boolean)
+      ),
+    ];
   }, [products, kategori]);
 
-  const models = useMemo(() => {
-    return [...new Set(
-      products
-        .filter((p) => (!kategori || p.kategori === kategori) && (!marka || p.marka === marka))
-        .map((p) => p.model)
-        .filter(Boolean)
-    )];
+  const modelOptions = useMemo(() => {
+    return [
+      ...new Set(
+        products
+          .filter((x) => (!kategori || x.kategori === kategori) && (!marka || x.marka === marka))
+          .map((x) => x.model)
+          .filter(Boolean)
+      ),
+    ];
   }, [products, kategori, marka]);
 
-  const filtered = useMemo(() => {
+  const filteredProducts = useMemo(() => {
     return sortProducts(
-      products.filter((p) => {
-        const okKategori = !kategori || p.kategori === kategori;
-        const okMarka = !marka || p.marka === marka;
-        const okModel = !model || p.model === model;
+      products.filter((item) => {
+        const okKategori = !kategori || item.kategori === kategori;
+        const okMarka = !marka || item.marka === marka;
+        const okModel = !model || item.model === model;
+
         const q = search.trim().toLocaleLowerCase("tr");
-        const fullText = `${p.marka} ${p.model} ${p.alt_model_guc} ${p.kategori}`.toLocaleLowerCase("tr");
-        const okSearch = !q || fullText.includes(q);
+        const haystack =
+          `${item.kategori} ${item.marka} ${item.model} ${item.alt_model_guc}`.toLocaleLowerCase("tr");
+        const okSearch = !q || haystack.includes(q);
+
         return okKategori && okMarka && okModel && okSearch;
       })
     );
   }, [products, kategori, marka, model, search]);
 
   const grouped = useMemo(() => {
-    const map = {};
-    for (const p of filtered) {
-      if (!map[p.kategori]) map[p.kategori] = {};
-      if (!map[p.kategori][p.marka]) map[p.kategori][p.marka] = [];
-      map[p.kategori][p.marka].push(p);
+    const result = {};
+    for (const item of filteredProducts) {
+      if (!result[item.kategori]) result[item.kategori] = {};
+      if (!result[item.kategori][item.marka]) result[item.kategori][item.marka] = [];
+      result[item.kategori][item.marka].push(item);
     }
-    return map;
-  }, [filtered]);
+    return result;
+  }, [filteredProducts]);
 
   return (
-    <main className="personel-page">
-      <div className="top-stats">
-        <span>Toplam ürün: {filtered.length}</span>
-        <span>Kategori: {categories.length}</span>
-        <span>Marka: {brands.length}</span>
+    <main>
+      <div className="stats-row">
+        <span>Toplam ürün: {filteredProducts.length}</span>
+        <span>Kategori: {kategoriOptions.length}</span>
+        <span>Marka: {markaOptions.length}</span>
       </div>
 
-      <div className="filters">
+      <div className="filters-row">
         <select
           value={kategori}
           onChange={(e) => {
@@ -125,8 +135,10 @@ export default function HomePage() {
           }}
         >
           <option value="">Tüm kategoriler</option>
-          {categories.map((x) => (
-            <option key={x} value={x}>{x}</option>
+          {kategoriOptions.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
           ))}
         </select>
 
@@ -138,15 +150,19 @@ export default function HomePage() {
           }}
         >
           <option value="">Tüm markalar</option>
-          {brands.map((x) => (
-            <option key={x} value={x}>{x}</option>
+          {markaOptions.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
           ))}
         </select>
 
         <select value={model} onChange={(e) => setModel(e.target.value)}>
           <option value="">Tüm modeller</option>
-          {models.map((x) => (
-            <option key={x} value={x}>{x}</option>
+          {modelOptions.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
           ))}
         </select>
 
@@ -158,79 +174,87 @@ export default function HomePage() {
         />
       </div>
 
-      {Object.entries(grouped).map(([catName, brandsMap]) => (
-        <section key={catName} className="category-section">
-          <h1>{catName}</h1>
+      {Object.entries(grouped).map(([kategoriName, brands]) => (
+        <section key={kategoriName}>
+          <h1>{kategoriName}</h1>
 
-          {Object.entries(brandsMap).map(([brandName, items]) => (
+          {Object.entries(brands).map(([brandName, items]) => (
             <div key={brandName}>
               <h2>{brandName}</h2>
 
-              <div className="cards">
-                {items.map((p) => (
-                  <article key={p.id} className="product-card">
-                    <div className="brand-pill">{p.marka}</div>
+              {items.map((item) => (
+                <article key={item.id} className="product-card">
+                  <div className="brand-pill">{item.marka}</div>
 
-                    <h3>
-                      {p.model} {p.alt_model_guc}
-                    </h3>
+                  <h3>
+                    {item.model} {item.alt_model_guc}
+                  </h3>
 
-                    <div className="mini-grid">
-                      <div className="mini-box">
-                        <span>Nakit</span>
-                        <strong>₺{num(p.nakit).toLocaleString("tr-TR")}</strong>
-                      </div>
-                      <div className="mini-box">
-                        <span>Kart</span>
-                        <strong>₺{num(p.kart).toLocaleString("tr-TR")}</strong>
-                      </div>
-                      <div className="mini-box">
-                        <span>Net</span>
-                        <strong>₺{num(p.net_bedel).toLocaleString("tr-TR")}</strong>
-                      </div>
-                      <div className="mini-box">
-                        <span>Kar</span>
-                        <strong>₺{num(p.kar).toLocaleString("tr-TR")}</strong>
-                      </div>
-                      <div className="mini-box">
-                        <span>Kampanya</span>
-                        <strong>₺{num(p.kampanya).toLocaleString("tr-TR")}</strong>
-                      </div>
-                      <div className="mini-box">
-                        <span>Net Bedel</span>
-                        <strong>₺{num(p.net_bedel).toLocaleString("tr-TR")}</strong>
-                      </div>
-                      <div className="mini-box">
-                        <span>Nakit Çarpanı</span>
-                        <strong>%{num(p.nakit_carpani).toLocaleString("tr-TR")}</strong>
-                      </div>
-                      <div className="mini-box">
-                        <span>Kart Komisyon</span>
-                        <strong>%{num(p.kart_komisyon).toLocaleString("tr-TR")}</strong>
-                      </div>
+                  <div className="mini-grid">
+                    <div className="mini-box">
+                      <span>Nakit</span>
+                      <strong>₺{toNumber(item.nakit).toLocaleString("tr-TR")}</strong>
                     </div>
 
-                    <div className="detail-grid">
-                      <div>
-                        <label>Alış</label>
-                        <input value={num(p.alis_fiyati)} readOnly />
-                      </div>
-                      <div>
-                        <label>Montaj</label>
-                        <input value={num(p.montaj_maliyeti)} readOnly />
-                      </div>
-                      <div>
-                        <label>Puan</label>
-                        <input value={num(p.puan)} readOnly />
-                      </div>
-                      <div>
-                        <label>Fayda</label>
-                        <input value={num(p.fayda)} readOnly />
-                      </div>
+                    <div className="mini-box">
+                      <span>Kart</span>
+                      <strong>₺{toNumber(item.kart).toLocaleString("tr-TR")}</strong>
                     </div>
-                  </article>
-                ))}
-              </div>
+
+                    <div className="mini-box">
+                      <span>Net</span>
+                      <strong>₺{toNumber(item.net_bedel).toLocaleString("tr-TR")}</strong>
+                    </div>
+
+                    <div className="mini-box">
+                      <span>Kar</span>
+                      <strong>₺{toNumber(item.kar).toLocaleString("tr-TR")}</strong>
+                    </div>
+
+                    <div className="mini-box">
+                      <span>Kampanya</span>
+                      <strong>₺{toNumber(item.kampanya).toLocaleString("tr-TR")}</strong>
+                    </div>
+
+                    <div className="mini-box">
+                      <span>Net Bedel</span>
+                      <strong>₺{toNumber(item.net_bedel).toLocaleString("tr-TR")}</strong>
+                    </div>
+
+                    <div className="mini-box">
+                      <span>Nakit Çarpanı</span>
+                      <strong>%{toNumber(item.nakit_carpani).toLocaleString("tr-TR")}</strong>
+                    </div>
+
+                    <div className="mini-box">
+                      <span>Kart Komisyon</span>
+                      <strong>%{toNumber(item.kart_komisyon).toLocaleString("tr-TR")}</strong>
+                    </div>
+                  </div>
+
+                  <div className="detail-grid">
+                    <div>
+                      <label>Alış</label>
+                      <input readOnly value={toNumber(item.alis_fiyati)} />
+                    </div>
+
+                    <div>
+                      <label>Montaj</label>
+                      <input readOnly value={toNumber(item.montaj_maliyeti)} />
+                    </div>
+
+                    <div>
+                      <label>Puan</label>
+                      <input readOnly value={toNumber(item.puan)} />
+                    </div>
+
+                    <div>
+                      <label>Fayda</label>
+                      <input readOnly value={toNumber(item.fayda)} />
+                    </div>
+                  </div>
+                </article>
+              ))}
             </div>
           ))}
         </section>
