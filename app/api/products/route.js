@@ -25,7 +25,6 @@ function normalizePayload(body) {
     nakit_carpani: Number(body?.nakit_carpani ?? 0),
     kart_komisyon: Number(body?.kart_komisyon ?? 0),
     aktif: body?.aktif ?? true,
-    siralama: Number(body?.siralama ?? 0),
   };
 }
 
@@ -38,7 +37,6 @@ export async function GET() {
       .select("*")
       .order("kategori", { ascending: true })
       .order("marka", { ascending: true })
-      .order("siralama", { ascending: true })
       .order("model", { ascending: true });
 
     if (error) {
