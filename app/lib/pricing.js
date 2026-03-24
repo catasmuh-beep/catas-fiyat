@@ -32,12 +32,12 @@ export function calculatePricing(product) {
     montaj,
     puan,
     fayda,
+    nakitCarpani,
+    kartKomisyon,
     netMaliyet,
     kar,
     nakit,
     kart,
     kampanya,
-    nakitCarpani,
-    kartKomisyon,
   };
 }
