@@ -1,25 +1,21 @@
 export const CATEGORY_ORDER = ["Kombi", "Klima", "Şofben", "Elektrikli Kombi"];
 
 export const BRAND_ORDER_BY_CATEGORY = {
-  "Kombi": ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
-  "Klima": ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
+  Kombi: ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
+  Klima: ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
   "Şofben": ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
   "Elektrikli Kombi": ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
 };
 
 export const BRAND_COLORS = {
-  "Vaillant": "#0a8f6a",
+  Vaillant: "#0a8f6a",
   "Demirdöküm": "#005baa",
-  "Baymak": "#00a651",
-  "ECA": "#005baa",
-  "Protherm": "#d71920",
-  "Baykan": "#f2c200",
-  "Warmhaus": "#e30613",
+  Baymak: "#00a651",
+  ECA: "#005baa",
+  Protherm: "#d71920",
+  Baykan: "#f2c200",
+  Warmhaus: "#e30613",
 };
-
-export function normalizeText(value) {
-  return (value || "").toString().trim();
-}
 
 export function categorySort(a, b) {
   const ai = CATEGORY_ORDER.indexOf(a);
@@ -37,7 +33,7 @@ export function brandSort(category, a, b) {
   const bIndex = bi === -1 ? 999 : bi;
 
   if (aIndex !== bIndex) return aIndex - bIndex;
-  return a.localeCompare(b, "tr");
+  return (a || "").localeCompare(b || "", "tr");
 }
 
 export function sortProducts(products = []) {
