@@ -493,3 +493,12 @@ textarea::placeholder {
     gap: 8px;
   }
 }
+.new-product-grid input::placeholder {
+  color: rgba(0, 0, 0, 0.35);
+  opacity: 1;
+}
+
+.admin-message {
+  margin: 14px 0 18px;
+  font-weight: 600;
+}
