@@ -655,13 +655,20 @@ export default function AdminClient({ initialRows }) {
   }
 
   function updateNewProduct(field, value) {
-    setNewProduct((prev) => ({
-      ...prev,
-      [field]: ["alis_fiyati", "montaj_maliyeti", "puan", "fayda"].includes(field)
-        ? Number(value === "" ? 0 : value)
-        : value,
-    }));
-  }
+  setNewProduct((prev) => ({
+    ...prev,
+    [field]: [
+      "alis_fiyati",
+      "montaj_maliyeti",
+      "puan",
+      "fayda",
+      "nakit_carpani",
+      "kart_komisyon",
+    ].includes(field)
+      ? Number(value === "" ? 0 : value)
+      : value,
+  }));
+}
 
   async function saveAllChanges() {
     const dirtyCount = dirtyIds.size;
