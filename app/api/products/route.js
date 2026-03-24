@@ -64,21 +64,9 @@ function calcProduct(row) {
       : Math.max(0, nakit - net_bedel + puan + fayda);
 
   const kampanya =
-    row.kampanya !== null && row.kampanya !== undefined && row.kampanya !== ""
-      ? num(row.kampanya)
-      : 0;
-const kar =
-  row.kar !== null &&
-  row.kar !== undefined &&
-  row.kar !== "" &&
-  storedKar > 0
-    ? storedKar
-    : Math.max(0, nakit - net_bedel + puan + fayda);
-  storedKar > 0
-    ? storedKar
-    : Math.max(0, nakit - net_bedel + puan + fayda);
-  const kampanya =
-    row.kampanya !== null && row.kampanya !== undefined && row.kampanya !== ""
+    row.kampanya !== null &&
+    row.kampanya !== undefined &&
+    row.kampanya !== ""
       ? num(row.kampanya)
       : 0;
 
