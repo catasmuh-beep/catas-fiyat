@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { calculatePricing, formatTL } from "../../lib/pricing";
+import { calculatePricing, formatTL } from "../lib/pricing";
 
 function emptyProduct() {
   return {
