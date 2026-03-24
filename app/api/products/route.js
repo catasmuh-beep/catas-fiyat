@@ -1,6 +1,35 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { sortProducts } from "../../lib/catalog";
+
+const CATEGORY_ORDER = ["Kombi", "Klima", "Şofben", "Elektrikli Kombi"];
+
+const BRAND_ORDER_BY_CATEGORY = {
+  Kombi: ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
+  Klima: ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
+  "Şofben": ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
+  "Elektrikli Kombi": ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
+};
+
+function sortProducts(products = []) {
+  return [...products].sort((a, b) => {
+    const c1 = CATEGORY_ORDER.indexOf(a.category);
+    const c2 = CATEGORY_ORDER.indexOf(b.category);
+    const ci1 = c1 === -1 ? 999 : c1;
+    const ci2 = c2 === -1 ? 999 : c2;
+
+    if (ci1 !== ci2) return ci1 - ci2;
+
+    const brands = BRAND_ORDER_BY_CATEGORY[a.category] || [];
+    const b1 = brands.indexOf(a.brand);
+    const b2 = brands.indexOf(b.brand);
+    const bi1 = b1 === -1 ? 999 : b1;
+    const bi2 = b2 === -1 ? 999 : b2;
+
+    if (bi1 !== bi2) return bi1 - bi2;
+
+    return (a.model || "").localeCompare(b.model || "", "tr");
+  });
+}
 
 function getSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -11,10 +40,7 @@ function getSupabase() {
   }
 
   return createClient(url, key, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
+    auth: { persistSession: false, autoRefreshToken: false },
   });
 }
 
