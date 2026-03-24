@@ -126,85 +126,84 @@ export default function AdminClient({ initialProducts = [] }) {
   }
 
   async function addNewProduct() {
-    setMessage("");
+  setMessage("");
 
-    if (!newProduct.kategori.trim() || !newProduct.marka.trim() || !newProduct.model.trim()) {
-      setMessage("Kategori, marka ve model alanları zorunludur.");
-      return;
-    }
-
-    try {
-      setSaving(true);
-
-     const alis = toNumber(newProduct.alis_fiyati);
-const montaj = toNumber(newProduct.montaj_maliyeti);
-const puan = toNumber(newProduct.puan);
-const fayda = toNumber(newProduct.fayda);
-
-const net_bedel = alis + montaj;
-
-// Yeni ürün ekleme alanında oran girişi yoksa şimdilik 0
-const nakit_carpani = 0;
-const kart_komisyon = 0;
-
-const nakit = Math.round(net_bedel * (1 + nakit_carpani / 100));
-const kart = Math.round(nakit * (1 + kart_komisyon / 100));
-const kar = Math.max(0, nakit - net_bedel + puan + fayda);
-const kampanya = 0;
-
-const payload = {
-  kategori: newProduct.kategori.trim(),
-  marka: newProduct.marka.trim(),
-  model: newProduct.model.trim(),
-  alt_model_guc: newProduct.alt_model_guc.trim(),
-
-  alis_fiyati: alis,
-  montaj_maliyeti: montaj,
-  puan: puan,
-  fayda: fayda,
-
-  net_bedel: net_bedel,
-  nakit_carpani: nakit_carpani,
-  kart_komisyon: kart_komisyon,
-  nakit: nakit,
-  kart: kart,
-  kar: kar,
-  kampanya: kampanya,
-
-  aktif: Boolean(newProduct.aktif),
-};
-
-      const res = await fetch("/api/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
-        },
-        body: JSON.stringify({
-          action: "create",
-          product: payload,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data?.error || "Yeni ürün eklenemedi.");
-      }
-
-      if (data?.product) {
-        setProducts((prev) => [...prev, normalizeProduct(data.product)]);
-      }
-
-      setNewProduct(emptyNewProduct());
-      setMessage("Yeni ürün başarıyla eklendi.");
-    } catch (error) {
-      setMessage(error.message || "Yeni ürün eklenirken hata oluştu.");
-    } finally {
-      setSaving(false);
-    }
+  if (!newProduct.kategori.trim() || !newProduct.marka.trim() || !newProduct.model.trim()) {
+    setMessage("Kategori, marka ve model alanları zorunludur.");
+    return;
   }
 
+  try {
+    setSaving(true);
+
+    const alis = toNumber(newProduct.alis_fiyati);
+    const montaj = toNumber(newProduct.montaj_maliyeti);
+    const puan = toNumber(newProduct.puan);
+    const fayda = toNumber(newProduct.fayda);
+
+    const net_bedel = alis + montaj;
+
+    // Yeni ürün ekleme alanında oran girişi yoksa şimdilik 0
+    const nakit_carpani = 0;
+    const kart_komisyon = 0;
+
+    const nakit = Math.round(net_bedel * (1 + nakit_carpani / 100));
+    const kart = Math.round(nakit * (1 + kart_komisyon / 100));
+    const kar = Math.max(0, nakit - net_bedel + puan + fayda);
+    const kampanya = 0;
+
+    const payload = {
+      kategori: newProduct.kategori.trim(),
+      marka: newProduct.marka.trim(),
+      model: newProduct.model.trim(),
+      alt_model_guc: newProduct.alt_model_guc.trim(),
+
+      alis_fiyati: alis,
+      montaj_maliyeti: montaj,
+      puan: puan,
+      fayda: fayda,
+
+      net_bedel: net_bedel,
+      nakit_carpani: nakit_carpani,
+      kart_komisyon: kart_komisyon,
+      nakit: nakit,
+      kart: kart,
+      kar: kar,
+      kampanya: kampanya,
+
+      aktif: Boolean(newProduct.aktif),
+    };
+
+    const res = await fetch("/api/products", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+      },
+      body: JSON.stringify({
+        action: "create",
+        product: payload,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.error || "Yeni ürün eklenemedi.");
+    }
+
+    if (data?.product) {
+      setProducts((prev) => [...prev, normalizeProduct(data.product)]);
+    }
+
+    setNewProduct(emptyNewProduct());
+    setMessage("Yeni ürün başarıyla eklendi.");
+  } catch (error) {
+    setMessage(error.message || "Yeni ürün eklenirken hata oluştu.");
+  } finally {
+    setSaving(false);
+  }
+}
   async function saveAllChanges() {
     setMessage("");
 
