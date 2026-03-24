@@ -1,10 +1,72 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { calculatePricing, formatTL } from "./lib/pricing";
 
 function safeText(value) {
   return String(value ?? "").trim();
+}
+
+function toNumber(val) {
+  if (val === null || val === undefined || val === "") return 0;
+
+  if (typeof val === "number") {
+    return Number.isFinite(val) ? val : 0;
+  }
+
+  const str = String(val).trim();
+  if (!str) return 0;
+
+  const normalized = str
+    .replace(/₺/g, "")
+    .replace(/%/g, "")
+    .replace(/\s/g, "")
+    .replace(/\./g, "")
+    .replace(",", ".");
+
+  const num = Number(normalized);
+  return Number.isFinite(num) ? num : 0;
+}
+
+function formatTL(value) {
+  return `₺${toNumber(value).toLocaleString("tr-TR")}`;
+}
+
+function calculatePricing(product) {
+  const alis = toNumber(product?.alis_fiyati ?? product?.alis ?? 0);
+  const montaj = toNumber(product?.montaj_maliyeti ?? product?.montaj ?? 0);
+  const puan = toNumber(product?.puan ?? 0);
+  const fayda = toNumber(product?.fayda ?? 0);
+  const nakitCarpani = toNumber(product?.nakit_carpani ?? 0);
+  const kartKomisyon = toNumber(product?.kart_komisyonu ?? product?.kart_komisyon ?? 0);
+  const kampanya = toNumber(product?.kampanya_fiyati ?? product?.kampanya ?? 0);
+
+  // Temel net maliyet
+  const netMaliyet = Math.max(0, alis + montaj - puan - fayda);
+
+  // Kampanya girilmişse nakit satışta onu baz al, yoksa hesaplanan net üstüne çarpan uygula
+  const nakit = kampanya > 0
+    ? Math.round(kampanya)
+    : Math.round(netMaliyet * (1 + nakitCarpani / 100));
+
+  // Kart satış
+  const kart = Math.round(nakit * (1 + kartKomisyon / 100));
+
+  // Kar = Nakit satış - Net maliyet
+  const kar = Math.max(0, nakit - netMaliyet);
+
+  return {
+    alis,
+    montaj,
+    puan,
+    fayda,
+    nakitCarpani,
+    kartKomisyon,
+    kampanya,
+    netMaliyet,
+    nakit,
+    kart,
+    kar,
+  };
 }
 
 function brandColor(brand) {
@@ -70,6 +132,7 @@ export default function Page() {
     }
 
     loadProducts();
+
     return () => {
       active = false;
     };
@@ -114,6 +177,7 @@ export default function Page() {
         safeText(p?.marka),
         safeText(p?.model),
         safeText(p?.urun_adi),
+        safeText(p?.guc),
       ].join(" ").toLowerCase();
 
       const searchOk = q ? text.includes(q) : true;
@@ -147,6 +211,7 @@ export default function Page() {
         <button className="switch-btn" type="button">
           Personel görünümü
         </button>
+
         <a href="/admin" className="admin-btn">
           Yönetici Girişi
         </a>
@@ -246,30 +311,37 @@ export default function Page() {
                             <span className="label orange">Nakit</span>
                             <strong>{formatTL(pricing.nakit)}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label blue">Kart</span>
                             <strong>{formatTL(pricing.kart)}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label gray">Net</span>
                             <strong>{formatTL(pricing.netMaliyet)}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label green">Kar</span>
                             <strong>{formatTL(pricing.kar)}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label">Kampanya</span>
                             <strong>{formatTL(pricing.kampanya)}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label">Net Bedel</span>
                             <strong>{formatTL(pricing.netMaliyet)}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label">Nakit Çarpanı</span>
                             <strong>%{pricing.nakitCarpani}</strong>
                           </div>
+
                           <div className="price-box">
                             <span className="label">Kart Komisyon</span>
                             <strong>%{pricing.kartKomisyon}</strong>
@@ -281,14 +353,17 @@ export default function Page() {
                             <label>Alış</label>
                             <input readOnly value={pricing.alis} />
                           </div>
+
                           <div>
                             <label className="label-red">Montaj</label>
                             <input readOnly value={pricing.montaj} />
                           </div>
+
                           <div>
                             <label className="label-teal">Puan</label>
                             <input readOnly value={pricing.puan} />
                           </div>
+
                           <div>
                             <label className="label-teal">Fayda</label>
                             <input readOnly value={pricing.fayda} />
