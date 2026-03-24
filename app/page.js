@@ -6,16 +6,25 @@ import { getBrowserSupabase } from "./lib/supabase";
 import { formatMoney, norm } from "./lib/pricing";
 
 function toNumber(value) {
+  if (value === null || value === undefined || value === "") return 0;
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
 }
 
-ffunction calcNakitCarpani(item) {
+function calcNakitCarpani(item) {
   const net = toNumber(item.net_bedel);
   const nakit = toNumber(item.nakit ?? item.nakit_satis);
 
   if (!net || !nakit || nakit <= net) return 0;
   return Math.floor(((nakit - net) / net) * 100);
+}
+
+function calcKartKomisyonu(item) {
+  const nakit = toNumber(item.nakit ?? item.nakit_satis);
+  const kart = toNumber(item.kart ?? item.kart_satis);
+
+  if (!nakit || !kart || kart <= nakit) return 0;
+  return Math.floor(((kart - nakit) / nakit) * 100);
 }
 
 function calcKartKomisyonu(item) {
@@ -391,7 +400,10 @@ export default function HomePage() {
                   <div className="table-wrap">
                     <div className="cards-wrap">
                       {items.map((item) => {
-                        const kar = toNumber(item.nakit_satis) - toNumber(item.net_bedel);
+                        const kar =
+  item.kar !== null && item.kar !== undefined && item.kar !== ""
+    ? toNumber(item.kar)
+    : toNumber(item.nakit ?? item.nakit_satis) - toNumber(item.net_bedel);;
                         const nakitCarpaniYuzde = calcNakitCarpani(item);
                         const kartKomisyonuYuzde = calcKartKomisyonu(item);
                         const modelName = buildDisplayName(item);
@@ -417,14 +429,14 @@ export default function HomePage() {
                                 <div className="price-box">
                                   <div className="price-label orange">Nakit</div>
                                   <div className="price-value">
-                                    {formatMoney(item.nakit_satis)}
+                                   {formatMoney(item.nakit ?? item.nakit_satis)}
                                   </div>
                                 </div>
 
                                 <div className="price-box">
                                   <div className="price-label blue">Kart</div>
                                   <div className="price-value">
-                                    {formatMoney(item.kart_satis)}
+                                  {formatMoney(item.kart ?? item.kart_satis)}
                                   </div>
                                 </div>
 
@@ -450,7 +462,7 @@ export default function HomePage() {
                                   <div className="summary-box">
                                     <div className="summary-label">Kampanya</div>
                                     <div className="summary-value">
-                                      {formatMoney(item.kampanya_maliyeti)}
+                                     {formatMoney(item.kampanya ?? item.kampanya_maliyeti ?? item.kampanya_fiyati)}
                                     </div>
                                   </div>
 
