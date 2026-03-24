@@ -16,7 +16,6 @@ function emptyProduct() {
     nakit_carpani: 0,
     kart_komisyon: 0,
     aktif: true,
-    siralama: 0,
   };
 }
 
@@ -26,9 +25,7 @@ function safeText(value) {
 
 async function safeReadJson(res) {
   const text = await res.text();
-  if (!text) {
-    throw new Error("API boş cevap döndü.");
-  }
+  if (!text) throw new Error("API boş cevap döndü.");
 
   try {
     return JSON.parse(text);
@@ -125,9 +122,7 @@ export default function AdminClient() {
 
       const res = await fetch("/api/products", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -155,9 +150,7 @@ export default function AdminClient() {
 
       const res = await fetch("/api/products", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(product),
       });
 
@@ -212,68 +205,16 @@ export default function AdminClient() {
         <h2>Yeni Ürün Ekle</h2>
 
         <div className="admin-grid">
-          <input
-            placeholder="Kategori"
-            value={newProduct.kategori}
-            onChange={(e) => updateNewProduct("kategori", e.target.value)}
-          />
-          <input
-            placeholder="Marka"
-            value={newProduct.marka}
-            onChange={(e) => updateNewProduct("marka", e.target.value)}
-          />
-          <input
-            placeholder="Model"
-            value={newProduct.model}
-            onChange={(e) => updateNewProduct("model", e.target.value)}
-          />
-          <input
-            placeholder="Ürün Adı"
-            value={newProduct.urun_adi}
-            onChange={(e) => updateNewProduct("urun_adi", e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Alış"
-            value={newProduct.alis}
-            onChange={(e) => updateNewProduct("alis", e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Montaj"
-            value={newProduct.montaj}
-            onChange={(e) => updateNewProduct("montaj", e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Puan"
-            value={newProduct.puan}
-            onChange={(e) => updateNewProduct("puan", e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Fayda"
-            value={newProduct.fayda}
-            onChange={(e) => updateNewProduct("fayda", e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Nakit Çarpanı"
-            value={newProduct.nakit_carpani}
-            onChange={(e) => updateNewProduct("nakit_carpani", e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Kart Komisyon"
-            value={newProduct.kart_komisyon}
-            onChange={(e) => updateNewProduct("kart_komisyon", e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Sıralama"
-            value={newProduct.siralama}
-            onChange={(e) => updateNewProduct("siralama", e.target.value)}
-          />
+          <input placeholder="Kategori" value={newProduct.kategori} onChange={(e) => updateNewProduct("kategori", e.target.value)} />
+          <input placeholder="Marka" value={newProduct.marka} onChange={(e) => updateNewProduct("marka", e.target.value)} />
+          <input placeholder="Model" value={newProduct.model} onChange={(e) => updateNewProduct("model", e.target.value)} />
+          <input placeholder="Ürün Adı" value={newProduct.urun_adi} onChange={(e) => updateNewProduct("urun_adi", e.target.value)} />
+          <input type="number" placeholder="Alış" value={newProduct.alis} onChange={(e) => updateNewProduct("alis", e.target.value)} />
+          <input type="number" placeholder="Montaj" value={newProduct.montaj} onChange={(e) => updateNewProduct("montaj", e.target.value)} />
+          <input type="number" placeholder="Puan" value={newProduct.puan} onChange={(e) => updateNewProduct("puan", e.target.value)} />
+          <input type="number" placeholder="Fayda" value={newProduct.fayda} onChange={(e) => updateNewProduct("fayda", e.target.value)} />
+          <input type="number" placeholder="Nakit Çarpanı" value={newProduct.nakit_carpani} onChange={(e) => updateNewProduct("nakit_carpani", e.target.value)} />
+          <input type="number" placeholder="Kart Komisyon" value={newProduct.kart_komisyon} onChange={(e) => updateNewProduct("kart_komisyon", e.target.value)} />
 
           <label className="checkbox-row">
             <input
@@ -334,7 +275,6 @@ export default function AdminClient() {
                             onChange={(e) => updateRow(product.id, "alis", e.target.value)}
                           />
                         </td>
-
                         <td>
                           <input
                             type="number"
@@ -342,7 +282,6 @@ export default function AdminClient() {
                             onChange={(e) => updateRow(product.id, "montaj", e.target.value)}
                           />
                         </td>
-
                         <td>
                           <input
                             type="number"
@@ -350,7 +289,6 @@ export default function AdminClient() {
                             onChange={(e) => updateRow(product.id, "puan", e.target.value)}
                           />
                         </td>
-
                         <td>
                           <input
                             type="number"
@@ -374,19 +312,10 @@ export default function AdminClient() {
 
                         <td>
                           <div className="row-actions">
-                            <button
-                              className="save-btn"
-                              onClick={() => handleUpdate(product)}
-                              disabled={saving}
-                            >
+                            <button className="save-btn" onClick={() => handleUpdate(product)} disabled={saving}>
                               Kaydet
                             </button>
-
-                            <button
-                              className="delete-btn"
-                              onClick={() => handleDelete(product.id)}
-                              disabled={saving}
-                            >
+                            <button className="delete-btn" onClick={() => handleDelete(product.id)} disabled={saving}>
                               Sil
                             </button>
                           </div>
