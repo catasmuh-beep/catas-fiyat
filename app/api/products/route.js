@@ -63,16 +63,6 @@ const kar =
   storedKar > 0
     ? storedKar
     : Math.max(0, nakit - net_bedel + puan + fayda);
-  row.kart !== undefined &&
-  row.kart !== "" &&
-  storedKart > 0
-    ? storedKart
-    : Math.round(nakit * (1 + kart_komisyon / 100));
-
-const kar =
-  row.kar !== null &&
-  row.kar !== undefined &&
-  row.kar !== "" &&
   storedKar > 0
     ? storedKar
     : Math.max(0, nakit - net_bedel + puan + fayda);
