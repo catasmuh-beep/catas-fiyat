@@ -22,7 +22,7 @@ function num(v, fallback = 0) {
   return Number.isFinite(n) ? n : fallback;
 }
 
-function enrichProduct(row) {
+function calcProduct(row) {
   const alis = num(row.alis_fiyati);
   const montaj = num(row.montaj_maliyeti);
   const puan = num(row.puan);
@@ -58,6 +58,9 @@ function enrichProduct(row) {
 
   return {
     ...row,
+    kategori: row.kategori || "",
+    marka: row.marka || "",
+    model: row.model || "",
     alt_model_guc: row.alt_model_guc || row.alt_model || "",
     alis_fiyati: alis,
     montaj_maliyeti: montaj,
@@ -90,7 +93,9 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json((data || []).map(enrichProduct), {
+    const products = (data || []).map(calcProduct);
+
+    return NextResponse.json(products, {
       status: 200,
       headers: {
         "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
@@ -117,7 +122,7 @@ export async function POST(request) {
 
     const p = body.product;
 
-    const payload = enrichProduct({
+    const payload = calcProduct({
       kategori: (p.kategori || "").trim(),
       marka: (p.marka || "").trim(),
       model: (p.model || "").trim(),
@@ -126,6 +131,13 @@ export async function POST(request) {
       montaj_maliyeti: num(p.montaj_maliyeti),
       puan: num(p.puan),
       fayda: num(p.fayda),
+      net_bedel: p.net_bedel,
+      nakit_carpani: p.nakit_carpani,
+      kart_komisyon: p.kart_komisyon,
+      nakit: p.nakit,
+      kart: p.kart,
+      kar: p.kar,
+      kampanya: p.kampanya,
       aktif: p.aktif ?? true,
       updated_at: new Date().toISOString(),
     });
@@ -141,7 +153,7 @@ export async function POST(request) {
     }
 
     return NextResponse.json(
-      { ok: true, product: enrichProduct(data) },
+      { ok: true, product: calcProduct(data) },
       {
         status: 200,
         headers: {
@@ -168,7 +180,7 @@ export async function PUT(request) {
     }
 
     const payload = products.map((item) =>
-      enrichProduct({
+      calcProduct({
         id: item.id,
         kategori: item.kategori || "",
         marka: item.marka || "",
@@ -178,13 +190,13 @@ export async function PUT(request) {
         montaj_maliyeti: num(item.montaj_maliyeti),
         puan: num(item.puan),
         fayda: num(item.fayda),
-        net_bedel: num(item.net_bedel),
-        nakit_carpani: num(item.nakit_carpani),
-        kart_komisyon: num(item.kart_komisyon),
-        nakit: num(item.nakit),
-        kart: num(item.kart),
-        kar: num(item.kar),
-        kampanya: num(item.kampanya),
+        net_bedel: item.net_bedel,
+        nakit_carpani: item.nakit_carpani,
+        kart_komisyon: item.kart_komisyon,
+        nakit: item.nakit,
+        kart: item.kart,
+        kar: item.kar,
+        kampanya: item.kampanya,
         aktif: Boolean(item.aktif),
         updated_at: new Date().toISOString(),
       })
@@ -200,7 +212,7 @@ export async function PUT(request) {
     }
 
     return NextResponse.json(
-      { ok: true, products: (data || []).map(enrichProduct) },
+      { ok: true, products: (data || []).map(calcProduct) },
       {
         status: 200,
         headers: {
