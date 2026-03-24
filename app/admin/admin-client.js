@@ -39,6 +39,7 @@ const combiBrandOrder = {
   baykan: 5,
   protherm: 6,
   daxom: 7,
+  warmhaus: 8,
 };
 
 const klimaBrandOrder = {
@@ -47,6 +48,7 @@ const klimaBrandOrder = {
   eca: 3,
   protherm: 4,
   daxom: 5,
+  warmhaus: 6,
 };
 
 const ecaKombiModelOrder = {
@@ -124,8 +126,6 @@ const emptyNewProduct = {
   montaj_maliyeti: 0,
   puan: 0,
   fayda: 0,
-  nakit_carpani: 9,
-  kart_komisyon: 18,
   aktif: true,
 };
 
@@ -654,21 +654,14 @@ export default function AdminClient({ initialRows }) {
     markDirty(id);
   }
 
- function updateNewProduct(field, value) {
-  setNewProduct((prev) => ({
-    ...prev,
-    [field]: [
-      "alis_fiyati",
-      "montaj_maliyeti",
-      "puan",
-      "fayda",
-      "nakit_carpani",
-      "kart_komisyon",
-    ].includes(field)
-      ? Number(value === "" ? 0 : value)
-      : value,
-  }));
-}
+  function updateNewProduct(field, value) {
+    setNewProduct((prev) => ({
+      ...prev,
+      [field]: ["alis_fiyati", "montaj_maliyeti", "puan", "fayda"].includes(field)
+        ? Number(value === "" ? 0 : value)
+        : value,
+    }));
+  }
 
   async function saveAllChanges() {
     const dirtyCount = dirtyIds.size;
@@ -1106,53 +1099,59 @@ export default function AdminClient({ initialRows }) {
         <h3 className="admin-box-title">Yeni ürün ekle</h3>
 
         <div className="admin-create-grid">
-          <input
-           <select
-  value={newProduct.kategori}
-  onChange={(e) => updateNewProduct("kategori", e.target.value)}
->
-  <option value="">Kategori seç</option>
-  <option value="Kombi">Kombi</option>
-  <option value="Klima">Klima</option>
-  <option value="Şofben">Şofben</option>
-  <option value="Elektrikli Kombi">Elektrikli Kombi</option>
-</select>
+          <select
+            value={newProduct.kategori}
+            onChange={(e) => updateNewProduct("kategori", e.target.value)}
+          >
+            <option value="">Kategori seç</option>
+            <option value="Kombi">Kombi</option>
+            <option value="Klima">Klima</option>
+            <option value="Şofben">Şofben</option>
+            <option value="Elektrikli Kombi">Elektrikli Kombi</option>
+          </select>
+
           <input
             type="text"
             placeholder="Marka"
             value={newProduct.marka}
             onChange={(e) => updateNewProduct("marka", e.target.value)}
           />
+
           <input
             type="text"
             placeholder="Model"
             value={newProduct.model}
             onChange={(e) => updateNewProduct("model", e.target.value)}
           />
+
           <input
             type="text"
             placeholder="Alt model / güç"
             value={newProduct.alt_model}
             onChange={(e) => updateNewProduct("alt_model", e.target.value)}
           />
+
           <input
             type="number"
             placeholder="Alış fiyatı"
             value={newProduct.alis_fiyati}
             onChange={(e) => updateNewProduct("alis_fiyati", e.target.value)}
           />
+
           <input
             type="number"
             placeholder="Montaj maliyeti"
             value={newProduct.montaj_maliyeti}
             onChange={(e) => updateNewProduct("montaj_maliyeti", e.target.value)}
           />
+
           <input
             type="number"
             placeholder="Puan"
             value={newProduct.puan}
             onChange={(e) => updateNewProduct("puan", e.target.value)}
           />
+
           <input
             type="number"
             placeholder="Fayda"
