@@ -1,1038 +1,3 @@
-*{
-  font-family: Calibri, Arial, Helvetica, sans-serif;
-}
-/* =========================
-   ADMIN SAYFASI
-   ========================= */
-
-.admin-page-shell {
-  width: min(1280px, calc(100% - 24px));
-  margin: 0 auto;
-  padding: 16px 0 48px;
-}
-
-.admin-page-shell .admin-desktop-table {
-  display: block;
-}
-
-.admin-page-shell .admin-mobile-list {
-  display: none;
-}
-
-.admin-page-shell .table-wrap {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.admin-page-shell table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.admin-page-shell th,
-.admin-page-shell td {
-  padding: 10px 8px;
-  white-space: nowrap;
-  vertical-align: middle;
-  border-bottom: 1px solid #ddd;
-}
-
-.admin-page-shell input[type="text"],
-.admin-page-shell input[type="number"],
-.admin-page-shell select {
-  width: 100%;
-  min-width: 84px;
-  padding: 8px 10px;
-  border: 1px solid #d7d7d7;
-  border-radius: 10px;
-  background: #fff;
-}
-
-.admin-page-shell input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-}
-
-@media (max-width: 900px) {
-  .admin-page-shell {
-    width: calc(100% - 16px);
-    padding: 12px 0 28px;
-  }
-
-  .admin-page-shell .admin-desktop-table {
-    display: none !important;
-  }
-
-  .admin-page-shell .admin-mobile-list {
-    display: block !important;
-  }
-
-  .admin-page-shell .admin-mobile-card {
-    background: #fff;
-    border: 1px solid #e3e3e3;
-    border-radius: 18px;
-    padding: 14px;
-    margin-bottom: 12px;
-  }
-
-  .admin-page-shell .admin-mobile-head {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-
-  .admin-page-shell .admin-mobile-brand {
-    font-size: 12px;
-    font-weight: 800;
-    color: #11a79a;
-    text-transform: uppercase;
-  }
-
-  .admin-page-shell .admin-mobile-model {
-    font-size: 20px;
-    font-weight: 800;
-    line-height: 1.2;
-    margin-top: 4px;
-  }
-
-  .admin-page-shell .admin-mobile-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-
-  .admin-page-shell .admin-mobile-stats div {
-    background: #f5f5f5;
-    border-radius: 12px;
-    padding: 10px;
-  }
-
-  .admin-page-shell .admin-mobile-stats span {
-    display: block;
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 4px;
-  }
-
-  .admin-page-shell .admin-mobile-stats strong {
-    font-size: 15px;
-  }
-
-  .admin-page-shell .admin-mobile-fields {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .admin-page-shell .admin-mobile-fields label {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 700;
-  }
-
-  .admin-page-shell .admin-mobile-fields input[type="number"],
-  .admin-page-shell .admin-mobile-fields input[type="text"],
-  .admin-page-shell .admin-mobile-fields select {
-    min-width: 0;
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 12px;
-    font-size: 16px;
-  }
-}
-/* =========================
-   PERSONEL SAYFASI FIX
-   SADECE .price-page İÇİN
-   ========================= */
-
-.price-page {
-  width: 100%;
-}
-
-.price-page .price-shell {
-  width: min(1120px, calc(100% - 24px));
-  margin: 0 auto;
-  padding: 20px 0 40px;
-}
-
-.price-page .topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.price-page .badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 46px;
-  padding: 0 18px;
-  border-radius: 999px;
-  background: #e5c36a;
-  color: #111;
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.price-page .button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 46px;
-  padding: 0 18px;
-  border-radius: 999px;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.price-page .button.primary {
-  background: #11a79a;
-  color: #fff;
-}
-
-.price-page .top-panel {
-  margin-bottom: 24px;
-}
-
-.price-page .top-row {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.price-page .stats {
-  display: flex;
-  justify-content: center;
-  gap: 28px;
-  flex-wrap: wrap;
-  margin: 8px 0 18px;
-}
-
-.price-page .stat {
-  font-size: 16px;
-}
-
-.price-page .filter-row {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.price-page .soft-select,
-.price-page .soft-input {
-  width: 100%;
-  min-height: 48px;
-  padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid #cfcfcf;
-  background: #f5f5f7;
-  color: #222;
-  font-size: 16px;
-  outline: none;
-}
-
-.price-page .section-title {
-  margin: 28px 0 10px;
-  font-size: 40px;
-  font-weight: 800;
-  line-height: 1.1;
-}
-
-.price-page .brand-title {
-  margin: 10px 0 16px;
-  font-size: 28px;
-  font-weight: 800;
-}
-
-.price-page .table-wrap {
-  width: 100%;
-}
-
-.price-page .cards-wrap {
-  display: grid;
-  grid-template-columns: 1fr; /* her yerde alt alta */
-  gap: 18px;
-}
-
-.price-page .product-card {
-  width: 100%;
-  background: #fcfcfc;
-  border: 1px solid #e6e6e6;
-  border-radius: 22px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
-}
-
-.price-page .product-top-line {
-  height: 8px;
-  background: #11a79a;
-}
-
-.price-page .product-inner {
-  padding: 22px;
-}
-
-.price-page .card-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 18px;
-}
-
-.price-page .brand-pill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: #ededed;
-  color: #333;
-  font-size: 13px;
-  font-weight: 700;
-  margin-bottom: 10px;
-}
-
-.price-page .model-title {
-  margin: 0;
-  font-size: 34px;
-  line-height: 1.15;
-  font-weight: 800;
-}
-
-.price-page .settings-placeholder {
-  width: 24px;
-  height: 24px;
-  flex: 0 0 24px;
-}
-
-.price-page .price-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 16px;
-}
-
-.price-page .price-box {
-  background: #f4f4f4;
-  border-radius: 16px;
-  padding: 16px 14px;
-  text-align: center;
-}
-
-.price-page .price-label {
-  margin-bottom: 10px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.price-page .price-label.orange { color: #ff8a00; }
-.price-page .price-label.blue { color: #1570ef; }
-.price-page .price-label.gray { color: #777; }
-.price-page .price-label.green { color: #11a79a; }
-
-.price-page .price-value {
-  font-size: 24px;
-  font-weight: 800;
-  line-height: 1.15;
-}
-
-.price-page .kar-pozitif { color: #11a79a; }
-.price-page .kar-negatif { color: #ef4444; }
-
-.price-page .edit-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr)); /* Alış/Montaj ve Puan/Fayda yan yana */
-  gap: 14px;
-  align-items: start;
-}
-
-.price-page .summary-grid {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.price-page .summary-box {
-  background: #f4f4f4;
-  border-radius: 16px;
-  padding: 16px 14px;
-}
-
-.price-page .summary-label {
-  margin-bottom: 10px;
-  font-size: 14px;
-  color: #333;
-}
-
-.price-page .summary-value {
-  font-size: 20px;
-  font-weight: 800;
-  line-height: 1.15;
-}
-
-.price-page .field-box {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.price-page .field-box label {
-  font-size: 14px;
-  font-weight: 700;
-  color: #222;
-}
-
-.price-page .readonly-input {
-  width: 100%;
-  min-height: 56px;
-  padding: 0 14px;
-  border-radius: 14px;
-  border: 2px solid #d8d8d8;
-  background: #fafafa;
-  color: #111;
-  font-size: 18px;
-  outline: none;
-}
-
-.price-page .field-box-red .readonly-input,
-.price-page .input-red {
-  border-color: #ff5a47;
-}
-
-.price-page .field-box-green .readonly-input,
-.price-page .input-green {
-  border-color: #11a79a;
-}
-
-.price-page .label-red {
-  color: #ff5a47 !important;
-}
-
-.price-page .label-green {
-  color: #11a79a !important;
-}
-
-.price-page .empty {
-  text-align: center;
-  padding: 40px 10px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #6b7280;
-}
-
-@media (max-width: 1024px) {
-  .price-page .filter-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .price-page .price-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .price-page .summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .price-page .model-title {
-    font-size: 28px;
-  }
-}
-
-@media (max-width: 640px) {
-  .price-page .price-shell {
-    width: min(100%, 420px);
-    padding-top: 14px;
-  }
-
-  .price-page .badge,
-  .price-page .button {
-    min-height: 42px;
-    padding: 0 14px;
-    font-size: 14px;
-    text-align: center;
-  }
-
-  .price-page .stats {
-    gap: 12px;
-    margin: 6px 0 14px;
-  }
-
-  .price-page .stat {
-    font-size: 13px;
-  }
-
-  .price-page .filter-row {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .price-page .soft-select,
-  .price-page .soft-input {
-    min-height: 46px;
-    font-size: 15px;
-    padding: 0 12px;
-  }
-
-  .price-page .section-title {
-    margin-top: 24px;
-    font-size: 30px;
-  }
-
-  .price-page .brand-title {
-    font-size: 24px;
-    margin-bottom: 12px;
-  }
-
-  .price-page .product-card {
-    border-radius: 18px;
-  }
-
-  .price-page .product-inner {
-    padding: 16px;
-  }
-
-  .price-page .model-title {
-    font-size: 22px;
-  }
-
-  .price-page .price-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-
-  .price-page .price-box {
-    border-radius: 12px;
-    padding: 12px 10px;
-  }
-
-  .price-page .price-label {
-    font-size: 12px;
-    margin-bottom: 6px;
-  }
-
-  .price-page .price-value {
-    font-size: 18px;
-  }
-
-  .price-page .edit-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .price-page .summary-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .price-page .summary-box {
-    border-radius: 12px;
-    padding: 12px 10px;
-  }
-
-  .price-page .summary-label {
-    font-size: 12px;
-    margin-bottom: 6px;
-  }
-
-  .price-page .summary-value {
-    font-size: 16px;
-  }
-
-  .price-page .readonly-input {
-    min-height: 50px;
-    padding: 0 12px;
-    font-size: 16px;
-    border-radius: 12px;
-  }
-
-  .price-page .field-box label {
-    font-size: 12px;
-  }
-}
-/* =========================
-   PERSONEL SAYFASI İYİLEŞTİRME
-   ========================= */
-
-/* Logoya yakın, daha zarif başlık fontu */
-.price-page .section-title,
-.price-page .brand-title,
-.price-page .model-title {
-  font-family: Georgia, "Times New Roman", serif;
-  letter-spacing: -0.02em;
-}
-
-/* Ürün kartı iç alanlar */
-.price-page .edit-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  align-items: start;
-}
-
-.price-page .field-box {
-  min-width: 0;
-}
-
-.price-page .readonly-input {
-  width: 100%;
-  display: block;
-  box-sizing: border-box;
-}
-
-/* Kutular birbirine girmesin */
-.price-page .field-box:nth-child(2),
-.price-page .field-box:nth-child(3),
-.price-page .field-box:nth-child(4),
-.price-page .field-box:nth-child(5) {
-  margin-top: 0;
-}
-
-/* Özet kutuları ile alt input alanları arasında boşluk */
-.price-page .summary-grid {
-  margin-bottom: 4px;
-}
-
-/* Mobilde daha kontrollü */
-@media (max-width: 640px) {
-  .price-page .product-inner {
-    padding: 14px;
-  }
-
-  .price-page .edit-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  .price-page .field-box {
-    width: 100%;
-  }
-
-  .price-page .readonly-input {
-    min-height: 48px;
-    padding: 0 12px;
-    font-size: 16px;
-  }
-
-  .price-page .model-title {
-    font-size: 20px;
-    line-height: 1.2;
-  }
-}
-
-/* =========================
-   ADMIN ÜST BUTONLAR DÜZENİ
-   ========================= */
-
-.admin-page-shell .admin-top-actions,
-.admin-page-shell .top-actions,
-.admin-page-shell .header-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-  margin: 14px 0 18px;
-}
-
-.admin-page-shell .button,
-.admin-page-shell button,
-.admin-page-shell a.button,
-.admin-page-shell .top-actions a,
-.admin-page-shell .top-actions button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 46px;
-  padding: 0 18px;
-  border-radius: 14px;
-  border: 1px solid #00917e;
-  background: #00917e;
-  color: #fff;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.admin-page-shell .button:hover,
-.admin-page-shell button:hover,
-.admin-page-shell a.button:hover,
-.admin-page-shell .top-actions a:hover,
-.admin-page-shell .top-actions button:hover {
-  opacity: 0.92;
-}
-
-.admin-page-shell .button.secondary,
-.admin-page-shell .secondary,
-.admin-page-shell .ghost {
-  background: #fff;
-  color: #00917e;
-  border: 1px solid #00917e;
-}
-
-.admin-page-shell .button.danger,
-.admin-page-shell .danger {
-  background: #fff;
-  color: #111;
-  border: 1px solid #d7d7d7;
-}
-
-@media (max-width: 640px) {
-  .admin-page-shell .admin-top-actions,
-  .admin-page-shell .top-actions,
-  .admin-page-shell .header-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .admin-page-shell .button,
-  .admin-page-shell button,
-  .admin-page-shell a.button,
-  .admin-page-shell .top-actions a,
-  .admin-page-shell .top-actions button {
-    width: 100%;
-    min-height: 44px;
-    padding: 0 12px;
-    font-size: 14px;
-    text-align: center;
-  }
-}
-/* ======================
-ADMIN PANEL DÜZEN
-====================== */
-
-.admin-page-shell table{
-  width:100%;
-  border-collapse:collapse;
-}
-
-.admin-page-shell th{
-  text-align:left;
-  padding:12px 10px;
-  font-weight:700;
-  border-bottom:2px solid #e5e5e5;
-}
-
-.admin-page-shell td{
-  padding:10px;
-  border-bottom:1px solid #eee;
-  vertical-align:middle;
-}
-
-/* inputlar */
-.admin-page-shell input{
-  width:100%;
-  min-width:80px;
-  padding:8px 10px;
-  border-radius:8px;
-  border:1px solid #d8d8d8;
-  font-size:14px;
-  box-sizing:border-box;
-}
-
-/* checkbox */
-.admin-page-shell input[type="checkbox"]{
-  width:18px;
-  height:18px;
-}
-
-/* tablo kaymasın */
-.admin-page-shell .table-wrap{
-  overflow-x:auto;
-}
-/* mevcut css kodların */
-
-.......
-
-
-/* ADMIN ÜST BUTONLARI */
-.admin-top-actions{
-  display:flex;
-  gap:12px;
-  margin:14px 0;
-  flex-wrap:wrap;
-}
-
-.admin-top-actions button,
-.admin-top-actions a{
-  background:#00917e;
-  color:white;
-  border:none;
-  padding:10px 16px;
-  border-radius:8px;
-  font-weight:700;
-  cursor:pointer;
-  text-decoration:none;
-}
-
-.admin-top-actions button:hover,
-.admin-top-actions a:hover{
-  opacity:0.9;
-}
-.admin-top-actions{
-  display:flex;
-  gap:12px;
-  margin:14px 0;
-  flex-wrap:wrap;
-}
-
-.admin-top-actions button,
-.admin-top-actions a{
-  background:#00917e;
-  color:white;
-  border:none;
-  padding:10px 16px;
-  border-radius:8px;
-  font-weight:700;
-  cursor:pointer;
-  text-decoration:none;
-}
-
-.admin-top-actions button:hover,
-.admin-top-actions a:hover{
-  opacity:0.9;
-}
-/* =========================
-   ADMIN ÜST BUTONLAR DÜZEN
-   ========================= */
-
-.admin-topbar-card {
-  padding: 0;
-  margin-bottom: 18px;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-}
-
-.admin-top-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-  margin: 0 0 18px;
-}
-
-.admin-top-actions .button,
-.admin-top-actions button,
-.admin-top-actions a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 46px;
-  padding: 0 18px;
-  border-radius: 14px;
-  text-decoration: none;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.admin-top-actions .button.primary {
-  background: #00917e;
-  color: #fff;
-  border: 1px solid #00917e;
-}
-
-.admin-top-actions .button.secondary {
-  background: #fff;
-  color: #00917e;
-  border: 1px solid #00917e;
-}
-
-.admin-top-actions .button.danger {
-  background: #fff;
-  color: #111;
-  border: 1px solid #d7d7d7;
-}
-
-.admin-top-actions .button:disabled,
-.admin-top-actions button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-/* MOBİLDE ADMIN ÜST BUTONLAR - KESİN ÇÖZÜM */
-@media (max-width: 640px) {
-  .admin-top-actions {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 10px !important;
-    align-items: stretch !important;
-    width: 100% !important;
-  }
-
-  .admin-top-actions .button,
-  .admin-top-actions button,
-  .admin-top-actions a {
-    display: flex !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    min-height: 46px !important;
-    padding: 0 12px !important;
-    margin: 0 !important;
-    font-size: 14px !important;
-    text-align: center !important;
-    justify-content: center !important;
-    white-space: normal !important;
-    box-sizing: border-box !important;
-  }
-}
-
-/* =========================
-   ADMIN TABLO SATIRLARI FLU
-   ========================= */
-
-.admin-table tbody tr:nth-child(odd) {
-  background: rgba(0, 145, 126, 0.04);
-}
-
-.admin-table tbody tr:nth-child(even) {
-  background: rgba(0, 145, 126, 0.08);
-}
-
-.admin-table tbody tr:hover {
-  background: rgba(0, 145, 126, 0.12);
-}
-
-/* inputlar arka planda daha temiz dursun */
-.admin-table input[type="number"],
-.admin-table input[type="text"] {
-  background: rgba(255, 255, 255, 0.9);
-}
-
-/* font */
-html,
-body,
-button,
-input,
-select,
-textarea {
-  font-family: Calibri, Arial, Helvetica, sans-serif;
-}
-/* =========================
-   ADMIN ÜST BUTONLAR DÜZEN
-   ========================= */
-
-.admin-topbar-card {
-  padding: 0;
-  margin-bottom: 18px;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-}
-
-.admin-top-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-  margin: 0 0 18px;
-}
-
-.admin-top-actions .button,
-.admin-top-actions button,
-.admin-top-actions a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 46px;
-  padding: 0 18px;
-  border-radius: 14px;
-  text-decoration: none;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.admin-top-actions .button.primary {
-  background: #00917e;
-  color: #fff;
-  border: 1px solid #00917e;
-}
-
-.admin-top-actions .button.secondary {
-  background: #fff;
-  color: #00917e;
-  border: 1px solid #00917e;
-}
-
-.admin-top-actions .button.danger {
-  background: #fff;
-  color: #111;
-  border: 1px solid #d7d7d7;
-}
-
-.admin-top-actions .button:disabled,
-.admin-top-actions button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-@media (max-width: 640px) {
-  .admin-top-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .admin-top-actions .button,
-  .admin-top-actions button,
-  .admin-top-actions a {
-    width: 100%;
-    min-width: 0;
-    padding: 0 10px;
-    font-size: 14px;
-    text-align: center;
-  }
-}
-
-/* =========================
-   ADMIN TABLO SATIRLARI FLU
-   ========================= */
-
-.admin-table tbody tr:nth-child(odd) {
-  background: rgba(0, 145, 126, 0.04);
-}
-
-.admin-table tbody tr:nth-child(even) {
-  background: rgba(0, 145, 126, 0.08);
-}
-
-.admin-table tbody tr:hover {
-  background: rgba(0, 145, 126, 0.12);
-}
-
-.admin-table input[type="number"],
-.admin-table input[type="text"] {
-  background: rgba(255, 255, 255, 0.92);
-}
-
-html,
-body,
-button,
-input,
-select,
-textarea {
-  font-family: Calibri, Arial, Helvetica, sans-serif;
-}
-:root {
-  --brand-orange: #ff9900;
-  --brand-green: #00917e;
-  --brand-gray: #a6a6a6;
-  --soft-bg: #f6f8f9;
-  --text-dark: #1f2937;
-  --border-soft: #d8e2df;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -1042,12 +7,8 @@ body {
   padding: 0;
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-  background: var(--soft-bg);
-  color: var(--text-dark);
-}
-
-body {
-  overflow-x: hidden;
+  background: #eef1f4;
+  color: #10233f;
 }
 
 a {
@@ -1057,1419 +18,365 @@ a {
 
 button,
 input,
-select,
-textarea {
+select {
   font: inherit;
 }
 
-.admin-page-shell {
-  width: 100%;
-  max-width: 1400px;
+.page-shell,
+.admin-shell {
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 20px 16px 110px;
+  padding: 24px 16px 48px;
 }
 
-.admin-topbar {
+.topbar {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
-  padding: 18px;
-  border-radius: 18px;
-  background: #ffffff;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.admin-page-title {
-  margin: 0;
-  font-size: 28px;
-  line-height: 1.1;
-  font-weight: 800;
-}
-
-.admin-page-subtitle {
-  margin: 8px 0 0;
-  font-size: 14px;
-  color: #667085;
-}
-
-.admin-topbar-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: flex-end;
-  min-width: 260px;
-}
-
-.topbar-btn {
+.switch-btn,
+.admin-btn,
+.primary-btn,
+.save-btn,
+.delete-btn {
   border: none;
-  border-radius: 12px;
-  background: var(--brand-green);
-  color: #fff;
+  border-radius: 999px;
+  padding: 12px 18px;
   font-weight: 700;
-  padding: 12px 14px;
   cursor: pointer;
-  min-height: 44px;
-  white-space: nowrap;
+  transition: 0.2s ease;
 }
 
-.topbar-btn-muted {
-  background: var(--brand-orange);
+.switch-btn {
+  background: #e2bf63;
+  color: #111;
 }
 
-.staff-filters {
+.admin-btn,
+.primary-btn,
+.save-btn {
+  background: #11a7a0;
+  color: white;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.switch-btn:hover,
+.admin-btn:hover,
+.primary-btn:hover,
+.save-btn:hover,
+.delete-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.logo-area {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.main-logo {
+  width: min(100%, 400px);
+  height: auto;
+  display: block;
+  margin: 0 auto 14px;
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.filters {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin: 14px 0 18px;
-  align-items: end;
+  gap: 14px;
+  margin-bottom: 28px;
 }
 
-.staff-filter-item {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.staff-filter-item label {
-  font-size: 13px;
-  font-weight: 800;
-  color: #18433b;
-  margin-bottom: 6px;
-}
-
-.staff-filter-item select,
-.staff-filter-item input {
+.filters select,
+.filters input,
+.admin-grid input,
+.detail-grid input,
+.admin-table input {
   width: 100%;
-  min-height: 46px;
-  border: 1px solid var(--border-soft);
-  border-radius: 12px;
-  padding: 10px 12px;
-  font-size: 14px;
-  background: #fff;
-}
-
-.staff-filter-item select:focus,
-.staff-filter-item input:focus,
-.admin-field input:focus {
-  outline: none;
-  border-color: var(--brand-green);
-  box-shadow: 0 0 0 3px rgba(0, 145, 126, 0.12);
-}
-
-.admin-summary-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.summary-pill {
-  background: #fff;
-  border: 1px solid #ebeeef;
-  border-radius: 999px;
-  padding: 10px 14px;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.summary-reset-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 10px 14px;
-  font-size: 14px;
-  font-weight: 700;
-  background: #eef7f5;
-  color: var(--brand-green);
-  cursor: pointer;
-}
-
-.panel-message {
+  min-width: 0;
   padding: 14px 16px;
+  border: 1px solid #cfd6de;
   border-radius: 14px;
-  margin-bottom: 14px;
-  font-weight: 700;
+  background: white;
 }
 
-.panel-message.success {
-  background: #ecfdf3;
-  color: #067647;
-}
-
-.panel-message.error {
-  background: #fef3f2;
-  color: #b42318;
-}
-
-.panel-loading,
-.panel-empty {
-  background: #fff;
-  border-radius: 18px;
-  padding: 28px;
+.state-box {
+  background: white;
+  border: 1px solid #d8dee6;
+  border-radius: 16px;
+  padding: 18px;
   text-align: center;
-  color: #667085;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-}
-
-.admin-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-}
-
-.admin-product-card {
-  background: #fff;
-  border-radius: 18px;
-  padding: 18px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-  border: 1px solid #edf0f2;
-}
-
-.admin-product-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: flex-start;
-  margin-bottom: 14px;
-}
-
-.admin-product-brand {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--brand-green);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.admin-product-model {
-  font-size: 20px;
-  font-weight: 800;
-  margin-top: 4px;
-}
-
-.admin-product-category {
-  font-size: 13px;
   font-weight: 700;
-  color: #475467;
-  background: #f4f6f7;
-  border-radius: 999px;
-  padding: 8px 12px;
-  white-space: nowrap;
+  margin-bottom: 20px;
 }
 
-.admin-form-grid {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 12px;
+.state-box.error {
+  color: #b91c1c;
+  background: #fff3f3;
+  border-color: #f1c1c1;
 }
 
-.admin-field {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+.category-section {
+  margin-top: 36px;
 }
-
-.admin-field label {
-  font-size: 12px;
-  font-weight: 800;
-  color: #344054;
-  margin-bottom: 6px;
-}
-
-.admin-field input {
-  width: 100%;
-  min-height: 46px;
-  border: 1px solid var(--border-soft);
-  border-radius: 12px;
-  padding: 10px 12px;
-  background: #fff;
-  font-size: 15px;
-}
-
-.admin-field-highlight label {
-  font-weight: 900;
-  font-size: 14px;
-  letter-spacing: 0.3px;
-  color: #b54708;
-  text-transform: uppercase;
-}
-
-.admin-field-highlight input {
-  border: 2px solid var(--brand-orange);
-  background: linear-gradient(180deg, #fff8ef 0%, #ffffff 100%);
-  font-weight: 800;
-  color: #8a4b00;
-  box-shadow: 0 8px 24px rgba(255, 153, 0, 0.12);
-}
-
-.field-badge {
-  display: inline-block;
-  margin-left: 8px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: var(--brand-orange);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 800;
-  vertical-align: middle;
-}
-
-.admin-field-montaj input {
-  background: rgba(220, 38, 38, 0.06);
-  border-color: rgba(220, 38, 38, 0.3);
-  color: #b42318;
-  font-weight: 800;
-}
-
-.admin-field-puan input {
-  background: rgba(21, 112, 239, 0.06);
-  border-color: rgba(21, 112, 239, 0.3);
-  color: #175cd3;
-  font-weight: 800;
-}
-
-.admin-field-fayda input {
-  background: rgba(2, 122, 72, 0.06);
-  border-color: rgba(2, 122, 72, 0.3);
-  color: #027a48;
-  font-weight: 800;
-}
-
-.staff-product-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.staff-product-card {
-  min-width: 0;
-  border-radius: 18px;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-}
-
-.staff-product-card-inner {
-  padding: 18px;
-}
-
-.staff-card-category {
-  display: inline-flex;
-  background: #f4f6f7;
-  color: #475467;
-  border-radius: 999px;
-  padding: 7px 11px;
-  font-size: 12px;
-  font-weight: 800;
-  margin-bottom: 10px;
-}
-
-.staff-card-brand {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--brand-green);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.staff-card-model {
-  margin-top: 4px;
-  font-size: 20px;
-  font-weight: 800;
-  line-height: 1.25;
-}
-
-.staff-price-list {
-  margin-top: 14px;
-  border-top: 1px solid #eef2f4;
-  border-bottom: 1px solid #eef2f4;
-  padding: 12px 0;
-}
-
-.staff-price-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 7px 0;
-  font-size: 14px;
-}
-
-.staff-price-row strong {
-  font-size: 15px;
-}
-
-.staff-benefit-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 7px 10px;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.pill.red {
-  background: rgba(220, 38, 38, 0.1);
-  color: #b42318;
-}
-
-.pill.blue {
-  background: rgba(21, 112, 239, 0.1);
-  color: #175cd3;
-}
-
-.pill.green {
-  background: rgba(2, 122, 72, 0.1);
-  color: #027a48;
-}
-
-.admin-sticky-save {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid #e8ecef;
-  z-index: 40;
-}
-
-.admin-save-btn {
-  display: block;
-  width: min(100%, 520px);
-  margin: 0 auto;
-  border: none;
-  border-radius: 14px;
-  min-height: 52px;
-  padding: 12px 18px;
-  background: var(--brand-green);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.admin-save-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-@media (max-width: 1200px) {
-  .admin-form-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .staff-product-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 992px) {
-  .staff-filters {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .admin-topbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .admin-topbar-actions {
-    min-width: 0;
-    justify-content: stretch;
-  }
-
-  .topbar-btn {
-    flex: 1 1 220px;
-  }
-}
-
-@media (max-width: 640px) {
-  .admin-page-shell {
-    padding: 14px 12px 110px;
-  }
-
-  .admin-page-title {
-    font-size: 22px;
-  }
-
-  .admin-page-subtitle {
-    font-size: 13px;
-  }
-
-  .staff-filters {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .staff-filter-item label {
-    font-size: 12px;
-    margin-bottom: 5px;
-  }
-
-  .staff-filter-item select,
-  .staff-filter-item input,
-  .admin-field input {
-    min-height: 42px;
-    border-radius: 10px;
-    font-size: 14px;
-  }
-
-  .admin-product-head {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .admin-product-model,
-  .staff-card-model {
-    font-size: 17px;
-  }
-
-  .admin-form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .staff-product-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .admin-topbar-actions {
-    flex-direction: column;
-  }
-
-  .topbar-btn {
-    width: 100%;
-  }
-}
-.calc-note {
-  display: inline-block;
-  margin-top: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #667085;
-}
-
-.staff-list-view {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.staff-list-row {
-  background: #fff;
-  border-radius: 18px;
-  padding: 18px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-  border: 1px solid #edf0f2;
-}
-
-.staff-list-main {
-  margin-bottom: 12px;
-}
-
-.staff-list-prices {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  padding: 12px 0;
-  border-top: 1px solid #eef2f4;
-  border-bottom: 1px solid #eef2f4;
-}
-
-.staff-list-prices .staff-price-row {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 0;
-}
-
-.staff-list-prices .staff-price-row span {
-  font-size: 13px;
-  color: #667085;
-}
-
-.staff-list-prices .staff-price-row strong {
-  font-size: 16px;
-}
-
-@media (max-width: 640px) {
-  .staff-list-row {
-    padding: 14px;
-    border-radius: 14px;
-  }
-
-  .staff-list-prices {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .staff-list-prices .staff-price-row {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 0;
-  }
-
-  .staff-benefit-strip {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .staff-benefit-strip .pill {
-    justify-content: center;
-  }
-}
-/* MOBILDE YÖNETİCİ ÜST BUTONLARI DÜZELT */
-@media (max-width: 640px) {
-  .admin-topbar {
-    padding: 16px !important;
-    gap: 12px !important;
-  }
-
-  .admin-topbar-actions {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
-    width: 100% !important;
-    min-width: 0 !important;
-  }
-
-  .topbar-btn {
-    width: 100% !important;
-    min-height: 48px !important;
-    height: 48px !important;
-    padding: 0 14px !important;
-    border-radius: 12px !important;
-    font-size: 16px !important;
-    line-height: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    white-space: normal !important;
-  }
-
-  .admin-page-title {
-    font-size: 22px !important;
-  }
-
-  .admin-page-subtitle {
-    font-size: 13px !important;
-    line-height: 1.4 !important;
-  }
-}
-@media (max-width: 640px) {
-  .admin-topbar-actions {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 10px !important;
-    width: 100% !important;
-  }
-
-  .topbar-btn {
-    width: 100% !important;
-    min-height: 48px !important;
-    height: 48px !important;
-    padding: 0 14px !important;
-    border-radius: 12px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    white-space: normal !important;
-  }
-}
-/* ALIŞ FİYATI ALANINI VURGULA */
-
-.admin-field input[name="purchase_price"],
-.admin-field input[name="alis_fiyati"],
-.admin-field input.purchase-price {
-  border: 2px solid #ff9900 !important;
-  background: linear-gradient(180deg,#fff7ed,#ffffff);
-  font-weight: 800;
-  color: #9a3412;
-  box-shadow: 0 4px 12px rgba(255,153,0,0.25);
-}
-
-/* label daha dikkat çekici */
-
-.admin-field label {
-  font-weight: 700;
-}
-
-.admin-field label:has(+ input[name="purchase_price"]),
-.admin-field label:has(+ input[name="alis_fiyati"]) {
-  color: #ea580c;
-  font-size: 13px;
-  letter-spacing: 0.3px;
-}
-/* ===== ALIŞ FİYATI VURGUSU ===== */
-
-/* ALIŞ kolonundaki input */
-table td:nth-child(2) input {
-  border: 2px solid #ff9900 !important;
-  background: linear-gradient(180deg,#fff7ed,#ffffff);
-  font-weight: 900 !important;
-  font-style: italic;
-  color: #9a3412;
-  box-shadow: 0 4px 14px rgba(255,153,0,0.35);
-  transition: all 0.2s ease;
-}
-
-/* hover efekti */
-table td:nth-child(2) input:hover {
-  border-color: #f97316;
-  box-shadow: 0 6px 18px rgba(249,115,22,0.45);
-}
-
-/* focus efekti */
-table td:nth-child(2) input:focus {
-  outline: none;
-  border: 2px solid #ea580c;
-  background: #fff1e6;
-}
-
-/* başlık yazısını da vurgula */
-table th:nth-child(2) {
-  color: #ea580c;
-  font-weight: 800;
-}
-/* KATEGORI BASLIKLARI */
-.category-title,
-h2.category-title,
-.section-category-title {
-  display: inline-block;
-  padding: 8px 16px;
-  border-radius: 14px;
-  font-weight: 900;
-  font-style: italic;
-  letter-spacing: 0.4px;
-  color: #fff;
-  margin-bottom: 12px;
-}
-
-/* kategori bazlı renkler */
-.category-title.kombi,
-.section-category-title.kombi {
-  background: linear-gradient(135deg, #ff9900, #ff7a00);
-}
-
-.category-title.klima,
-.section-category-title.klima {
-  background: linear-gradient(135deg, #00917e, #0ea5a4);
-}
-
-.category-title.sofben,
-.section-category-title.sofben {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-}
-
-.category-title.elk-kombi,
-.section-category-title.elk-kombi {
-  background: linear-gradient(135deg, #7c3aed, #5b21b6);
-}
-/* MARKA ETIKETLERI */
-.brand-badge,
-.brand-title,
-.brand-name-chip {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-weight: 800;
-  font-size: 14px;
-  border: 2px solid transparent;
-}
-
-/* Vaillant */
-.brand-badge.vaillant,
-.brand-title.vaillant,
-.brand-name-chip.vaillant {
-  background: rgba(0, 145, 126, 0.10);
-  color: #00917e;
-  border-color: #00917e;
-}
-
-/* Baymak */
-.brand-badge.baymak,
-.brand-title.baymak,
-.brand-name-chip.baymak {
-  background: rgba(0, 146, 69, 0.10);
-  color: #009245;
-  border-color: #009245;
-}
-
-/* Demirdöküm */
-.brand-badge.demirdokum,
-.brand-title.demirdokum,
-.brand-name-chip.demirdokum {
-  background: rgba(0, 102, 204, 0.10);
-  color: #0066cc;
-  border-color: #0066cc;
-}
-
-/* ECA */
-.brand-badge.eca,
-.brand-title.eca,
-.brand-name-chip.eca {
-  background: rgba(0, 84, 166, 0.10);
-  color: #0054a6;
-  border-color: #0054a6;
-}
-/* KATEGORI BASLIKLARI */
-.category-title {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 16px;
-  border-radius: 14px;
-  font-weight: 900;
-  font-style: italic;
-  letter-spacing: 0.4px;
-  color: #fff !important;
-  margin-bottom: 14px;
-}
-
-.category-title.kombi {
-  background: linear-gradient(135deg, #ff9900, #ff7a00);
-}
-
-.category-title.klima {
-  background: linear-gradient(135deg, #00917e, #0ea5a4);
-}
-
-.category-title.sofben {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-}
-
-.category-title.elk-kombi {
-  background: linear-gradient(135deg, #7c3aed, #5b21b6);
-}
-
-/* MARKA ETIKETLERI */
-.brand-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-weight: 800;
-  font-size: 13px;
-  margin-bottom: 10px;
-  border: 2px solid transparent;
-}
-
-.brand-badge.vaillant {
-  background: rgba(0, 145, 126, 0.10);
-  color: #00917e;
-  border-color: #00917e;
-}
-
-.brand-badge.baymak {
-  background: rgba(0, 146, 69, 0.10);
-  color: #009245;
-  border-color: #009245;
-}
-
-.brand-badge.demirdokum {
-  background: rgba(0, 102, 204, 0.10);
-  color: #0066cc;
-  border-color: #0066cc;
-}
-
-.brand-badge.eca {
-  background: rgba(0, 84, 166, 0.10);
-  color: #0054a6;
-  border-color: #0054a6;
-}
-
-.admin-mobile-brand.brand-badge {
-  margin-bottom: 8px;
-}
-
-.admin-table td .brand-badge {
-  margin-bottom: 8px;
-}
-
-.admin-table td strong {
-  display: block;
-}
-/* ===================================== */
-/* KATEGORI BASLIK RENKLERI */
-/* ===================================== */
 
 .category-title {
-  display: inline-block;
-  padding: 8px 18px;
-  border-radius: 14px;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-  margin-bottom: 14px;
-  color: white !important;
-}
-
-/* Kombi */
-.category-title.kombi {
-  background: linear-gradient(135deg,#ff9900,#ff7a00);
-}
-
-/* Klima */
-.category-title.klima {
-  background: linear-gradient(135deg,#00917e,#0ea5a4);
-}
-
-/* Şofben */
-.category-title.sofben {
-  background: linear-gradient(135deg,#2563eb,#1d4ed8);
-}
-
-/* Elektrikli kombi */
-.category-title.elk-kombi {
-  background: linear-gradient(135deg,#7c3aed,#5b21b6);
-}
-
-
-/* ===================================== */
-/* MARKA ROZETLERI */
-/* ===================================== */
-
-.brand-badge{
-  display:inline-block;
-  padding:5px 12px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:700;
-  margin-bottom:6px;
-  border:2px solid transparent;
-}
-
-/* Vaillant */
-.brand-badge.vaillant{
-  background:rgba(0,145,126,0.12);
-  color:#00917e;
-  border-color:#00917e;
-}
-
-/* Baymak */
-.brand-badge.baymak{
-  background:rgba(0,146,69,0.12);
-  color:#009245;
-  border-color:#009245;
-}
-
-/* Demirdöküm */
-.brand-badge.demirdokum{
-  background:rgba(0,102,204,0.12);
-  color:#0066cc;
-  border-color:#0066cc;
-}
-
-/* ECA */
-.brand-badge.eca{
-  background:rgba(0,84,166,0.12);
-  color:#0054a6;
-  border-color:#0054a6;
-}
-
-/* Baykan */
-.brand-badge.baykan{
-  background:rgba(255,120,0,0.12);
-  color:#ff7800;
-  border-color:#ff7800;
-}
-
-
-/* ===================================== */
-/* ALIŞ FIYATI VURGUSU */
-/* ===================================== */
-
-.purchase-input{
-  border:2px solid #ff9900 !important;
-  background:linear-gradient(180deg,#fff7ed,#ffffff);
-  font-weight:900;
-  font-style:italic;
-  color:#9a3412;
-  box-shadow:0 3px 10px rgba(255,153,0,0.35);
-  transition:all .2s ease;
-}
-
-.purchase-input:hover{
-  border-color:#f97316;
-  box-shadow:0 4px 14px rgba(249,115,22,0.45);
-}
-
-.purchase-input:focus{
-  outline:none;
-  border:2px solid #ea580c;
-  background:#fff1e6;
-}
-
-
-/* ===================================== */
-/* MOBIL UYUMLULUK DÜZENLEMESI */
-/* ===================================== */
-
-.admin-mobile-brand.brand-badge{
-  margin-bottom:6px;
-}
-
-.admin-table td .brand-badge{
-  margin-bottom:6px;
-}
-
-.admin-table td strong{
-  display:block;
-}
-
-
-/* ===================================== */
-/* MASAÜSTÜ INPUT GÖRÜNÜMÜ */
-/* ===================================== */
-
-.admin-table input[type="number"]{
-  width:100%;
-  padding:6px 8px;
-  border-radius:6px;
-}
-
-
-/* ===================================== */
-/* DIRTY ROW (DEĞİŞEN SATIR) */
-/* ===================================== */
-
-.admin-row-dirty{
-  background:rgba(255,153,0,0.08);
-}
-/* ===================================== */
-/* PERSONEL GORUNUMU - MARKA VE KATEGORI */
-/* ===================================== */
-
-/* Ana kategori başlığı siyah kalsın */
-.section-title {
-  color: #0f172a;
-  font-weight: 800;
-}
-
-/* Marka başlığı */
-.brand-title {
-  display: inline-block;
-  margin: 4px 0 14px;
-  font-weight: 800;
-  letter-spacing: 0.2px;
-}
-
-/* Vaillant */
-.brand-title-vaillant {
-  color: #00917e;
-}
-
-/* Demirdöküm */
-.brand-title-demirdokum {
-  color: #0066cc;
-}
-
-/* ECA */
-.brand-title-eca {
-  color: #0054a6;
-}
-
-/* Baymak */
-.brand-title-baymak {
-  color: #009245;
-}
-
-/* Baykan */
-.brand-title-baykan {
-  color: #d4a000;
-}
-
-/* Bilinmeyen/diğer */
-.brand-title-default {
-  color: #334155;
-}
-
-
-/* ===================================== */
-/* KART ICINDEKI MARKA PILL */
-/* ===================================== */
-
-.brand-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 28px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
+  font-size: 44px;
   line-height: 1;
-  border: 1px solid transparent;
+  margin: 0 0 18px;
+  color: #19345b;
+}
+
+.brand-section {
+  margin-bottom: 28px;
+}
+
+.brand-title {
+  font-size: 30px;
+  margin: 0 0 14px;
+}
+
+.cards {
+  display: grid;
+  gap: 18px;
+}
+
+.product-card {
+  background: #f8fafc;
+  border: 1px solid #dce5ee;
+  border-top: 8px solid #11a7a0;
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 10px 24px rgba(16, 35, 63, 0.05);
+}
+
+.brand-badge {
+  display: inline-block;
+  background: #eef3f8;
+  color: #3a4c67;
+  border: 1px solid #d6e0ea;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 700;
   margin-bottom: 10px;
 }
 
-/* Vaillant */
-.brand-pill-vaillant {
-  color: #00917e;
-  background: rgba(0, 145, 126, 0.10);
-  border-color: rgba(0, 145, 126, 0.25);
+.product-title {
+  font-size: 28px;
+  margin: 0 0 18px;
+  color: #19345b;
 }
 
-/* Demirdöküm */
-.brand-pill-demirdokum {
-  color: #0066cc;
-  background: rgba(0, 102, 204, 0.10);
-  border-color: rgba(0, 102, 204, 0.24);
-}
-
-/* ECA */
-.brand-pill-eca {
-  color: #0054a6;
-  background: rgba(0, 84, 166, 0.10);
-  border-color: rgba(0, 84, 166, 0.24);
-}
-
-/* Baymak */
-.brand-pill-baymak {
-  color: #009245;
-  background: rgba(0, 146, 69, 0.10);
-  border-color: rgba(0, 146, 69, 0.24);
-}
-
-/* Baykan */
-.brand-pill-baykan {
-  color: #b8860b;
-  background: rgba(212, 160, 0, 0.14);
-  border-color: rgba(212, 160, 0, 0.30);
-}
-
-/* Default */
-.brand-pill-default {
-  color: #475569;
-  background: rgba(148, 163, 184, 0.14);
-  border-color: rgba(148, 163, 184, 0.26);
-}
-
-
-/* ===================================== */
-/* KART UST RENK CIZGISI */
-/* ===================================== */
-
-.product-top-line {
-  height: 8px;
-  width: 100%;
-  border-radius: 18px 18px 0 0;
-}
-
-.product-top-line-vaillant {
-  background: linear-gradient(90deg, #00917e, #0ea5a4);
-}
-
-.product-top-line-demirdokum {
-  background: linear-gradient(90deg, #0066cc, #3b82f6);
-}
-
-.product-top-line-eca {
-  background: linear-gradient(90deg, #0054a6, #2563eb);
-}
-
-.product-top-line-baymak {
-  background: linear-gradient(90deg, #009245, #16a34a);
-}
-
-.product-top-line-baykan {
-  background: linear-gradient(90deg, #d4a000, #f2c94c);
-}
-
-.product-top-line-default {
-  background: linear-gradient(90deg, #94a3b8, #cbd5e1);
-}
-
-
-/* ===================================== */
-/* MODEL BASLIGI DAHA TEMIZ GORUNSUN */
-/* ===================================== */
-
-.model-title {
-  color: #0f172a;
-  font-weight: 800;
-  line-height: 1.2;
-  margin: 0;
-  word-break: break-word;
-}
-
-
-/* ===================================== */
-/* PERSONEL FILTRE VE BASLIK KOSMETIK */
-/* ===================================== */
-
-.price-page .filter-row {
-  gap: 12px;
-}
-
-.price-page .soft-select,
-.price-page .soft-input {
-  border-radius: 12px;
-}
-
-.price-page .stats {
-  margin-top: 6px;
-}
-
-
-/* ===================================== */
-/* MOBILDE PILL VE MARKA BASLIGI */
-/* ===================================== */
-
-@media (max-width: 640px) {
-  .brand-title {
-    margin: 2px 0 12px;
-    font-size: 22px;
-    line-height: 1.2;
-  }
-
-  .brand-pill {
-    font-size: 11px;
-    min-height: 26px;
-    padding: 4px 10px;
-    margin-bottom: 8px;
-  }
-
-  .product-top-line {
-    height: 6px;
-  }
-
-  .model-title {
-    font-size: 17px;
-  }
-}
-.brand-title-protherm {
-  color: #e11d48;
-}
-.brand-pill-protherm {
-  color: #e11d48;
-  background: rgba(225,29,72,0.10);
-  border-color: rgba(225,29,72,0.25);
-}
-.product-top-line-protherm {
-  background: linear-gradient(90deg,#e11d48,#fb7185);
-}
-.admin-product-meta {
+.price-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.admin-meta-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #ffffff;
-}
-
-.admin-meta-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #475569;
-  min-width: 72px;
-}
-
-.admin-meta-value {
-  font-size: 14px;
-  font-weight: 600;
-  color: #0f172a;
-  text-align: right;
-  word-break: break-word;
-}
-
-.admin-meta-brand {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 10px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-}
-
-@media (max-width: 640px) {
-  .admin-meta-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .admin-meta-value {
-    text-align: left;
-  }
-}
-.admin-filter-bar {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
   margin-bottom: 18px;
-  padding: 18px;
 }
 
-.admin-filter-stats {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
+.price-box {
+  background: #ffffff;
+  border: 1px solid #dce5ee;
+  border-radius: 18px;
+  padding: 16px;
+  text-align: center;
+}
+
+.price-box .label {
+  display: block;
   font-size: 14px;
-  color: #0f172a;
+  margin-bottom: 8px;
 }
 
-.admin-filter-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1.2fr;
-  gap: 12px;
+.price-box strong {
+  font-size: 18px;
 }
 
-.admin-filter-grid select,
-.admin-filter-grid input {
-  width: 100%;
-  height: 44px;
-  border: 1px solid #d1d5db;
-  border-radius: 12px;
-  background: #fff;
-  padding: 0 14px;
-  font-size: 14px;
-  color: #111827;
+.orange {
+  color: #ff8a00;
 }
 
-.admin-filter-grid input::placeholder {
+.blue {
+  color: #2764ff;
+}
+
+.gray {
   color: #6b7280;
 }
 
-@media (max-width: 900px) {
-  .admin-filter-grid {
-    grid-template-columns: 1fr 1fr;
-  }
+.green {
+  color: #00917e;
 }
 
-@media (max-width: 640px) {
-  .admin-filter-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-filter-stats {
-    gap: 10px;
-    font-size: 13px;
-  }
-}
-.admin-create-box,
-.admin-bulk-box,
-.admin-manage-box,
-.admin-filter-bar {
-  margin-bottom: 18px;
-  padding: 18px;
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
 }
 
-.admin-box-title {
-  margin: 0 0 14px;
-  font-size: 18px;
+.detail-grid label {
+  display: block;
+  font-size: 14px;
   font-weight: 700;
+  margin-bottom: 6px;
 }
 
-.admin-helper-text {
-  margin: 0 0 12px;
-  font-size: 13px;
-  color: #64748b;
+.label-red {
+  color: #ff4d3d;
 }
 
-.admin-create-grid {
+.label-teal {
+  color: #00917e;
+}
+
+.admin-main-title {
+  margin: 0 0 16px;
+  font-size: 34px;
+}
+
+.admin-create-card,
+.admin-category {
+  background: white;
+  border: 1px solid #dce5ee;
+  border-radius: 22px;
+  padding: 20px;
+  margin-bottom: 22px;
+}
+
+.admin-create-card h2,
+.admin-category-title {
+  margin: 0 0 16px;
+}
+
+.admin-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
-.admin-create-grid input,
-.admin-manage-box input,
-.admin-manage-box select,
-.admin-filter-grid select,
-.admin-filter-grid input {
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  padding: 12px 4px;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
   width: 100%;
-  height: 44px;
-  border: 1px solid #d1d5db;
-  border-radius: 12px;
-  background: #fff;
-  padding: 0 14px;
+  border-collapse: collapse;
+  min-width: 1100px;
+}
+
+.admin-table th,
+.admin-table td {
+  border-bottom: 1px solid #e5ebf1;
+  padding: 12px 10px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.admin-table th {
+  background: #f8fafc;
   font-size: 14px;
-  color: #111827;
 }
 
-.admin-create-actions,
-.admin-bulk-actions,
-.admin-manage-actions {
+.product-info-cell {
+  min-width: 170px;
+}
+
+.row-actions {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.admin-manage-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  margin-bottom: 18px;
-}
-
-.admin-manage-box {
-  display: grid;
-  gap: 12px;
-}
-
-.admin-filter-stats {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-  font-size: 14px;
-  color: #0f172a;
-}
-
-.admin-filter-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1.2fr;
-  gap: 12px;
-}
-
-.admin-mobile-actions {
-  margin-top: 12px;
-  display: flex;
-  justify-content: flex-end;
+  gap: 8px;
 }
 
 @media (max-width: 900px) {
-  .admin-create-grid {
+  .filters,
+  .price-grid,
+  .admin-grid,
+  .detail-grid {
     grid-template-columns: 1fr 1fr;
   }
 
-  .admin-manage-grid,
-  .admin-filter-grid {
-    grid-template-columns: 1fr 1fr;
+  .category-title {
+    font-size: 34px;
+  }
+
+  .brand-title {
+    font-size: 24px;
+  }
+
+  .product-title {
+    font-size: 24px;
   }
 }
 
 @media (max-width: 640px) {
-  .admin-create-grid,
-  .admin-manage-grid,
-  .admin-filter-grid {
+  .page-shell,
+  .admin-shell {
+    padding: 16px 12px 36px;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters,
+  .price-grid,
+  .admin-grid,
+  .detail-grid {
     grid-template-columns: 1fr;
   }
 
-  .admin-filter-stats {
-    gap: 10px;
-    font-size: 13px;
+  .stats {
+    gap: 12px;
+    flex-direction: column;
+  }
+
+  .switch-btn,
+  .admin-btn,
+  .primary-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .category-title {
+    font-size: 28px;
+  }
+
+  .brand-title {
+    font-size: 22px;
+  }
+
+  .product-title {
+    font-size: 22px;
+  }
+
+  .product-card {
+    padding: 16px;
   }
 }
