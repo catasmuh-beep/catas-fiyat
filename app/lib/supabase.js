@@ -1,16 +1,14 @@
-
 import { createClient } from "@supabase/supabase-js";
 
-export function getBrowserSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) throw new Error("Supabase ortam değişkenleri eksik.");
-  return createClient(url, key);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl) {
+  throw new Error("NEXT_PUBLIC_SUPABASE_URL eksik");
 }
 
-export function getServerSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceKey) throw new Error("Server Supabase ortam değişkenleri eksik.");
-  return createClient(url, serviceKey, { auth: { persistSession: false } });
+if (!supabaseAnonKey) {
+  throw new Error("NEXT_PUBLIC_SUPABASE_ANON_KEY eksik");
 }
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
