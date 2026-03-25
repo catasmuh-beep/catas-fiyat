@@ -1,8 +1,4 @@
 "use client";
-
-import { useMemo, useState } from "react";
-import { computeDerived, formatMoney, norm } from "../lib/pricing";
-
 function safeText(value) {
   return String(value ?? "").trim();
 }
