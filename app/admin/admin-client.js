@@ -7,7 +7,7 @@ import { computeDerived, formatMoney, norm } from "../lib/pricing";
 function numericFields() {
   return ["alis_fiyati", "puan", "fayda", "montaj_maliyeti"];
 }
-
+ 
 export default function AdminClient({ initialRows }) {
   const [rows, setRows] = useState(initialRows);
   const [savingId, setSavingId] = useState("");
