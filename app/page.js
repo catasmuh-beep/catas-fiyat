@@ -6,7 +6,7 @@ import { supabase } from "./lib/supabase";
 export default function Page() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState("");
-  const [debug, setDebug] = useState("");
+  const [debug, setDebug] = useState("başlamadı");
 
   useEffect(() => {
     loadProducts();
@@ -14,8 +14,7 @@ export default function Page() {
 
   async function loadProducts() {
     try {
-      setError("");
-      setDebug("Bağlantı deneniyor...");
+      setDebug("sorgu başlıyor");
 
       const { data, error } = await supabase
         .from("catas-fiyat-v3")
@@ -24,15 +23,15 @@ export default function Page() {
 
       if (error) {
         setError(error.message);
-        setDebug(JSON.stringify(error, null, 2));
+        setDebug(`supabase error: ${JSON.stringify(error)}`);
         return;
       }
 
       setProducts(data || []);
-      setDebug(`Ürün sayısı: ${(data || []).length}`);
+      setDebug(`ürün sayısı: ${(data || []).length}`);
     } catch (err) {
-      setError(err?.message || "Bilinmeyen hata");
-      setDebug(String(err));
+      setError(err?.message || "bilinmeyen hata");
+      setDebug(`catch: ${String(err)}`);
     }
   }
 
@@ -40,17 +39,15 @@ export default function Page() {
     <main style={{ padding: 40, fontFamily: "Arial, sans-serif" }}>
       <h1>Çataş Fiyat Sistemi</h1>
 
+      <div style={{ marginBottom: 16 }}>
+        <strong>Debug:</strong> {debug}
+      </div>
+
       {error ? (
         <div style={{ color: "red", marginBottom: 20 }}>
           Hata: {error}
         </div>
       ) : null}
-
-      <div style={{ marginBottom: 20, color: "#555" }}>
-        Debug: {debug}
-      </div>
-
-      {products.length === 0 && !error ? <div>Ürün bulunamadı.</div> : null}
 
       {products.map((p) => (
         <div
@@ -68,9 +65,9 @@ export default function Page() {
           </h3>
 
           <div>Kategori: {p.kategori}</div>
-          <div>Güç: {p.guc} kW</div>
-          <div>Alış: {p.alis} ₺</div>
-          <div>Montaj: {p.montaj} ₺</div>
+          <div>Güç: {p.guc}</div>
+          <div>Alış: {p.alis}</div>
+          <div>Montaj: {p.montaj}</div>
           <div>Puan: {p.puan}</div>
           <div>Fayda: {p.fayda}</div>
         </div>
