@@ -61,13 +61,28 @@ function safeCalculatePricing(product) {
   }
 }
 
-const CATEGORY_ORDER = ["Kombi", "Klima", "Şofben", "Elektrikli Kombi"];
+const CATEGORY_ORDER = [
+  "Kombi",
+  "Klima",
+  "Şofben",
+  "Elektrikli Kombi",
+  "Boyler",
+  "Kazan",
+  "Radyatör",
+  "Pompa",
+  "Aksesuar",
+];
 
 const BRAND_ORDER = {
-  Kombi: ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
+  Kombi: ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan",  "Ferroli", "Warmhaus"],
   Klima: ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Protherm", "Baykan", "Warmhaus"],
   Şofben: ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Daxom"],
   "Elektrikli Kombi": ["Daxom", "ECA"],
+    Boyler: ["Wenta", "APA", "Apamet", "Kodsan", "Baymak", "MIT", "ECA", "Vaillant", "Viessmann", "Bosch", "Buderus"],
+  Kazan: ["Vaillant", "Viessmann", "Bosch", "Buderus", "ECA"],
+  Radyatör: ["Demirdöküm", "ECA", "Baymak"],
+  Pompa: ["Wilo", "Grundfos", "Duca", "Regen", "DAB"],
+  Aksesuar: ["Vaillant", "Demirdöküm", "Baymak", "ECA", "Bosch", "Buderus"],
 };
 
 const EMPTY_NEW_PRODUCT = {
